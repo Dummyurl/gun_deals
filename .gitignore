@@ -1,0 +1,14 @@
+/node_modules
+/public/storage
+/public/.htaccess
+/storage/
+/vendor
+/storage/
+/tests/
+/public/di_sitemap/
+/public/home_tabs_html/
+/.idea
+Homestead.json
+Homestead.yaml
+.env
+
