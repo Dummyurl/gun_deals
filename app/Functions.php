@@ -307,3 +307,28 @@ function getAdminUserTypes()
 
     return $array;
 }
+
+function filterPrice($price)
+{
+    $price = trim($price);
+    $price = str_replace("$", "", $price);
+    $price = str_replace(",", "", $price);
+    $price = trim($price);
+    $price = floatval($price);    
+    return $price;
+}
+
+function getBreadCrumbArr($categoryID, $lastArr = [])
+{
+    $arr = [];
+    $obj = \App\Models\Category::find($categoryID);
+    if($obj)
+    {
+        $arr[] = $obj->title;
+        
+        if($obj->parent_id > 0)
+        $arr = getBreadCrumbArr($obj->parent_id, $arr);
+    }
+    
+    return array_merge($arr,$lastArr);
+}

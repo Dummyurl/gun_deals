@@ -39,6 +39,20 @@
                                 <tr>
                                     <td width="30%"><b>Source: </b></td>
                                     <td width="70%">{{ ($deal->scrapSource) ? $deal->scrapSource->title:"" }}</td>
+                                </tr>                     
+                                
+                                <tr>
+                                    <td width="30%"><b>Category: </b></td>
+                                    <td width="70%">
+                                        @if($deal->category_id > 0)
+                                        @php
+                                            $categories = getBreadCrumbArr($deal->category_id);
+                                        @endphp                                        
+                                        {!! implode(" >> ",$categories) !!}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                 </tr>                                
                                 <tr>
                                     <td width="30%"><b>In Stock: </b></td>
@@ -72,6 +86,25 @@
                                 
                             </table>
                             
+                            @php
+                                $qty_options = $deal->qty_options;
+                                if(!empty($qty_options))
+                                {
+                                    $qty_options = json_decode($qty_options,1);
+                                }
+                            @endphp
+                            
+                            @if(is_array($qty_options) && count($qty_options) > 0)
+                                <h4><b>Quantity Pricing</b></h4>
+                                <table class="table table-bordered">
+                                    @foreach($qty_options as $r)
+                                        <tr>
+                                            <td width="40%"><b>{{ $r['key'] }}</b></td>
+                                            <td width="60%">{{ $r['value'] }}</td>
+                                        </tr>                                
+                                    @endforeach                                
+                                </table>                                                            
+                            @endif                            
                             @if($deal->dealSpecifications && count($deal->dealSpecifications))
                             <h4><b>Deal Specifications</b></h4>
                             <table class="table table-bordered">

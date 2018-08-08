@@ -44,6 +44,23 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        // $pageURL  = \App\Custom::getCurrentUrl();
+        // $errorMessage = $exception->getMessage();        
+        // $filePath = $exception->getFile();
+        // $lineNumber = $exception->getLine();
+        // $errorClass = get_class($exception);
+        // $ip = \App\Custom::GetUserIp();        
+
+
+        // $content = "<p><b>Error Class:</b> $errorClass</p>";
+        // $content .= "<p><b>Error Message:</b> $errorMessage</p>";
+        // $content .= "<p><b>Error ON File:</b> $filePath</p>";
+        // $content .= "<p><b>Error in line number:</b> $lineNumber</p>";        
+
+        // echo $content;
+        // exit;
+
+
         return parent::render($request, $exception);
     }
 

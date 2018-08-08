@@ -398,6 +398,19 @@ class Scrapping {
             }
 
                         
+            session(["tmp_categories" => []]);
+            if($crawler->filter("ul.breadcrumbs li.breadcrumb")->count() > 0)
+            {
+               $crawler->filter("ul.breadcrumbs li.breadcrumb")->each(function($li){
+                   if(trim(strtolower($li->text())) != "home" && trim(strtolower($li->text())) != strtolower("HOT Deals"))
+                   {
+                       $categories = session("tmp_categories");
+                       $categories[] = trim($li->text());
+                       session(["tmp_categories" => $categories]);
+                   }
+               }); 
+            }
+
             $rows = session("rows");            
             $rows['out_of_stock'] = $out_of_stock;
             $rows['image'] = "";
@@ -418,6 +431,7 @@ class Scrapping {
             
             $rows['images'] = session("tmp_images");
             $rows['specification'] = session("tmp_options");            
+            $rows['categories'] = session("tmp_categories");
             session(["rows" => $rows]);
         }
         else if($type == "primaryarms")
@@ -531,6 +545,12 @@ class Scrapping {
             {
                 $out_of_stock = 1;
             }
+            
+            if($old_price == 0 && $special_price == 0 && $crawler->filter(".item-views-price-lead-p .item-views-price-lead")->count() > 0)
+            {
+                $tmp = $crawler->filter(".item-views-price-lead-p .item-views-price-lead")->first()->text();
+                $old_price = filterPrice($tmp);
+            }
                         
             $rows = session("rows");            
             $rows['out_of_stock'] = $out_of_stock;
@@ -598,31 +618,6 @@ class Scrapping {
                 $description = trim($crawler->filter("#producttabDescription")->html());
             }
 
-            if($crawler->filter('#price.prc p.prc')->count() > 0)
-            {
-                $special_price = trim($crawler->filter('#price.prc p.prc')->text());
-                $special_price = str_replace("$", "", $special_price);
-                $special_price = trim($special_price);
-                $special_price = floatval($special_price);
-            }
-            else if($crawler->filter('#priceContainer .prc .sale')->count() > 0)
-            {
-                $special_price = trim($crawler->filter('#priceContainer .prc .sale')->text());
-                $special_price = str_replace("$", "", $special_price);
-                $special_price = trim($special_price);
-                $special_price = floatval($special_price);
-            }
-
-            if($crawler->filter('#priceContainer .prc .strike')->count() > 0)
-            {
-                $old_price = trim($crawler->filter('#priceContainer .prc .strike')->text());
-                $old_price = str_replace("$", "", $old_price);
-                $old_price = trim($old_price);
-                $old_price = floatval($old_price);
-            }
-
-
-
             session(["tmp_images" => []]);     
 
             if($crawler->filter(".bxslider li")->count() > 0)
@@ -651,21 +646,18 @@ class Scrapping {
                 {
                     foreach($jsonData as $key => $val)
                     {
-                        if(isset($jsonData[$key]['LoadSKUSpecificInfo']['PriceText']))
+                        if(isset($jsonData[$key]['LoadSKUSpecificInfo']['PriceText']) && $old_price == 0)
                         {
                             $html = $jsonData[$key]['LoadSKUSpecificInfo']['PriceText'];
                             preg_match_all("/<span class='strike'>(.*?)<\/span>/s", $html, $matches);
 
-
                             if(isset($matches[1][0]))
                             {
                                 $old_price = trim($matches[1][0]);
-                                $old_price = str_replace("$", "", $old_price);
-                                $old_price = trim($old_price);
-                                $old_price = floatval($old_price);
+                                $old_price = filterPrice($old_price);
                             }
                         }
-
+                        
                         if(isset($jsonData[$key]['Attributes']))
                         {
                             foreach($jsonData[$key]['Attributes'] as $r)
@@ -701,18 +693,80 @@ class Scrapping {
                         $out_of_stock = 1;
                     }
                 }
-            }    
+            }
+            
+            
+            if($crawler->filter('#price.prc p.prc')->count() > 0)
+            {
+                $special_price = trim($crawler->filter('#price.prc p.prc')->text());
+                $special_price = filterPrice($special_price);
+            }            
 
             if($old_price == 0)
             {
                 if($crawler->filter('#priceContainer .prc p')->count() > 0)
                 {
                     $old_price = trim($crawler->filter('priceContainer .prc p')->text());
-                    $old_price = str_replace("$", "", $old_price);
-                    $old_price = trim($old_price);
-                    $old_price = floatval($old_price);
+                    $old_price = filterPrice($old_price);
                 }
-            }        
+            }       
+            
+            if($old_price == 0 && $special_price == 0)
+            {
+                if($crawler->filter('#priceContainer .prc .sale')->count() > 0)
+                {
+                    $special_price = trim($crawler->filter('#priceContainer .prc .sale')->first()->text());
+                    $special_price = filterPrice($special_price);
+                }
+
+                if($crawler->filter('#priceContainer .prc .strike')->count() > 0)
+                {
+                    $old_price = trim($crawler->filter('#priceContainer .prc .strike')->first()->text());
+                    $old_price = filterPrice($old_price);
+                }                
+            }
+            
+            if($crawler->filter(".wrap#wrap")->count() > 1)
+            {
+               if($crawler->filter(".wrap#wrap")->first()->filter("#priceContainer .prc .sale")->count())
+               {
+                    $special_price = trim($crawler->filter(".wrap#wrap")->first()->filter("#priceContainer .prc .sale")->text());
+                    $special_price = filterPrice($special_price);
+                    
+                    if($crawler->filter(".wrap#wrap")->first()->filter("#priceContainer .prc .strike")->count())
+                    {
+                        $old_price = trim($crawler->filter(".wrap#wrap")->first()->filter("#priceContainer .prc .strike")->text());
+                        $old_price = filterPrice($old_price);
+                    }                                   
+               }
+               else if($crawler->filter(".wrap#wrap")->first()->filter("#priceContainer p.prc")->count())
+               {
+                  $old_price = trim($crawler->filter(".wrap#wrap")->first()->filter("#priceContainer p.prc")->text()); 
+                  $old_price = filterPrice($old_price);
+                  $special_price = 0;                  
+               } 
+            }
+            
+            if($old_price == 0 && $special_price == 0 && $crawler->filter("#priceContainer p.prc")->count() > 0)
+            {
+                $tmp = trim($crawler->filter("#priceContainer p.prc")->first()->text());
+                $old_price = filterPrice($tmp);
+            }
+            
+            
+            session(["tmp_categories" => []]);
+            if($crawler->filter(".breadCrumb.mbl ul li")->count() > 0)
+            {
+               $crawler->filter(".breadCrumb.mbl ul li")->each(function($li){
+                   if(trim(strtolower($li->text())) != "home")
+                   {
+                       $categories = session("tmp_categories");
+                       $categories[] = $li->text();
+                       session(["tmp_categories" => $categories]);
+                   }
+               }); 
+            }
+            
                         
             $rows = session("rows");            
             $rows['out_of_stock'] = $out_of_stock;
@@ -733,10 +787,489 @@ class Scrapping {
             }
             
             $rows['images'] = session("tmp_images");
-            $rows['specification'] = session("tmp_options");
+            $rows['specification'] = session("tmp_options");            
+            $rows['categories'] = session("tmp_categories");
             session(["rows" => $rows]);            
         }             
+        else if($type == "sgammo_count")
+        {
+            if($crawler->filter('.pager-last.last a')->count() > 0)
+            {
+                $text = $crawler->filter('.pager-last.last a')->first()->attr("href");
+                $text = explode("page=", trim($text));
 
+                if(isset($text[1]))
+                    return intval($text[1]);
+                else
+                    return 0;
+            }
+
+            return 0;
+            
+        }        
+        else if($type == "sgammo")
+        {
+            if($crawler->filter(".views-view-grid tr")->count() >0 )
+            {
+                $crawler->filter(".views-view-grid tr")->each(function($tr){                    
+                        $tr->filter("td")->each(function($td){
+                            $rows = session("rows");
+                            $link = "https://www.sgammo.com".$td->filter("a")->first()->attr("href");
+                            if(!empty($link))
+                            {
+                                $rows[] = $link;    
+                                session(["rows" => $rows]);
+                            }                            
+                        });
+                });
+            }            
+        }        
+        else if($type == "sgammo_detail")
+        {
+            $base_image = "";
+            $name = "";
+            $description = "";
+            $reviewCount = 0;
+            $stars = 0;
+            $old_price = 0;
+            $special_price = 0;
+            $ext_date = null;
+            
+            if($crawler->filter("h1.title")->count() > 0)
+            {
+                $name = trim($crawler->filter("h1.title")->text());
+            }
+            
+            if($crawler->filter("#content-body .product-body")->count() > 0)
+            {
+                $description = trim($crawler->filter("#content-body .product-body")->html());
+            }
+            
+            if($crawler->filter("#product-details .uc-price-product")->count() > 0)
+            {
+                $old_price = trim($crawler->filter("#product-details .uc-price-product")->first()->text());
+                $old_price = filterPrice($old_price);
+            }
+            
+            session(["tmp_options" => []]);
+            if($crawler->filter("#product-details .product-info.model")->count() > 0)
+            {
+                $tmp = trim($crawler->filter("#product-details .product-info.model")->first()->text());
+                $tmp = str_replace('sku:', '', strtolower($tmp));
+                $tmp = trim($tmp);
+                if(!empty($tmp))
+                {
+                    $tmp_options = session("tmp_options");
+                    $tmp_options[] = ["key" => "SKU", "value" => $tmp];
+                    session(["tmp_options" => $tmp_options]);                    
+                }
+            }         
+            
+            session(["tmp_qty_options" => []]);
+            if($crawler->filter(".quantity-table")->count() > 0)
+            {
+               $crawler->filter(".quantity-table tr")->each(function($tr){
+                   if($tr->filter("td")->count() > 0)
+                   {
+                       if(trim($tr->filter("td")->first()->text()) == "QUANTITY PRICING")
+                       {
+                           // skip
+                       }
+                       else
+                       {
+                            $key = $tr->filter("td")->first()->text();
+                            $value = $tr->filter("td")->last()->text();                            
+                            if(!empty($key) && !empty($value) && $value != $key)
+                            {
+                                $tmp_options = session("tmp_qty_options");
+                                $tmp_options[] = ["key" => $key, "value" => $value];
+                                session(["tmp_qty_options" => $tmp_options]);                                                                               
+                            }
+                       }
+                   }
+                   
+               }); 
+            }
+            
+            session(["tmp_images" => []]);     
+
+            if($crawler->filter("#product-thumb a")->count() > 0)
+            {                
+                $crawler->filter("#product-thumb a")->each(function ($row){                                        
+                    $image = $row->attr("rel");                    
+                    if(!empty($image))
+                    {
+                        $image = str_replace("/product_list/", "/product_full/", $image);
+                        $tmp_images = session("tmp_images");
+                        $tmp_images[] = ["image" => $image];
+                        session(["tmp_images" => $tmp_images]);
+                    }                    
+                });
+            }  
+            else if($crawler->filter(".image .product-image a")->count() > 0)
+            {
+                $image = $crawler->filter(".image .product-image a")->attr("href");
+                $image = str_replace("/product_list/", "/product_full/", $image);
+                if(!empty($image))
+                {
+                    $tmp_images = session("tmp_images");
+                    $tmp_images[] = ["image" => $image];
+                    session(["tmp_images" => $tmp_images]);
+                }                                    
+            }
+
+            session(["tmp_categories" => []]);
+            if($crawler->filter(".breadcrumb a")->count() > 0)
+            {
+               $crawler->filter(".breadcrumb a")->each(function($li){
+                   if(trim(strtolower($li->text())) != "home" && trim(strtolower($li->text())) != "catalog")
+                   {
+                       $categories = session("tmp_categories");
+                       $categories[] = $li->text();
+                       session(["tmp_categories" => $categories]);
+                   }
+               }); 
+            }
+
+         
+            $rows = session("rows");            
+            $rows['out_of_stock'] = 0;
+            $rows['image'] = "";
+            $rows['name'] = $name;
+            $rows['description'] = $description;
+            $rows['special_price'] = $special_price;
+            $rows['old_price'] = $old_price;
+            $rows['ext_date'] = $ext_date;
+
+            if($old_price >0 && $special_price > 0)
+            {
+                $rows['saving_price'] = $old_price - $special_price;
+            }
+            else
+            {
+                $rows['saving_price'] = 0;
+            }
+            
+            $rows['images'] = session("tmp_images");
+            $rows['specification'] = session("tmp_options");
+            $rows['qty_options'] = session("tmp_qty_options");            
+            $rows['categories'] = session("tmp_categories");
+            session(["rows" => $rows]);
+
+        }     
+        else if($type == "righttobear_deals")
+        {
+            if($crawler->filter("#content_area .deal")->count() >0 )
+            {
+                $crawler->filter("#content_area .deal")->each(function($row){
+
+                        if($row->filter(".deal-product-name a")->count() > 0)
+                        {
+                            $rows = session("rows");
+                            $link = $row->filter(".deal-product-name a")->attr("href");
+                            if(!empty($link))
+                            {
+                                $rows[] = $link;    
+                                session(["rows" => $rows]);
+                            }
+                        }    
+                });
+            }
+        }           
+        else if($type == "righttobear_sales")
+        {
+            if($crawler->filter(".v-product-grid .v-product")->count() >0 )
+            {
+                $crawler->filter(".v-product-grid .v-product")->each(function($row){
+
+                        if($row->filter("a")->count() > 0)
+                        {
+                            $rows = session("rows");
+                            $link = $row->filter("a")->attr("href");
+                            if(!empty($link))
+                            {
+                                $rows[] = $link;    
+                                session(["rows" => $rows]);
+                            }
+                        }    
+                });
+            }
+        }           
+        else if($type == "righttobear_detail")
+        {
+            $base_image = "";
+            $name = "";
+            $description = "";
+            $reviewCount = 0;
+            $stars = 0;
+            $old_price = 0;
+            $special_price = 0;
+            $ext_date = null;
+            
+            if($crawler->filter("#content_area span[itemprop='name']")->count() > 0)
+            {
+                $name = trim($crawler->filter("#content_area span[itemprop='name']")->text());
+            }
+            
+            if($crawler->filter("#ProductDetail_ProductDetails_div #product_description")->count() > 0)
+            {
+                $description = trim($crawler->filter("#ProductDetail_ProductDetails_div #product_description")->html());
+            }
+            
+            if($crawler->filter("#content_area .product_productprice span[itemprop='price']")->count() > 0)
+            {
+                $old_price = trim($crawler->filter("#content_area .product_productprice span[itemprop='price']")->first()->text());
+                $old_price = filterPrice($old_price);
+            }
+
+            if($crawler->filter("#content_area .product_dealprice span[itemprop='price']")->count() > 0)
+            {
+                $special_price = trim($crawler->filter("#content_area .product_dealprice span[itemprop='price']")->first()->text());
+                $special_price = filterPrice($special_price);
+            }
+            
+            session(["tmp_options" => []]);
+            if($crawler->filter("#content_area .product_code")->count() > 0)
+            {
+                $tmp = trim($crawler->filter("#content_area .product_code")->first()->text());
+                if(!empty($tmp))
+                {
+                    $tmp_options = session("tmp_options");
+                    $tmp_options[] = ["key" => "Product Code", "value" => $tmp];
+                    session(["tmp_options" => $tmp_options]);                    
+                }
+            }         
+            
+            session(["tmp_images" => []]);     
+
+            if($crawler->filter("#altviews a")->count() > 0)
+            {                
+                $crawler->filter("#altviews a")->each(function ($row){                                        
+                    $image = $row->attr("href");                    
+                    if(!empty($image))
+                    {
+                        $tmp_images = session("tmp_images");
+                        $tmp_images[] = ["image" => $image];
+                        session(["tmp_images" => $tmp_images]);
+                    }                    
+                });
+            }  
+            else if($crawler->filter("#product_photo_zoom_url")->count() > 0)
+            {
+                $image = $crawler->filter("#product_photo_zoom_url")->first()->attr("href");
+                if(!empty($image))
+                {
+                    $tmp_images = session("tmp_images");
+                    $tmp_images[] = ["image" => $image];
+                    session(["tmp_images" => $tmp_images]);
+                }                
+            }
+
+            $out_of_stock = 0;
+            if($crawler->filter("#content_area .outofstock")->count() > 0)
+            {
+                $out_of_stock = 1;
+            }
+
+            if($old_price == 0 && $special_price == 0)
+            {
+                if($crawler->filter(".colors_pricebox .product_productprice")->count() > 0)
+                {
+                    $tmp = trim($crawler->filter(".colors_pricebox .product_productprice")->text());
+                    $tmp = str_replace("MSRP", "", $tmp);
+                    $tmp = trim($tmp);
+                    $old_price = filterPrice($tmp);
+                }
+                if($crawler->filter(".colors_pricebox .product_saleprice")->count() > 0)
+                {
+                    $tmp = trim($crawler->filter(".colors_pricebox .product_saleprice")->text());
+                    $tmp = str_replace("SALE PRICE:", "", $tmp);
+                    $tmp = trim($tmp);
+                    $special_price = filterPrice($tmp);
+                }
+            }            
+         
+            $rows = session("rows");            
+            $rows['out_of_stock'] = $out_of_stock;
+            $rows['image'] = "";
+            $rows['name'] = $name;
+            $rows['description'] = $description;
+            $rows['special_price'] = $special_price;
+            $rows['old_price'] = $old_price;
+            $rows['ext_date'] = $ext_date;
+
+            if($old_price >0 && $special_price > 0)
+            {
+                $rows['saving_price'] = $old_price - $special_price;
+            }
+            else
+            {
+                $rows['saving_price'] = 0;
+            }
+            
+            $rows['images'] = session("tmp_images");
+            $rows['specification'] = session("tmp_options");
+            $rows['qty_options'] = session("tmp_qty_options");            
+            $rows['categories'] = session("tmp_categories");
+            session(["rows" => $rows]);
+        }
+        else if($type == "preppergunshop_count")
+        {
+            if($crawler->filter('.pager .amount')->count() > 0)
+            {
+                $text = $crawler->filter('.pager .amount')->first()->text();
+                $text = explode("of", trim($text));
+
+                if(isset($text[1]))
+                {
+                    $pages = str_replace("total", "", $text[1]);
+                    $pages = intval($pages);
+                    $perPage = 150;
+
+                    if($pages > 0)
+                    return ceil($pages/$perPage);
+
+                }
+                else
+                    return 0;
+            }
+
+            return 0;
+        }
+        else if($type  == "preppergunshop")
+        {
+            if($crawler->filter("ul.products-grid")->count() >0 )
+            {
+                $crawler->filter("ul.products-grid")->each(function($row){
+                    if($row->filter(".item")->count() > 0)
+                    {       
+                            $row->filter(".item")->each(function($li){
+                                    if($li->filter("a")->count() > 0)
+                                    {
+                                        $rows = session("rows");
+                                        $link = $li->filter("a")->first()->attr("href");
+                                        if(!empty($link))
+                                        {
+                                            $rows[] = $link;    
+                                            session(["rows" => $rows]);
+                                        }
+                                    }    
+                            });
+                    }    
+                });
+            }
+        }
+        else if($type  == "preppergunshop_detail")
+        {
+            $base_image = "";
+            $name = "";
+            $description = "";
+            $reviewCount = 0;
+            $stars = 0;
+            $old_price = 0;
+            $special_price = 0;
+            $ext_date = null;
+            
+            if($crawler->filter(".product-name h1")->count() > 0)
+            {
+                $name = trim($crawler->filter(".product-name h1")->text());
+            }
+            
+            if($crawler->filter(".box-collateral.box-description .box-collateral-content .std")->count() > 0)
+            {
+                $description = trim($crawler->filter(".box-collateral.box-description .box-collateral-content .std")->html());
+            }
+            
+            if($crawler->filter(".product-view .old-price .price")->count() > 0)
+            {
+                $old_price = trim($crawler->filter(".product-view .old-price .price")->first()->text());
+                $old_price = filterPrice($old_price);
+            }
+            else if($crawler->filter(".regular-price .price")->count() > 0)
+            {
+                $old_price = trim($crawler->filter(".regular-price .price")->first()->text());
+                $old_price = filterPrice($old_price);
+            }
+
+            if($crawler->filter(".product-view .special-price .price")->count() > 0)
+            {
+                $special_price = trim($crawler->filter(".product-view .special-price .price")->first()->text());
+                $special_price = filterPrice($special_price);
+            }
+            
+            session(["tmp_options" => []]);
+            if($crawler->filter("#product-attribute-specs-table tr")->count() > 0)
+            {
+                $crawler->filter("#product-attribute-specs-table tr")->each(function($tr){
+                    if($tr->filter("th.label")->count() > 0 && $tr->filter("td.data")->count() > 0)
+                    {
+                         if($tr->filter("td.data .embed-responsive")->count() > 0 )
+                         {
+                            // do nothing
+                         }   
+                         else
+                         {
+                            $key = trim($tr->filter("th.label")->text());
+                            $val = trim($tr->filter("td.data")->text());
+
+                            if(!empty($key) && !empty($val))
+                            {
+                                $tmp_options = session("tmp_options");
+                                $tmp_options[] = ["key" => $key, "value" => $val];
+                                session(["tmp_options" => $tmp_options]);
+                            }                                                    
+
+                         }
+                    }
+                });
+            }         
+            
+            session(["tmp_images" => []]);     
+
+            if($crawler->filter(".my-gallery a.gallery-thumbnail")->count() > 0)
+            {                
+                $crawler->filter(".my-gallery a.gallery-thumbnail")->each(function ($row){                                        
+                    $image = $row->attr("href");                    
+                    if(!empty($image))
+                    {
+                        $tmp_images = session("tmp_images");
+                        $tmp_images[] = ["image" => $image];
+                        session(["tmp_images" => $tmp_images]);
+                    }                    
+                });
+            }  
+
+            $out_of_stock = 0;
+            if($crawler->filter(".availability.out-of-stock")->count() > 0)
+            {
+                $out_of_stock = 1;
+            }
+
+         
+            $rows = session("rows");            
+            $rows['out_of_stock'] = $out_of_stock;
+            $rows['image'] = "";
+            $rows['name'] = $name;
+            $rows['description'] = $description;
+            $rows['special_price'] = $special_price;
+            $rows['old_price'] = $old_price;
+            $rows['ext_date'] = $ext_date;
+
+            if($old_price >0 && $special_price > 0)
+            {
+                $rows['saving_price'] = $old_price - $special_price;
+            }
+            else
+            {
+                $rows['saving_price'] = 0;
+            }
+            
+            $rows['images'] = session("tmp_images");
+            $rows['specification'] = session("tmp_options");
+            $rows['qty_options'] = session("tmp_qty_options");            
+            $rows['categories'] = session("tmp_categories");
+            session(["rows" => $rows]);
+        }        
         return session("rows");
     }
 }

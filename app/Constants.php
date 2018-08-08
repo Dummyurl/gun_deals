@@ -15,3 +15,4 @@ define("TBL_STATE","states");
 define("TBL_CITY","cities");
 define("TBL_DEALS","deals");
 define("TBL_DEAL_SOURCE","scrap_sources");
+define("TBL_CATEGORY","categories");
