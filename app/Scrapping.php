@@ -11,6 +11,126 @@ use Goutte\Client;
  */
 class Scrapping {
 
+    public static function scrapSale($type, $pageURL)
+    {
+        $client = new Client();
+        $guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false)));
+        $client->setClient($guzzleClient);
+
+        $options = array('request.options' => array(
+                'proxy' => 'socks5://127.0.0.1:9050',
+        ));
+
+        $IS_TOR = \Config::get('app.IS_TOR');
+
+        if ($IS_TOR == 1)
+        {
+            $crawler = $client->request('GET', $pageURL, $options);
+        }
+        else
+        {
+            $crawler = $client->request('GET', $pageURL);
+        }
+        
+        session(["temp_rows" => []]);
+
+        if($type == "dentaltown_master")
+        {
+            if($crawler->filter(".container-fluid .row.boxRow")->count() > 0)
+            {
+                $crawler->filter(".container-fluid .row.boxRow")->each(function($row){                        
+
+                        if($row->filter(".linkTitle a")->count())
+                        {
+                            $data = session("temp_rows");
+
+                            $title = $row->filter(".linkTitle a")->text();
+                            $website = $row->filter(".linkTitle a")->attr("href");
+
+                            if(!empty($website))
+                            {
+                                $data[] = array("title"=>$title,"link"=>$website);
+                                session(["temp_rows" => $data]);        
+                            }
+                        }
+                });
+            }    
+        }        
+        else if($type == "dentaltown_detail")
+        {
+            // echo "count: ".$crawler->filter(".ClassifiedDetailsForm")->count();
+
+            if($crawler->filter(".ClassifiedDetailsForm")->count() > 0)
+            {
+                session(["tmp_labels" => []]);
+                $crawler->filter(".ClassifiedDetailsForm .formlabel")->each(function($row){                        
+
+                    $className = trim($row->attr("class"));
+
+                    // echo "\n".$className;
+
+                    if (strpos($className, 'hidden-xs-up') !== false)
+                    {
+                        // do nothing for now
+                    }
+                    else
+                    {
+                        $label = trim($row->text());
+                        if(true)
+                        {
+                            $data = session("tmp_labels");
+                            $data[] = $label;
+                            session(["tmp_labels" => $data]);
+                        }
+                    }
+                });
+
+                session(["tmp_values" => []]);
+                $crawler->filter(".container-fluid .col-sm-8")->each(function($row){                        
+
+                    $className = trim($row->attr("class"));
+                    if (strpos($className, 'hidden-xs-up') !== false)
+                    {
+                        // do nothing for now
+                    }
+                    else
+                    {
+                        $label = trim($row->text());
+                        if(true)
+                        {
+                            $data = session("tmp_values");
+                            $data[] = $label;
+                            session(["tmp_values" => $data]);
+                        }
+                    }
+                });
+
+                $tmp_labels = session("tmp_labels");
+                $tmp_values = session("tmp_values");
+
+                $rows = [];
+
+                if(count($tmp_labels) > 0)
+                {
+                    foreach($tmp_labels as $key => $val)
+                    {
+                        if(isset($tmp_values[$key]))
+                        {
+                            $rows[$tmp_labels[$key]] = $tmp_values[$key];
+                        }
+                    }
+                }
+
+                
+
+                session(["temp_rows" => $rows]);
+            }    
+        }
+
+        return session("temp_rows");
+    }
+
+
     public static function deal_scraps($type, $pageURL)
     {
         session(["rows" => []]);
