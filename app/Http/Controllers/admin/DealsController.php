@@ -110,9 +110,17 @@ class DealsController extends Controller {
                         ->filter(function ($query) {                            
                             $search_title = request()->get("search_title");
                             $source_id = request()->get("source_id");
+                            $search_product_id = request()->get("search_product_id");
+                            
                             if (!empty($search_title)) {
                                 $query = $query->where(TBL_DEALS.".title", 'LIKE', '%' . $search_title . '%');
                             }
+
+                            if($search_product_id > 0)
+                            {
+                                $query = $query->where(TBL_DEALS.".product_id", $search_product_id);
+                            }
+
                             if (!empty($source_id)) {
                                 $query = $query->where(TBL_DEALS.".source_id", $source_id);
                             }

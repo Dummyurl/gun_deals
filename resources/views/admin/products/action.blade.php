@@ -17,5 +17,11 @@
         <i class="fa fa-eye"></i>
     </a>          
     @endif            
+
+    @if($isDeals)
+    <a target="_blank" data-id="{{ $row->id }}" href="{{ url("admin/deals?search_product_id=".$row->id) }}" class="btn btn-xs btn-success" title="View Deals">
+        <i class="fa fa-list"></i>
+    </a>          
+    @endif            
 </div>
 </center>

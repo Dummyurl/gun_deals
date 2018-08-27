@@ -44,12 +44,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        // $pageURL  = \App\Custom::getCurrentUrl();
+
         // $errorMessage = $exception->getMessage();        
         // $filePath = $exception->getFile();
         // $lineNumber = $exception->getLine();
         // $errorClass = get_class($exception);
-        // $ip = \App\Custom::GetUserIp();        
+        // // $ip = \App\Custom::GetUserIp();        
 
 
         // $content = "<p><b>Error Class:</b> $errorClass</p>";

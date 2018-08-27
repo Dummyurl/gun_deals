@@ -3,6 +3,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Models\Product;
+use App\Migration;
+use App\Scrapping;
 
 class MigrationDeals extends Command
 {
@@ -11,14 +14,14 @@ class MigrationDeals extends Command
      *
      * @var string
      */
-    protected $signature = 'migrate:deals';
+    protected $signature = 'migrate:deals {type}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create deals from master products';
+    protected $description = 'Deals/Products Migration';
 
     /**
      * Create a new command instance.
@@ -30,33 +33,18 @@ class MigrationDeals extends Command
         parent::__construct();
     }
 
-    public function handle()
-    {        
-        $this->createProducts();
-        // $this->downloadProductImages();
-        // $this->scrapGunDetails();
-
-    }   
-
+    /**
+     * Scrap Detail Page Of Gallery Of Guns
+     *
+     */
     public function scrapGunDetails()
     {
-       $links = [];
-       $sql = 'SELECT link FROM products WHERE product_id IN ("GR-047700852010","GR-725327616337","GR-736676067589","GR-736676072163","GR-787450431683","GR-806703064895");';
-
-       $rows = \DB::select($sql); 
-       foreach($rows as $row)
-       {
-            $links[] = $row->link;
-            // $links[] = "https://www.galleryofguns.com/genie/Default.aspx?item=HG4068B-N&zipcode=49464";
-       } 
-
        $i = 0;
        $offset = 0;
        $limit = 100;
        while(true)
        {
             $rows = \DB::table("galleryofguns")                    
-                    ->whereIn("link",$links)
                     ->limit($limit)
                     ->offset($offset)
                     ->get();
@@ -71,9 +59,7 @@ class MigrationDeals extends Command
 
                     echo "\nPage URL: ".$link;                    
 
-                    $data = \App\Scrapping::scrapGuns($link, "detail");
-                    // print_r($data);
-                    // exit;
+                    $data = Scrapping::scrapGuns($link, "detail");
 
                     if(count(array_keys($data)) > 0 )
                     {
@@ -102,213 +88,153 @@ class MigrationDeals extends Command
        }
     }
 
-    public function downloadProductImages()
+    /**
+     * Scrap Master Links Of Gallery Of Guns
+     *
+     */
+    public function scrapGuns($link, $type)
     {
-       $public_path = "/home/reaper/public_html/"; 
-       $public_path = public_path();
+        $url = $link;
+        $page = 0;
+        $counter = 0;
+        $flag = true;
+        while($flag)
+        {
+            $pageUrl = $url;
 
-       $i = 0;
-       $offset = 0;
-       $limit = 100;
+            if($page > 0)
+            $pageUrl = $url."&index=$page";
 
-       while(true)
-       {
-            $rows = \DB::table("products")
-                    ->limit($limit)
-                    ->offset($offset)
-                    ->get();
+            $rows = Scrapping::scrapGuns($pageUrl, "master");
 
-            $offset = $offset + $limit;
-
-            if($rows && count($rows))
-            {
-                foreach($rows as $row)
-                {                    
-                    $url_to_image = $row->image;
-                    if(!empty($url_to_image))
-                    {
-                        echo "\nImage: ".$url_to_image;
-                        $my_save_dir = $public_path.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."products".DIRECTORY_SEPARATOR.$row->id.DIRECTORY_SEPARATOR;
-                        echo "\nPath: ".$my_save_dir;
-                        makeDir($my_save_dir);
-                        $filename = basename($url_to_image);
-                        $complete_save_loc = $my_save_dir . $filename;
-                        file_put_contents($complete_save_loc, file_get_contents($url_to_image));
-                    }
-
-                    $url_to_image = $row->thumb_image;
-                    if(!empty($url_to_image))
-                    {
-                        echo "\nImage: ".$url_to_image;
-                        $my_save_dir = $public_path.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."products".DIRECTORY_SEPARATOR.$row->id.DIRECTORY_SEPARATOR;
-                        echo "\nPath: ".$my_save_dir;
-                        makeDir($my_save_dir);
-                        $filename = "thumb_".basename($url_to_image);
-                        $complete_save_loc = $my_save_dir . $filename;
-                        file_put_contents($complete_save_loc, file_get_contents($url_to_image));
-                    }
-                    
-                    $i++;
-                    echo "\n".$i; 
-                                         
-                }   
-            }
-            else
-            {
-                break;
-            }    
-       }
-    }
-
-    public function createProducts()
-    {
-       $i = 0;
-       $offset = 0;
-       $limit = 100;
-       while(true)
-       {
-            $rows = \DB::table("galleryofguns")
-                    ->limit($limit)
-                    ->offset($offset)
-                    ->get();
-
-            $offset = $offset + $limit;
-
-            if($rows && count($rows))
+            if(is_array($rows) && count($rows) > 0)
             {
                 foreach($rows as $row)
                 {
-                    $item_id = $row->item_id;
-                    $category = $row->category;
-                    $title = $row->title;
-                    $link = $row->link;
-                    $link_md5 = $row->link_md5;
-                    $image = $row->image;
-                    $thumb_image = $row->thumb_image;
-                    $item_unique_id = $row->item_unique_id;
-                    $msrp = $row->msrp;
-                    $attr = $row->attr;
-                    $upc_number = $brand = $model = "";
+                    $title = trim($row['title']);
+                    $link = trim($row['link']);
+                    $itemID = $row['itemID'];
+                    $linkMD5 = md5($itemID);
 
-                    $dataToInsertAttr = [];
-
-                    $notMapped = [
-                        "UPC","Brand","Model","Item #","Description"
-                    ];
-
-                    echo "\nLink: ".$link;
-
-                    if(!empty($attr))
+                    if(!empty($itemID))
                     {
-                        $attr = json_decode($attr,1);
-                        // print_r($attr);
-                        // exit;
-                        foreach($attr as $r)
+                        $existObj = DB::table("galleryofguns")->where("link_md5",$linkMD5)->first();
+                        if(!$existObj)
                         {
-                            $r['key'] = explode(":", $r['key']);
-                            $r['key'] = trim($r['key'][0]);
-
-                            if($r['key'] == "UPC:\u00a0" || $r['key'] == "UPC")
-                            {
-                                $upc_number = $r['val'];
-                            }
-                            else if($r['key'] == "Brand:\u00a0" || $r['key'] == "Brand")
-                            {
-                                $brand = $r['val'];
-                            }
-                            else if($r['key'] == "Model:\u00a0" || $r['key'] == "Model")
-                            {
-                                $model = $r['val'];
-                            }
-
-                            if(!in_array($r['key'], $notMapped))
-                            {
-                                $dataToInsertAttr[] = [
-                                    "key" => $r['key'],
-                                    "val" => $r['val']
-                                ];
-                            }
-                        }                            
-                    }
-
-                    $title = $brand." ".$model;                    
-
-                    $product_id = null;
-
-                    if(!empty($upc_number))
-                    $product_id = "GR-".$upc_number;
-                    
-                    // echo "\nUPC: ".$upc_number;
-                    // echo "\nBrand: ".$brand;
-                    // echo "\nModel: ".$model;                
-                    // exit;                    
-                    // continue;
-
-                    $dataToInsert = 
-                    [
-                        "product_id" => $product_id,
-                        "item_id" => $item_id,
-                        "category" => $category,
-                        "title" => $title,
-                        "link" => $link,
-                        "link_md5" => $link_md5,
-                        "image" => $image,
-                        "thumb_image" => $thumb_image,
-                        "item_unique_id" => $item_id,
-                        "brand" => $brand,
-                        "model" => $model,
-                        "upc_number" => $upc_number,
-                        "msrp" => $msrp,                        
-                        "created_at" => date("Y-m-d H:i:s")
-                    ];
-
-                    // print_r($dataToInsert);
-                    // print_r($dataToInsertAttr);
-                    // exit;
-
-                    $product = \DB::table("products")
-                                ->where("link",$link)
-                                ->first();
-
-                    if($product)
-                    {
-                        $productId = $product->id;
-
-                        \DB::table("product_attributes")
-                        ->where("id",$productId)
-                        ->delete();
-
-                        \DB::table("products")
-                        ->where("id",$productId)
-                        ->update($dataToInsert);
-                    }            
-                    else
-                    {
-                        $productId = \DB::table("products")
-                        ->insertGetId($dataToInsert);
-                    }
-
-                    if(count($dataToInsertAttr) > 0)
-                    {
-                        foreach($dataToInsertAttr as $r)
-                        {
-                            \DB::table("product_attributes")
-                            ->insert([
-                                "product_id" => $productId,
-                                "keyname" => $r["key"],
-                                "keyvalue" => $r["val"],
-                            ]);
+                            \DB::table("galleryofguns")
+                            ->insert
+                            (
+                                [
+                                    "item_id" => $itemID,
+                                    "category" => $type,
+                                    "title" => $title,
+                                    "link" => $link,
+                                    "link_md5" => $linkMD5,
+                                    "created_at" => date("Y-m-d H:i:s")
+                                ]
+                            );
                         }
                     }
 
-                    echo "\n".$i;
-                    $i++;
+
+                    $counter++;
+                    echo "\n$counter processed!";
                 }
             }
             else
             {
-                break;
+                $flag = false;
             }
-       }
+
+            $page++;
+        }                        
+
     }
+
+    public function handle()
+    {        
+        $type = $this->argument("type");
+
+        // Scrap products from          
+        if($type == "grap-product")
+        {
+            $links[] = 
+            [
+                'type' => "Handguns All Types",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=1&type=All&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Revolver All Types",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Revolver&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Rifle All Types",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Rifle&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Shotgun Bolt Action",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?mfg=All&mdl=All&cat=All&type=Shotgun%3a+Bolt+Action&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Shotgun Lever Action",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Shotgun%3a+Lever+Action&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Shotgun Over Under",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Shotgun%3a+Over+and+Under&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Shotgun Pump Action",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Shotgun%3a+Pump+Action&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Shotgun Side by Side",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Shotgun%3a+Side+by+Side&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Shotgun Single Shot",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Shotgun%3a+Single+Shot&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+            $links[] = 
+            [
+                'type' => "Shotgun Semi-Auto",
+                "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Shotgun%3a+Semi-Auto&cal=All&rebate=No&zipcode=49464"
+            ];        
+
+
+            foreach($links as $row)
+            {
+                $link = $row['link'];
+                $type = $row['type'];                    
+                $this->scrapGuns($link,$type);
+            }
+
+            $this->scrapGunDetails();
+        }
+        else if($type == "migrate-product")
+        {
+            Migration::migrateMasterProducts();
+        }
+        else if($type == "migrate-deals")
+        {
+            Migration::mapDeals();
+        }
+    }   
 }

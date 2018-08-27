@@ -209,19 +209,21 @@ class ProductsController extends Controller {
                                         'row' => $row,
                                         'isEdit' => \App\Models\Admin::isAccess(\App\Models\Admin::$EDIT_GALLERYGUNS),
                                         'isDelete' => 0,
+                                        'isDeals' => 1,
                                         'isView' => $isView,
                                             ]
                                     )->render();
                         })
                         ->editColumn('created_at', function($row){
                             if(!empty($row->created_at))                    
-                                return date("j M, Y h:i:s A",strtotime($row->created_at));
+                                return date("j M, Y",strtotime($row->created_at));
                             else
                                 return '-';    
                         })                        
                         ->rawColumns(['action'])
                         ->filter(function ($query) {                            
 
+                            $search_gr_id = request()->get("search_gr_id");
                             $search_title = request()->get("search_title");
                             $category = request()->get("search_category");
                             $complete_product = request()->get("complete_product");
@@ -244,6 +246,11 @@ class ProductsController extends Controller {
                             if (!empty($category)) 
                             {
                                 $query = $query->where(TBL_PRODUCTS.".category", 'LIKE', $category);
+                            }   
+
+                            if (!empty($search_gr_id)) 
+                            {
+                                $query = $query->where(TBL_PRODUCTS.".product_id", 'LIKE', "%".$search_gr_id."%");
                             }                            
                         })
                         ->make(true);

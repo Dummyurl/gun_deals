@@ -71,6 +71,7 @@
                 "url": "{!! route($moduleRouteText.'.data') !!}",
                 "data": function (data)
                 {
+                    data.search_product_id = $("#search-frm input[name='search_product_id']").val();
                     data.search_title = $("#search-frm input[name='search_title']").val();
                     data.source_id = $("#search-frm select[name='source_id']").val();
                 }
