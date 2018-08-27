@@ -87,6 +87,7 @@ class Admin extends Authenticatable
     public static $DELETE_DEAL = 50;
 
     public static $LIST_GALLERYGUNS = 51;
+    public static $EDIT_GALLERYGUNS = 52;
 
     /**
      * check page acces permissions

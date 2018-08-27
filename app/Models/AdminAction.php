@@ -71,5 +71,7 @@ class AdminAction extends Model
     
     public $ADD_DEAL_SOURCE = 30;
     public $EDIT_DEAL_SOURCE = 31;
-    public $DELETE_DEAL_SOURCE = 32;   
+    public $DELETE_DEAL_SOURCE = 32;
+
+    public $EDIT_PRODUCT = 33;   
 }

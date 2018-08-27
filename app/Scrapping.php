@@ -11,6 +11,125 @@ use Goutte\Client;
  */
 class Scrapping {
 
+    public static function scrapGuns($pageURL,$type)
+    {
+        $client = new Client();
+        $guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false)));
+        $client->setClient($guzzleClient);
+
+        $options = array('request.options' => array(
+                'proxy' => 'socks5://127.0.0.1:9050',
+        ));
+
+        $IS_TOR = \Config::get('app.IS_TOR');
+
+        if ($IS_TOR == 1)
+        {
+            $crawler = $client->request('GET', $pageURL, $options);
+        }
+        else
+        {
+            $crawler = $client->request('GET', $pageURL);
+        }
+        
+        session(["temp_rows" => []]);
+
+        if($type == "master")
+        {
+            if($crawler->filter("ul.ThumbView li")->count() > 0)
+            {
+                $crawler->filter("ul.ThumbView li")->each(function($li){
+
+                    if($li->filter(".ThumbViewTitle a")->count() > 0)
+                    {
+                        $title = trim($li->filter(".ThumbViewTitle a")->text());
+                        $link = trim($li->filter(".ThumbViewTitle a")->attr("href"));
+
+                        $linkTMP = explode("?", $link);
+                        $itemID = 0;
+                        if(isset($linkTMP[1]))
+                        {   
+                            $tmp = explode("&", $linkTMP[1]);
+                            $itemID = str_replace("item=", "", $tmp[0]);
+                        }
+
+                        $data = session("temp_rows");
+                        $data[] = ['title' => $title,"link" => $link,'itemID' => $itemID];
+                        session(["temp_rows" => $data]);           
+                    }
+                });                  
+            }
+        }
+        else if($type == "detail")
+        {            
+            session(["tmp_attr" => []]);
+            if($crawler->filter("#tableIitemDetail tr")->count() > 0)
+            {   
+                $crawler->filter("#tableIitemDetail tr")->each(function($tr){
+                    if($tr->filter("td")->count() == 2)
+                    {
+
+                        $key = trim($tr->filter("td")->first()->text());
+                        $val = trim($tr->filter("td")->last()->text());
+
+                        if(!empty($key) && !empty($val))
+                        {
+                            $data = session("tmp_attr");
+
+                            $data[] = 
+                            [
+                                "key" => $key,
+                                "val" => $val
+                            ];
+
+                            session(["tmp_attr" => $data]);
+                        }
+                    }    
+                });
+            }
+
+            $image = "";
+            if($crawler->filter("#LargeImage.ImagePopup img")->count() > 0)
+            {
+                $image = $crawler->filter("#LargeImage.ImagePopup img")->first()->attr("src");
+                $image = trim($image);
+            }
+
+            $thumb_image = "";
+            if($crawler->filter(".DetailPageWidths img.NavAppear")->count() > 0)
+            {
+                $thumb_image = $crawler->filter(".DetailPageWidths img.NavAppear")->first()->attr("src");
+                $thumb_image = trim($thumb_image);
+            }
+
+            $itemID = "";
+            if($crawler->filter("#ctl00_mainContent_mainContentControl_lblItemID")->count() > 0)
+            {
+                $itemID = $crawler->filter("#ctl00_mainContent_mainContentControl_lblItemID")->text();
+                $itemID = trim($itemID);
+            }
+
+            $msrp = "";
+            if($crawler->filter("#ctl00_mainContent_mainContentControl_lblMSRP")->count() > 0)
+            {
+                $msrp = $crawler->filter("#ctl00_mainContent_mainContentControl_lblMSRP")->text();
+                $msrp = trim($msrp);
+            }
+
+            $attr = session("tmp_attr");
+
+            $row['item'] = $itemID;
+            $row['msrp'] = $msrp;
+            $row['image'] = $image;
+            $row['thumb_image'] = $thumb_image;
+            $row['attr'] = $attr;
+            session(["temp_rows" => $row]);
+        }
+
+
+        return session("temp_rows");
+    }
+
     public static function deal_scraps($type, $pageURL)
     {
         session(["rows" => []]);

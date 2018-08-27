@@ -39,20 +39,43 @@
                                             {{ $deal->title }}
                                         </a>
                                     </td>
-                                </tr>                                                                
+                                </tr>       
+                                @if(!empty($deal->description))                                                         
+                                <tr>
+                                    <td width="30%"><b>Description: </b></td>
+                                    <td width="70%">
+                                        {!! $deal->description !!}
+                                    </td>
+                                </tr>
+                                @endif                                                                
+                                <tr>
+                                    <td width="30%"><b>GR ID: </b></td>
+                                    <td width="70%">{{ ($deal->product_id) }}</td>
+                                </tr>                                                     
                                 <tr>
                                     <td width="30%"><b>Item #:</b></td>
                                     <td width="70%">{{ $deal->item_unique_id }}</td>
                                 </tr>
                                 <tr>
+                                    <td width="30%"><b>UPC:</b></td>
+                                    <td width="70%">{{ $deal->upc_number }}</td>
+                                </tr>
+                                <tr>
                                     <td width="30%"><b>MSRP:</b></td>
                                     <td width="70%">{{ $deal->msrp }}</td>
-                                </tr>
-                                
+                                </tr>                                
+                                <tr>
+                                    <td width="30%"><b>Brand:</b></td>
+                                    <td width="70%">{{ $deal->brand }}</td>
+                                </tr>                                
+                                <tr>
+                                    <td width="30%"><b>Model:</b></td>
+                                    <td width="70%">{{ $deal->model }}</td>
+                                </tr>                                
                             </table>
 
                             @php
-                                $attrs = json_decode($deal->attr,1);
+                                $attrs = $deal->productAttributes ? $deal->productAttributes->toArray():[];
                             @endphp
                             
                             @if(count($attrs))
@@ -60,8 +83,8 @@
                             <table class="table table-bordered">
                                 @foreach($attrs as $row)
                                     <tr>
-                                        <td width="30%"><b>{{ $row['key'] }}</b></td>
-                                        <td width="70%">{{ $row['val'] }}</td>
+                                        <td width="30%"><b>{{ $row['keyname'] }}</b></td>
+                                        <td width="70%">{{ $row['keyvalue'] }}</td>
                                     </tr>                                
                                 @endforeach                                
                             </table>                            

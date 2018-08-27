@@ -5,6 +5,7 @@
 /vendor
 /storage/
 /tests/
+/public/uploads/
 /public/di_sitemap/
 /public/home_tabs_html/
 /.idea

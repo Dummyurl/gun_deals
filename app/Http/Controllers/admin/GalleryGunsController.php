@@ -91,12 +91,19 @@ class GalleryGunsController extends Controller {
 
         return Datatables::eloquent($model)
                         ->addColumn('action', function($row) {
+                            
+                            $isView = 1;
+                            if($row->category != 'Revolver All Types')
+                            {
+                                //$isView = 0;
+                            }    
+                            
                             return view($this->moduleViewName . ".action", [
                                         'currentRoute' => $this->moduleRouteText,
                                         'row' => $row,
                                         'isEdit' => 0,
                                         'isDelete' => 0,
-                                        'isView' => 1,
+                                        'isView' => $isView,
                                             ]
                                     )->render();
                         })

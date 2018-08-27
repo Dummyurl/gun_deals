@@ -90,5 +90,10 @@ Route::group(['prefix' => $ADMIN_PREFIX], function(){
 	Route::any('galleryofguns/data', 'admin\GalleryGunsController@data')->name('galleryofguns.data');
 	Route::resource('galleryofguns', 'admin\GalleryGunsController');        
 
+	Route::any('products/pending', 'admin\ProductsController@pending')->name('products.pending');
+	Route::any('products/data', 'admin\ProductsController@data')->name('products.data');
+	Route::resource('products', 'admin\ProductsController');        
+
+
     });    
 });

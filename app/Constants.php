@@ -17,3 +17,4 @@ define("TBL_DEALS","deals");
 define("TBL_DEAL_SOURCE","scrap_sources");
 define("TBL_CATEGORY","categories");
 define("TBL_GALLERYGUNS","galleryofguns");
+define("TBL_PRODUCTS","products");
