@@ -41,7 +41,7 @@ class MigrationDeals extends Command
     {
        $i = 0;
        $offset = 0;
-       $limit = 100;
+       $limit = 100;       
        while(true)
        {
             $rows = \DB::table("galleryofguns")                    
@@ -98,6 +98,7 @@ class MigrationDeals extends Command
         $page = 0;
         $counter = 0;
         $flag = true;
+        $newAdded = 0;
         while($flag)
         {
             $pageUrl = $url;
@@ -133,6 +134,7 @@ class MigrationDeals extends Command
                                     "created_at" => date("Y-m-d H:i:s")
                                 ]
                             );
+                            $newAdded++;
                         }
                     }
 
@@ -149,11 +151,16 @@ class MigrationDeals extends Command
             $page++;
         }                        
 
+        return ['total' => $counter,"new" => $newAdded];
     }
 
     public function handle()
     {        
         $type = $this->argument("type");
+
+        $scriptStartTime = date("Y-m-d H:i:s");
+        $content = [];
+
 
         // Scrap products from          
         if($type == "grap-product")
@@ -218,23 +225,47 @@ class MigrationDeals extends Command
                 "link" => "https://www.galleryofguns.com/genie/PowerSearchTabView/SearchResultsFirearms.aspx?&mfg=All&mdl=All&cat=All&type=Shotgun%3a+Semi-Auto&cal=All&rebate=No&zipcode=49464"
             ];        
 
+            $cron_id = 10;            
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
 
+            $overall_total = 0;
+            $overall_new = 0;
             foreach($links as $row)
             {
                 $link = $row['link'];
                 $type = $row['type'];                    
-                $this->scrapGuns($link,$type);
+
+                $res = $this->scrapGuns($link,$type);
+
+                $overall_total = $overall_total + $res['total'];
+                $overall_new = $overall_new + $res['new'];
             }
 
             $this->scrapGunDetails();
+
+            $content = 
+            [
+                "total" => $overall_total, 
+                "new" => $overall_new
+            ];
         }
         else if($type == "migrate-product")
         {
-            Migration::migrateMasterProducts();
+            $cron_id = 11;            
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+            $content = Migration::migrateMasterProducts();
         }
         else if($type == "migrate-deals")
         {
             Migration::mapDeals();
+            exit;
         }
+        else
+        {
+            exit("Invalid cron type!");
+        }
+
+        $scriptEndTime = date("Y-m-d H:i:s");                
+        storeCronLogs($scriptStartTime, $scriptEndTime, NULL, $content, 'Web Server', $cron_id, $mainLogID);        
     }   
 }

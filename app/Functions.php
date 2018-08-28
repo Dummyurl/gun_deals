@@ -4,6 +4,35 @@
  * Website General Functions
  *
  */
+
+function storeCronLogs($start_time, $end_time, $total_time, $content, $machine_id, $cron_id, $insertedID = 0) 
+{
+    if($insertedID > 0)
+    {
+        $dataToUpdate = array
+        (
+            'end_time' => date("Y-m-d H:i:s", strtotime($end_time)),
+            'summary' => json_encode($content),
+        );
+
+        \App\Models\CronLogDetail::where("id", $insertedID)->update($dataToUpdate);
+    }
+    else
+    {
+        $dataToUpdate = array
+        (
+            'cron_log_id' => $cron_id,
+            'start_time' => date("Y-m-d H:i:s", strtotime($start_time)),
+            'end_time' => NULL,
+            'machine_id' => $machine_id            
+        );        
+
+        $model = new \App\Models\CronLogDetail;
+        $model = $model->create($dataToUpdate);        
+        return $model->id;
+    }        
+}    
+
 function getFilename($fullpath, $uploaded_filename) {
     $count = 1;
     $new_filename = $uploaded_filename;

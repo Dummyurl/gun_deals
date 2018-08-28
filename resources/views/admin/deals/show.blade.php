@@ -32,7 +32,7 @@
                                     <td width="30%"><b>Title: </b></td>
                                     <td width="70%">
                                         <a title="View Deal" href="{{ $deal->link }}" target="_blank">
-                                            {{ $deal->title }}
+                                            {{ !empty($deal->title) ? $deal->title:'No title- view link' }}
                                         </a>
                                     </td>
                                 </tr>

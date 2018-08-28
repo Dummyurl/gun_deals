@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\TestData',
         'App\Console\Commands\ScrapSale',
         'App\Console\Commands\MigrationDeals',
+        'App\Console\Commands\ScrapDeals',
     ];
 
     /**

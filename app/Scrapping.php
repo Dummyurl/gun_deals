@@ -1194,15 +1194,21 @@ class Scrapping {
             if($crawler->filter(".views-view-grid tr")->count() >0 )
             {
                 $crawler->filter(".views-view-grid tr")->each(function($tr){                    
-                        $tr->filter("td")->each(function($td){
-                            $rows = session("rows");
-                            $link = "https://www.sgammo.com".$td->filter("a")->first()->attr("href");
-                            if(!empty($link))
-                            {
-                                $rows[] = $link;    
-                                session(["rows" => $rows]);
-                            }                            
-                        });
+                        if($tr->filter("td")->count() > 0)
+                        {
+                            $tr->filter("td")->each(function($td){
+                                if($td->filter("a")->count() > 0)
+                                {
+                                    $rows = session("rows");
+                                    $link = "https://www.sgammo.com".$td->filter("a")->first()->attr("href");
+                                    if(!empty($link))
+                                    {
+                                        $rows[] = $link;    
+                                        session(["rows" => $rows]);
+                                    }                            
+                                }
+                            });
+                        }
                 });
             }            
         }        

@@ -74,4 +74,8 @@ class AdminAction extends Model
     public $DELETE_DEAL_SOURCE = 32;
 
     public $EDIT_PRODUCT = 33;   
+
+    public $ADD_CRON = 34;
+    public $EDIT_CRON = 35;
+    public $DELETE_CRON = 36;
 }

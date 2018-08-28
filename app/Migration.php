@@ -64,8 +64,12 @@ class Migration
     public static function migrateMasterProducts()
     {
        $i = 0;
+       
        $offset = 0;
        $limit = 100;
+
+       $newAdded = 0;
+
        while(true)
        {
             $rows = \DB::table("galleryofguns")
@@ -166,7 +170,7 @@ class Migration
                     // exit;
 
                     $product = \DB::table("products")
-                                ->where("link",$link)
+                                ->where("link_md5",$link_md5)
                                 ->first();
 
                     if($product)
@@ -188,6 +192,7 @@ class Migration
                     {
                         $productId = \DB::table("products")
                         ->insertGetId($dataToInsert);
+                        $newAdded++;
                     }
 
                     if(count($dataToInsertAttr) > 0)
@@ -212,6 +217,8 @@ class Migration
                 break;
             }
        }
+
+       return ['total' => $i,"new" => $newAdded];
     }
 }
 

@@ -94,6 +94,10 @@ Route::group(['prefix' => $ADMIN_PREFIX], function(){
 	Route::any('products/data', 'admin\ProductsController@data')->name('products.data');
 	Route::resource('products', 'admin\ProductsController');        
 
+	Route::any('cron-log', 'admin\CronsController@Log')->name('cron-log.index');
+	Route::any('cron-log/data', 'admin\CronsController@logData')->name('cron-log.data');
+	Route::any('crons/data', 'admin\CronsController@data')->name('crons.data');
+	Route::resource('crons', 'admin\CronsController');
 
     });    
 });
