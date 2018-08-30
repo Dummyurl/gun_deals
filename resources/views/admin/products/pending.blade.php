@@ -38,9 +38,9 @@
                                 <th width="8%">ID</th>                                   
                                 <th width="20%">GR ID</th>
                                 <th width="30%">Title</th>
-                                <th width="22%">Category</th>                           
+                                <th width="20%">Category</th>                           
                                 <th width="10%">Created At</th>                           
-                                <th width="10%">Action</th>
+                                <th width="12%">Action</th>
                             </tr>
                         </thead>                                         
                         <tbody>

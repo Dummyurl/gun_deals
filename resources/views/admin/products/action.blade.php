@@ -6,11 +6,6 @@
     </a>         
     @endif
 
-    @if($isDelete)
-    <a data-id="{{ $row->id }}" href="{{ route($currentRoute.'.destroy',['id' => $row->id]) }}" class="btn btn-xs btn-danger btn-delete-record" title="delete">
-        <i class="fa fa-trash-o"></i>
-    </a>          
-    @endif            
     
     @if($isView)
     <a data-id="{{ $row->id }}" href="{{ route($currentRoute.'.show',['id' => $row->id]) }}" class="btn btn-xs btn-warning" title="View">
@@ -23,5 +18,12 @@
         <i class="fa fa-list"></i>
     </a>          
     @endif            
+
+    @if($isDelete)
+    <a data-id="{{ $row->id }}" href="{{ route($currentRoute.'.destroy',['id' => $row->id]) }}" class="btn btn-xs btn-danger btn-delete-record" title="delete">
+        <i class="fa fa-trash-o"></i>
+    </a>          
+    @endif            
+    
 </div>
 </center>

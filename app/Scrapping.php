@@ -143,15 +143,22 @@ class Scrapping {
 
         $IS_TOR = \Config::get('app.IS_TOR');
 
-        if ($IS_TOR == 1) 
+        try
         {
-            $crawler = $client->request('GET', $pageURL, $options);
-        } 
-        else 
-        {
-            $crawler = $client->request('GET', $pageURL);
+            if ($IS_TOR == 1) 
+            {
+                $crawler = $client->request('GET', $pageURL, $options);
+            } 
+            else 
+            {
+                $crawler = $client->request('GET', $pageURL);
+            }
         }
-
+        catch(\Exception $e)
+        {
+            return [];
+        }
+        
         if($type == "classicfirearms_count")
         {
             if($crawler->filter('.pager .amount')->count() > 0)

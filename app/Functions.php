@@ -5,6 +5,78 @@
  *
  */
 
+function getParents($id)
+{
+    $ids = [];
+
+    $row = \DB::table("product_categories")
+    ->where("id",$id)
+    ->first();
+
+    
+    if($row->parent_id > 0)
+    {
+        $ids[] = $row->parent_id;
+        $newIDS = getParents($row->parent_id);
+        $ids = array_merge($ids,$newIDS);
+    }    
+
+    return $ids;
+}
+
+function getChildrens($id)
+{
+    $ids = [];
+
+    $rows = \DB::table("product_categories")
+    ->where("parent_id",$id)
+    ->get();
+
+    foreach($rows as $row)
+    {
+        $ids[] = $row->id;
+        $newIDS = getChildrens($row->id);
+        $ids = array_merge($ids,$newIDS);
+    }
+
+    return $ids;
+}
+
+function display_children($parent, $level) 
+{
+    if($parent > 0)
+    {
+        $sql = "SELECT a.id, a.title, Deriv1.Count,a.url FROM `product_categories` a  
+    LEFT OUTER JOIN (SELECT parent_id, COUNT(*) AS Count FROM `product_categories` GROUP BY parent_id) Deriv1 ON a.id = Deriv1.parent_id 
+    WHERE a.parent_id=".$parent;
+    }
+    else
+    {
+        $sql = "SELECT a.id, a.title, Deriv1.Count,a.url FROM `product_categories` a  
+    LEFT OUTER JOIN (SELECT parent_id, COUNT(*) AS Count FROM `product_categories` GROUP BY parent_id) Deriv1 ON a.id = Deriv1.parent_id 
+    WHERE a.parent_id IS NULL";
+    }
+
+    $result = \DB::select($sql);
+    $result = json_decode(json_encode($result),1);
+
+    echo "<ul>";
+
+    foreach($result as $row)
+    {        
+        if ($row['Count'] > 0) 
+        {
+            echo "<li><a href='/" . $row['url'] . "'>" . $row['title'] . "</a>";
+            display_children($row['id'], $level + 1);
+            echo "</li>";
+        } elseif ($row['Count']==0) {
+            echo "<li><a href='/" . $row['url'] . "'>" . $row['title'] . "</a></li>";
+        } else;
+    }
+
+    echo "</ul>";
+}
+
 function storeCronLogs($start_time, $end_time, $total_time, $content, $machine_id, $cron_id, $insertedID = 0) 
 {
     if($insertedID > 0)

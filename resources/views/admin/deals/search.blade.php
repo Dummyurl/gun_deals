@@ -23,12 +23,24 @@
                     {!! Form::select('source_id', [''=>'Select Source'] + $sources, null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="col-md-3">
+                    <label class="control-label">Is Featured</label>
+                    {!! Form::select('search_featured', [''=>'select option',1 => "Yes",2 => "No"] , null, ['class' => 'form-control']) !!}
+                </div>
+            </div>                                                   
+            <div class="clearfix">&nbsp;</div>
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="onlymap_deals" class="checkbox-inline">
+                        <input type="checkbox" name="onlymap_deals" id="onlymap_deals"/> View only mapped deals
+                    </label>                                    
+                </div>    
+                <div class="col-md-3 pull-right">
                     <input type="hidden" name="record_per_page" id="record_per_page" />
                     <input type="submit" class="btn blue mTop25" value="Search" />
                     &nbsp;
                     <a href="{{ $list_url }}" class="btn red mTop25">Reset</a>                           
-                </div>                
-            </div>                                                   
+                </div>                                
+            </div>            
         </form>
     </div>    
 </div>    

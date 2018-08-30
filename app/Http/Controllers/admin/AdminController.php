@@ -20,7 +20,9 @@ class AdminController extends Controller
 
     public function index(Request $request)
     {                          
-        $data = array();              
+        $data = array(); 
+        $data['total_products'] = \App\Models\Product::count();
+        $data['total_deals'] = \App\Models\Deal::count();             
         return view('admin.dashboard',$data);
     }    
     

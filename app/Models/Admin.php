@@ -95,6 +95,9 @@ class Admin extends Authenticatable
     public static $DELETE_CRON = 56;
     public static $LIST_CRON_LOG = 57;
 
+    public static $ADD_GALLERYGUNS = 58;
+    public static $DELETE_GALLERYGUNS = 59;
+
 
     /**
      * check page acces permissions

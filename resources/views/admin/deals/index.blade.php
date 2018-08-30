@@ -27,11 +27,13 @@
                     <table class="table table-bordered table-striped table-condensed flip-content" id="server-side-datatables">
                         <thead>
                             <tr>
-                                <th width="8%">ID</th>                                   
-                                <th width="44%">Title</th>
-                                <th width="20%">Source</th>                           
-                                <th width="20%">Created At</th>                           
-                                <th width="8%">Action</th>
+                                <th width="5%">ID</th>                                   
+                                <th width="30%">Title</th>
+                                <th width="15%">Source</th>
+                                <th width="15%">Product</th>
+                                <th width="10%">Featured</th>                           
+                                <th width="15%">Created At</th>                           
+                                <th width="10%">Action</th>
                             </tr>
                         </thead>                                         
                         <tbody>
@@ -74,6 +76,15 @@
                     data.search_product_id = $("#search-frm input[name='search_product_id']").val();
                     data.search_title = $("#search-frm input[name='search_title']").val();
                     data.source_id = $("#search-frm select[name='source_id']").val();
+                    data.search_featured = $("#search-frm select[name='search_featured']").val();
+                    if($("#onlymap_deals").is(":checked"))
+                    {
+                        data.onlymap_deals = 1;
+                    }   
+                    else
+                    {
+                        data.onlymap_deals = 0;
+                    }
                 }
             },
             "order": [[0, "desc"]],
@@ -81,6 +92,8 @@
                 {data: 'id', name: 'id'},
                 {data: 'title', name: '{{ TBL_DEALS }}.title'},
                 {data: 'source_title', name: '{{ TBL_DEAL_SOURCE }}.title'},
+                {data: 'product_title', name: '{{ TBL_PRODUCTS }}.title'},
+                {data: 'is_featured', name: '{{ TBL_DEALS }}.is_featured'},
                 {data: 'created_at', name: '{{ TBL_DEALS }}.created_at'},
                 {data: 'action', orderable: false, searchable: false}
             ]

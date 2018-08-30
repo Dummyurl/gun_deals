@@ -69,4 +69,18 @@ class Deal extends Model
     {
         return $this->hasMany('App\Models\DealSpecification');
     }
+
+    public function featuredDeals($limit = 5)
+    {
+        return $this->where("is_featured",1)
+               ->limit($limit)
+               ->get();
+    }
+
+    public function mostVotedDeals($limit = 10)
+    {
+        return $this->orderBy("vot_counter","DESC")
+               ->limit($limit)
+               ->get();
+    }
 }

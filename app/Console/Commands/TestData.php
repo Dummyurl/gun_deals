@@ -1358,10 +1358,46 @@ class TestData extends Command
         }
         
     }
-    
+
+    public function mapSlugOfProductCategories()
+    {
+        $rows = \App\Models\ProductCategory::orderBy("menu_level","DESC")->get();
+        foreach($rows as $row)
+        {
+            // $row->slug = str_slug($row->title,"-");
+            // $row->save();
+            echo "\n$row->title => ".$row->slug;            
+            $parents = getParents($row->id);
+            $url = "";
+            if(count($parents) > 0)
+            {
+                echo "\nID: ".$row->id;                
+                $parents = array_reverse($parents,true);
+                foreach($parents as $pid)
+                {
+                    $parent = \App\Models\ProductCategory::find($pid);
+                    $url .= $parent->slug."/";
+                }
+                
+            }
+
+            $url .= $row->slug;
+
+            $row->url = $url;
+            $row->save();
+
+            echo "\n Url: ".$url;
+        }
+    }    
+
+
 
     public function handle()
     {        
+
+        $this->mapSlugOfProductCategories();
+        exit;
+
         // $this->scrapPsaMasterLinks();
         // $this->scrapPsaDetailLinks();
 

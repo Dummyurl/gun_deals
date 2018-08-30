@@ -407,7 +407,7 @@ class ScrapDeals extends Command
                         
                         $this->mapCategory($categories, $mainID);
                         
-                        if(array_keys($res) > 0 && false)
+                        if(array_keys($res) > 0 && isset($res["name"]) && !empty($res["name"]))
                         {
                             $source_id = 4;
 

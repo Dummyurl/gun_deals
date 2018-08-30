@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
+use App\Models\ProductCategory;
+use App\Models\ProductAttribute;
 use App\Migration;
 use App\Scrapping;
 
@@ -31,6 +33,92 @@ class MigrationDeals extends Command
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function mapProductCategory()
+    {
+        $tmp = 
+        [
+            "Pistol: Derringer" => ProductCategory::$HANDSGUN_SPC_DERRINGER,
+            "Pistol: Double Action Only" => 0,
+            "Pistol: Lever Action" => ProductCategory::$HANDSGUN_SPC_LEVER_ACTION,
+            "Pistol: Semi-Auto" => ProductCategory::$HANDSGUN_SEMI_AUTO,
+            "Pistol: Single Shot" => ProductCategory::$HANDSGUN_SPC_SINGLE_SHOT,
+            "Revolver: Double Action" => ProductCategory::$HANDSGUN_REVOLVER_DOUBLE_ACTION,
+            "Revolver: Double Action Only" => ProductCategory::$HANDSGUN_REVOLVER_DOUBLE_ACTION_ONLY,
+            "Revolver: Single Action" => ProductCategory::$HANDSGUN_REVOLVER_SINGLE_ACTION,
+            "Rifle: Air Gun" => 0,
+            "Rifle: Bolt Action" => ProductCategory::$RIFLES_BOLT_ACTION,
+            "Rifle: Lever Action" => ProductCategory::$RIFLES_LEVER_ACTION,
+            "Rifle: Muzzleloader" => ProductCategory::$RIFLES_MUZZLE_LOADER,
+            "Rifle: Pump Action" => ProductCategory::$RIFLES_PUMP_ACTION,
+            "Rifle: Semi-Auto" => ProductCategory::$RIFLES_SEMI_AUTO,
+            "Rifle: Single Shot" => ProductCategory::$RIFLES_SINGLE_SHOT,
+            "Rifle|Shotgun Combo: All" => 0,
+            "Rifle|Shotgun: All" => 0,
+            "Shotgun: Bolt Action" => ProductCategory::$SHOTGUNS_BOLT_ACTION,
+            "Shotgun: Lever Action" => ProductCategory::$SHOTGUNS_LEVER_ACTION,
+            "Shotgun: Over and Under" => ProductCategory::$SHOTGUNS_OVER_UNDER,
+            "Shotgun: Pump Action" => ProductCategory::$SHOTGUNS_PUMP_ACTION,
+            "Shotgun: Semi-Auto" => ProductCategory::$SHOTGUNS_SEMI_AUTO,
+            "Shotgun: Side By Side" => ProductCategory::$SHOTGUNS_SIDE_BY_SIDE,
+            "Shotgun: Single Shot" => ProductCategory::$SHOTGUNS_SINGLE_SHOT,
+        ];
+
+        $categoryARR = [];
+
+        foreach($tmp as $k => $v)
+        {
+            $categoryARR[strtolower($k)] = $tmp[$k];
+        }        
+
+        $flag = true;
+        $i = 0;
+        $offset = 0;
+        $limit = 100;
+
+        while($flag)
+        {
+            $rows = ProductAttribute::select("id","product_id","keyname","keyvalue")
+                    ->whereRaw("TRIM(LOWER(`keyname`)) = 'type'")
+                    ->limit($limit)
+                    ->offset($offset)                                    
+                    ->get();
+
+            $offset = $offset + $limit;        
+
+            if($rows && count($rows) > 0)
+            {
+                foreach($rows as $row)
+                {
+                    $product_id = $row->product_id;
+                    $keyvalue = trim(strtolower($row->keyvalue));
+
+                    if(isset($categoryARR[$keyvalue]))
+                    {
+                        $categoryID = $categoryARR[$keyvalue];
+                        if($categoryID > 0)
+                        {
+                            \DB::table("products")
+                            ->where("id",$product_id)
+                            ->update
+                            (
+                                [
+                                    "product_category_id" => $categoryID
+                                ]
+                            );
+                        }
+                    }
+
+                    $i++;
+                    echo "\n$i";                    
+                }
+            }
+            else
+            {
+                $flag = false;
+            }        
+        }
     }
 
     /**
@@ -258,6 +346,11 @@ class MigrationDeals extends Command
         else if($type == "migrate-deals")
         {
             Migration::mapDeals();
+            exit;
+        }
+        else if($type == "map-category")
+        {
+            $this->mapProductCategory();
             exit;
         }
         else

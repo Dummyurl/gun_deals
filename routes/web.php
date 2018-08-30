@@ -17,7 +17,8 @@ Route::get('/', function (){
     return view('welcome');
 });
 
-Route::get('test', 'TestController@index');
+Route::get('test-home-page', 'TestController@home');
+Route::get('listing/{id}', 'TestController@listing');
 
 Route::get('clear-cache', function () {
 	$exitCode = Artisan::call('cache:clear');
@@ -101,3 +102,5 @@ Route::group(['prefix' => $ADMIN_PREFIX], function(){
 
     });    
 });
+
+Route::get('{category}/{sub_category?}/{third_sub_category?}', 'DealsController@listing');

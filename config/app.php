@@ -14,6 +14,32 @@ return [
 
     'name' => 'Laravel',
 
+    // custom variables
+
+    'product_category_mapping' => [
+        "Pistol: Semi-Auto" => 1,
+        "Pistol: Single Shot" => 1,
+        "Revolver: Double Action" => 1,
+        "Revolver: Double Action Only" => 1,
+        "Revolver: Single Action" => 1,
+        "Rifle: Air Gun" => 1,
+        "Rifle: Bolt Action" => 1,
+        "Rifle: Lever Action" => 1,
+        "Rifle: Muzzleloader" => 1,
+        "Rifle: Pump Action" => 1,
+        "Rifle: Semi-Auto" => 1,
+        "Rifle: Single Shot" => 1,
+        "Rifle|Shotgun Combo: All" => 1,
+        "Rifle|Shotgun: All" => 1,
+        "Shotgun: Bolt Action" => 1,
+        "Shotgun: Lever Action" => 1,
+        "Shotgun: Over and Under" => 1,
+        "Shotgun: Pump Action" => 1,
+        "Shotgun: Semi-Auto" => 1,
+        "Shotgun: Side By Side" => 1,
+        "Shotgun: Single Shot" => 1,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

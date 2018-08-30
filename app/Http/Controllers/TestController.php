@@ -17,6 +17,25 @@ class TestController extends Controller
     {
     }
 
+    public function home()
+    {
+        $data = [];
+        return view('test',$data);                
+    }    
+
+    public function listing($id)
+    {
+        $category = \App\Models\ProductCategory::find($id);
+        if(!$category)
+            abort(404);
+
+        $ids = getChildrens($id);
+        $ids[] = $id;
+        $data['rows'] = \App\Models\Product::whereIn("product_category_id",$ids)->paginate(10);
+        $data['page_title'] = $category->title;
+        return view("listing", $data);
+    }    
+
     public function scrapClassicfirearmsMasterLinks()
     {
         $url = "https://www.classicfirearms.com/product-specials";
