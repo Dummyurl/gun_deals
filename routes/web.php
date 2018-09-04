@@ -92,8 +92,15 @@ Route::group(['prefix' => $ADMIN_PREFIX], function(){
 	Route::resource('galleryofguns', 'admin\GalleryGunsController');        
 
 	Route::any('products/pending', 'admin\ProductsController@pending')->name('products.pending');
+
 	Route::any('products/data', 'admin\ProductsController@data')->name('products.data');
 	Route::resource('products', 'admin\ProductsController');        
+
+	Route::any('ammo-products/data', 'admin\AmmoProductsController@data')->name('ammo-products.data');
+	Route::resource('ammo-products', 'admin\AmmoProductsController');	       
+
+	Route::any('scrap-source-urls/data', 'admin\ScrapSourceUrlsController@data')->name('scrap-source-urls.data');
+	Route::resource('scrap-source-urls', 'admin\ScrapSourceUrlsController');	
 
 	Route::any('cron-log', 'admin\CronsController@Log')->name('cron-log.index');
 	Route::any('cron-log/data', 'admin\CronsController@logData')->name('cron-log.data');

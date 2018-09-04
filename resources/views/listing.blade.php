@@ -31,6 +31,44 @@
 				    	@endif
 					</ul>
 
+					<div class="row">
+			        	@if(isset($featured_deals) && count($featured_deals) > 0)
+			        	<div class="col-md-12">
+				            <div class="clearfix"></div>    
+				            <div class="portlet box green">
+				                <div class="portlet-title">
+				                    <div class="caption">
+				                        <i class="fa fa-list"></i> Featured Deals
+				                    </div>
+				                </div>
+				                <div class="portlet-body">                    
+						        		<table class="table table-bordered">
+						        			<tbody>
+						        				<tr>
+						        				@foreach($featured_deals as $featured_deal)			        					
+						        						<td class="text-center">
+						        							@php
+					        									$photo = \App\Models\DealPhotos::where("deal_id",$featured_deal->id)->first();
+						        							@endphp
+
+						        							@if($photo)
+						        							<a href="{{ $featured_deal->link }}" target="_blank">
+						        								<img src="{{ $photo->image_url }}" style="max-width: 100px;" />
+						        								<br />
+						        								{{ $featured_deal->title }}
+						        							</a>
+						        							@endif
+						        						</td>
+						        				@endforeach
+						        				</tr>
+						        			</tbody>
+						        		</table>	                	
+								</div>					
+							</div>	
+
+			        	</div>
+			        	@endif						
+					</div>
 
                     <div class="row">
                         <div class='col-md-3'>
@@ -68,7 +106,6 @@
                     </div>                            
 
         <div class="row">
-
         	<div class="col-md-12">
 	            <div class="clearfix"></div>    
 	            <div class="portlet box green">

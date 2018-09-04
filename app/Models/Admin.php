@@ -98,6 +98,14 @@ class Admin extends Authenticatable
     public static $ADD_GALLERYGUNS = 58;
     public static $DELETE_GALLERYGUNS = 59;
 
+    public static $LIST_AMMO_PRODUCTS = 60;
+
+    public static $LIST_SCRAP_URLS = 61;
+    public static $ADD_SCRAP_URL = 62;
+    public static $EDIT_SCRAP_URL = 63;
+    public static $DELETE_SCRAP_URL = 64;
+  
+
 
     /**
      * check page acces permissions

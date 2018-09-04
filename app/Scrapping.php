@@ -11,6 +11,299 @@ use Goutte\Client;
  */
 class Scrapping {
 
+    public static function scrapGrabGunsProductCategory($pageURL)
+    {
+        echo "\n Page: ".$pageURL;
+        $categoryUrls = self::deal_scraps("grabagun_categories",$pageURL);        
+        return $categoryUrls;
+    }
+
+    public static function scrapGrabGunsProductLinks($pageURL)
+    {
+        $categoryUrls = self::scrapGrabGunsProductCategory($pageURL);        
+        $links = [];
+        if(count($categoryUrls) > 0)
+        {
+            foreach($categoryUrls as $url)
+            {
+                $link = $url['link'];                                
+                $categoryUrls1 = self::scrapGrabGunsProductCategory($link);
+                if(count($categoryUrls1) > 0)
+                {
+                    foreach($categoryUrls1 as $url)
+                    {
+                        $link = $url['link'];
+                        $links[] = $link;
+                    }
+                }
+                else
+                {
+                    $links[] = $link;
+                }
+            }
+        }
+
+        $masterLinks = [];
+        
+        foreach($links as $link)
+        {
+            $masterUrls = self::scrapGrabGunsListingLinks($link);
+            $masterLinks = array_merge($masterLinks,$masterUrls);
+        }
+
+        return $masterLinks;
+    }
+
+    public static function scrapGrabGunsListingLinks($pageURL)
+    {
+        $url = $pageURL."?limit=20";
+        echo "\nUrl: ".$url;
+        $total_records = self::deal_scraps("grabagun_count",$url);
+        $cnt = 0;
+        $newAdded = 0;
+        $mainLinks = [];
+        echo "\n Total Records: ".$total_records;
+        if($total_records > 0)
+        {
+            $recordsPerPage = 20;
+            $pages = ceil($total_records / $recordsPerPage);
+            
+            echo "<br />Total Pages: ".$pages;
+            
+            for($i = 1;$i<=$pages;$i++)
+            {
+                $url = $pageURL."?limit=20&p=$i";
+                echo "\nPage: ".$url;
+                $rows = self::deal_scraps("grabagun",$url);
+                $mainLinks = array_merge($mainLinks,$rows);
+            }
+        }    
+
+        return $mainLinks;            
+    }
+
+    public static function scrapAmmo($pageURL,$type)
+    {
+        $client = new Client();
+        $guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false)));
+        $client->setClient($guzzleClient);
+
+        $options = array('request.options' => array(
+                'proxy' => 'socks5://127.0.0.1:9050',
+        ));        
+
+        try
+        {
+            $crawler = $client->request('GET', $pageURL);
+
+        }
+        catch(\Symfony\Component\Debug\Exception\FatalErrorException $e)
+        {
+            return [];
+        }       
+        catch(\Exception $e)
+        {
+            return [];
+        }
+
+        session(["temp_rows" => []]);
+
+        if($type == "handgun_master")
+        {
+            if($crawler->filter(".main-category-cols ul.col")->count() > 0)
+            {
+                $crawler->filter(".main-category-cols ul.col")->each(function($ul){
+
+                    if($ul->filter("li")->count() > 0)
+                    {
+                        $ul->filter("li")->each(function($li){
+                            if($li->filter("a")->count() > 0)
+                            {
+                                $label = trim($li->filter("a")->text());
+                                $link = trim($li->filter("a")->attr("href"));
+
+                                $data = session("temp_rows");
+                                $data[] = ['title' => $label,"link" => $link];
+                                session(["temp_rows" => $data]);                                           
+                            }
+                        });
+                    }
+
+                });
+            }
+        }
+        else if($type == "handgun_master_1")
+        {
+            if($crawler->filter("#products-list li")->count() > 0){
+
+               $crawler->filter("#products-list li")->each(function($li){     
+
+                    if($li->filter("a")->count() > 0)
+                    {
+                        $link = trim($li->filter("a")->first()->attr("href"));
+                        if(!empty($link))
+                        {
+                            $data = session("temp_rows");
+                            $data[] = ['title' => "","link" => $link];
+                            session(["temp_rows" => $data]);                                           
+                        }
+                    }
+               });
+            }
+        }
+        else if($type == "rimfire_master" || $type == "rimfire_master_2")
+        {
+            if($crawler->filter("#products-list li")->count() > 0){
+
+               $crawler->filter("#products-list li")->each(function($li){     
+
+                    if($li->filter("a")->count() > 0)
+                    {
+                        $link = trim($li->filter("a")->first()->attr("href"));
+                        if(!empty($link))
+                        {
+                            $data = session("temp_rows");
+                            $data[] = ['title' => "","link" => $link];
+                            session(["temp_rows" => $data]);                                           
+                        }
+                    }
+               });
+            }
+
+        }
+        else if($type == "rimfire_master_1")
+        {
+            if($crawler->filter(".subcategories-with-filters tr")->count() > 0){
+
+               $crawler->filter(".subcategories-with-filters tr")->each(function($li){     
+
+                    if($li->filter("td")->count() > 0)
+                    {
+                        $li->filter("td")->each(function($td){
+                            if($td->filter("a")->count() > 0)
+                            {
+                                $link = trim($td->filter("a")->first()->attr("href"));
+
+                                if(!empty($link))
+                                {
+                                    $data = session("temp_rows");
+                                    $data[] = ['title' => "","link" => $link];
+                                    session(["temp_rows" => $data]);                                           
+                                }
+                            }
+                        });
+                    }
+               });
+            }
+
+        }
+        else if($type == "shotgun_master")
+        {
+            if($crawler->filter(".subcategories table tr")->count() > 0){
+
+               $crawler->filter(".subcategories table tr")->each(function($li){     
+
+                    if($li->filter("td")->count() > 0)
+                    {
+                        $li->filter("td")->each(function($td){
+                            if($td->filter("a")->count() > 0)
+                            {
+                                $link = trim($td->filter("a")->first()->attr("href"));
+
+                                if(!empty($link))
+                                {
+                                    $data = session("temp_rows");
+                                    $data[] = ['title' => "","link" => $link];
+                                    session(["temp_rows" => $data]);                                           
+                                }
+                            }
+                        });
+                    }
+               });
+            }
+
+        }
+        else if($type == "detail")
+        {
+            echo "\Count:".$crawler->filter("h1.product-name")->count();
+            if($crawler->filter("h1.product-name")->count() > 0)
+            {
+                $title = trim($crawler->filter("h1.product-name")->text());
+                $price = "";
+                $desc = "";
+                $sale_price = "";
+
+                if($crawler->filter(".old-price .price")->count() > 0 && $crawler->filter(".special-price .price")->count() > 0)
+                {
+                    $price = trim($crawler->filter(".old-price .price")->first()->text());
+                    $sale_price = trim($crawler->filter(".special-price .price")->first()->text());   
+                }    
+                else if($crawler->filter(".product-shop .regular-price")->count() > 0)
+                {
+                    $price = trim($crawler->filter(".product-shop .regular-price")->first()->text());   
+                }
+
+                if($crawler->filter(".product-section-details .std")->count() > 0)
+                {
+                    $desc = trim($crawler->filter(".product-section-details .std")->first()->html());   
+                }
+
+
+                session(["tmp_options" => []]);
+
+                if($crawler->filter("#product-attribute-specs-table tr")->count() > 0)
+                {
+                    $crawler->filter("#product-attribute-specs-table tr")->each(function($row){
+
+                        if($row->filter(".label")->count() > 0 && $row->filter(".data")->count() > 0)
+                        {
+                            $optionText = trim($row->filter(".label")->text());
+                            $optionValue = trim($row->filter(".data")->text());                        
+                            $optionText = rtrim($optionText,":");
+                            $optionValue = ltrim($optionValue,":");
+
+                            if(!empty($optionText) && !empty($optionValue))
+                            {
+                                $tmp_options = session("tmp_options");
+                                $tmp_options[] = ["key" => $optionText,"value" => $optionValue];
+                                session(["tmp_options" => $tmp_options]);
+                            }                        
+                        }    
+                    });
+                }       
+
+                session(["tmp_images" => []]);
+
+                if($crawler->filter("#imageGallery li")->count() > 0)
+                {
+                    $crawler->filter("#imageGallery li")->each(function($li){                        
+                        $image = trim($li->attr("data-src"));                        
+                        if(!empty($image))
+                        {
+                            $tmp_options = session("tmp_images");
+                            $tmp_options[] = $image;
+                            session(["tmp_images" => $tmp_options]);
+                        }
+                    });
+                }             
+
+                $attr = session("tmp_options");
+                $images = session("tmp_images");
+
+                $row = [];
+                $row['title'] = $title;
+                $row['price'] = $price;
+                $row['sale_price'] = $sale_price;
+                $row['desc'] = $desc;
+                $row['attr'] = $attr;
+                $row['images'] = $images;
+
+                session(["temp_rows" => $row]);
+            }
+        }
+
+        return session("temp_rows");
+    }
     public static function scrapGuns($pageURL,$type)
     {
         $client = new Client();
@@ -137,6 +430,9 @@ class Scrapping {
         $client = new Client();
         $guzzleClient = new \GuzzleHttp\Client(array('curl' => array(CURLOPT_SSL_VERIFYPEER => false)));
         $client->setClient($guzzleClient);
+        
+        $client->setMaxRedirects(2);
+
         $options = array('request.options' => array(
                 'proxy' => 'socks5://127.0.0.1:9050',
         ));
@@ -153,7 +449,13 @@ class Scrapping {
             {
                 $crawler = $client->request('GET', $pageURL);
             }
+
+
         }
+        catch(\Symfony\Component\Debug\Exception\FatalErrorException $e)
+        {
+            return [];
+        }       
         catch(\Exception $e)
         {
             return [];
@@ -325,6 +627,32 @@ class Scrapping {
 
             return 0;
         }
+        else if($type == "grabagun_categories")
+        {
+            if($crawler->filter('#catList .item')->count() > 0)
+            {
+                $crawler->filter('#catList .item')->each(function ($ul) 
+                {                        
+                    if($ul->filter("a")->count() > 0)
+                    {
+                        $link = $ul->filter("a")->first()->attr("href");
+
+                        if(!empty($link))
+                        {
+                            $rows = session("rows");
+                            
+                            $rows[] = 
+                            [
+                                "name" => "",
+                                "link" => $link
+                            ];    
+
+                            session(["rows" => $rows]);
+                        }                        
+                    }
+                });
+            }            
+        }
         else if($type == "grabagun")
         {
             if($crawler->filter('.products-grid .item')->count() > 0)
@@ -397,6 +725,28 @@ class Scrapping {
             }      
 
             session(["tmp_options" => []]);
+
+            if($crawler->filter("#product-attribute-specs-table tr")->count() > 0)
+            {
+                $crawler->filter("#product-attribute-specs-table tr")->each(function($row){
+
+                    if($row->filter(".label")->count() > 0 && $row->filter(".data")->count() > 0)
+                    {
+                        $optionText = trim($row->filter(".label")->text());
+                        $optionValue = trim($row->filter(".data")->text());                        
+                        $optionText = rtrim($optionText,":");
+                        $optionValue = ltrim($optionValue,":");
+
+                        if(!empty($optionText) && !empty($optionValue))
+                        {
+                            $tmp_options = session("tmp_options");
+                            $tmp_options[] = ["key" => $optionText,"value" => $optionValue];
+                            session(["tmp_options" => $tmp_options]);
+                        }                        
+                    }    
+                });
+            }            
+
 
 
             $rows = session("rows");            

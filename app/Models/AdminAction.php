@@ -81,4 +81,8 @@ class AdminAction extends Model
 
     public $ADD_PRODUCT = 37;
     public $DELETE_PRODUCT = 38;
+
+    public static $ADD_SCRAP_URL = 39;
+    public static $EDIT_SCRAP_URL = 40;
+    public static $DELETE_SCRAP_URL = 41;    
 }

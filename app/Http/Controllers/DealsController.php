@@ -72,6 +72,8 @@ class DealsController extends Controller
                         ->whereIn("products.product_category_id",$ids)
                         ->paginate(10);
 
+        $deal = new \App\Models\Deal;
+        $data['featured_deals']= $deal->featuredDeals();                
         return view("listing", $data);
     }    
 }

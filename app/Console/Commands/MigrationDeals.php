@@ -353,6 +353,16 @@ class MigrationDeals extends Command
             $this->mapProductCategory();
             exit;
         }
+        else if($type == "scrap-ammo")
+        {
+            $this->scrapAmmo();
+            exit;
+        }
+        else if($type == "scrap-ammo-map-deal")
+        {
+            $this->scrapAmmoMapDeal();
+            exit;
+        }
         else
         {
             exit("Invalid cron type!");
@@ -361,4 +371,391 @@ class MigrationDeals extends Command
         $scriptEndTime = date("Y-m-d H:i:s");                
         storeCronLogs($scriptStartTime, $scriptEndTime, NULL, $content, 'Web Server', $cron_id, $mainLogID);        
     }   
+
+    function scrapAmmoMapDeal()
+    {
+        $i = 0;
+        $offset = 0;
+        $limit = 100;
+        while(true)
+        {
+            $rows = DB::table("deal_specifications as ds")
+                    ->select("deals.id","ds.value as upc")
+                    ->join("deals","deals.id","=","ds.deal_id")
+                    ->whereRaw("TRIM(LOWER(ds.`key`)) = 'upc' AND deals.product_id IS NULL")
+                    ->limit($limit)
+                    ->offset($offset)
+                    ->get();                    
+
+            $offset = $offset + $limit;      
+
+            if($rows && count($rows))
+            {
+                foreach($rows as $row)
+                {
+                    
+                    $dealID = $row->id;
+                    $upc = trim($row->upc);
+                    echo "\nUPC: ".$upc;
+                    $i++;
+                    echo "\n$i processed!";
+
+                    $product = \App\Models\AmmoProduct::where("upc_number",$upc)->first();
+
+                    if($product)
+                    {
+                        \DB::table("deals")
+                        ->where("id",$dealID)
+                        ->update
+                        (
+                            [
+                                "ammo_product_id" => $product->id 
+                            ]
+                        );                        
+                    }
+                    
+                    unset($product);
+                }
+            }  
+            else
+            {
+                break;
+            }
+        }        
+    }
+
+    function scrapAmmo()
+    {
+        $type = "Handgun Ammo";
+        $typeID = 36;
+        // $this->scrapMasterLinks($type, $typeID);
+
+        $type = "Rimfire Ammo";
+        $typeID = 37;
+        // $this->scrapMasterLinks($type, $typeID);
+
+        $type = "Rifle Ammo";
+        $typeID = 38;
+        // $this->scrapMasterLinks($type, $typeID);        
+
+        $type = "Shotgun Ammo";
+        $typeID = 39;
+        // $this->scrapMasterLinks($type, $typeID);        
+
+        $this->scrapAmmoDetails();
+    }
+
+    function scrapAmmoDetails()
+    {
+       $i = 0;
+       $offset = 0;
+       $limit = 100;
+       $counter = 0;
+       $date = date("Y-m-d");
+
+       while(true)
+       {
+            $rows = \DB::table("scrap_ammo_products")
+            ->limit($limit)
+            ->offset($offset)                
+            ->get();
+
+            $offset = $offset + $limit;
+
+            if($rows && count($rows))
+            {   
+                foreach($rows as $row)
+                {                  
+                    $mainID = $row->id;                    
+                    $url = $row->link;  
+                    echo "\nUrl: ".$url;            
+
+                    $res = \App\Scrapping::scrapAmmo($url,"detail");                                                        
+
+                    if(isset($res['title']))
+                    {
+                        $title = trim($res['title']);
+                        $price = trim($res['price']);
+                        $sale_price = trim($res['sale_price']);                        
+                        $desc = trim($res['desc']);
+                        $images = $res['images'];
+                        $attr = $res['attr'];
+
+                        $image = isset($images[0]) ? $images[0]:"";
+                        $item_unique_id = "";
+                        $upc_number = "";
+
+                        foreach($attr as $k => $r)
+                        {
+                            if($r['key'] == "UPC Barcode")
+                            {
+                                $upc_number = $r['value'];
+                                unset($attr[$k]);
+                            }
+                            else if($r['key'] == "Manufacturer SKU")
+                            {
+                                $item_unique_id = $r['value'];
+                                unset($attr[$k]);
+                            }
+                        }
+
+                        $product_id = null;
+
+                        if(!empty($upc_number))
+                        $product_id = "GR-".$upc_number;
+
+
+                        $dataToUpdate = 
+                        [
+                            "product_id" => $product_id,
+                            "title" => $title,
+                            "description" => $desc,
+                            "image" => $image,
+                            "item_unique_id" => $item_unique_id,
+                            "upc_number" => $upc_number,
+                            "attr" => json_encode($attr),
+                            "images" => json_encode($images),
+                        ];
+
+                        \DB::table("scrap_ammo_products")
+                        ->where("id",$mainID)
+                        ->update($dataToUpdate);
+
+                        $obj = \DB::table("scrap_ammo_prices")
+                        ->where("parent_id",$mainID)
+                        ->where("date",$date)
+                        ->first();
+
+                        if($obj)
+                        {
+                            \DB::table("scrap_ammo_prices")
+                            ->where("id",$obj->id)
+                            ->update([
+                                "regular_price" => $price,
+                                "sale_price" => $sale_price,
+                            ]);
+                        }
+                        else
+                        {
+                            \DB::table("scrap_ammo_prices")
+                            ->insert([
+                                "regular_price" => $price,
+                                "sale_price" => $sale_price,
+                                "parent_id" => $mainID,
+                                "date" => $date
+                            ]);
+                        }
+
+                    }
+
+                    $counter++;
+                    echo "\n $counter";
+                }
+            }   
+            else
+            {
+                break;
+            } 
+       }            
+    }
+
+    function scrapMasterLinks($type, $typeID)
+    {
+        if($type == "Handgun Ammo")
+        {            
+            $link = "https://www.luckygunner.com/handgun";
+            echo "\n Page: ".$link;
+            $links = Scrapping::scrapAmmo($link, "handgun_master");
+            $counter = 0;
+
+            foreach($links as $link)
+            {
+                $link = $link['link']."?limit=all";
+                echo "\n Sub Page: ".$link;
+                $rows = Scrapping::scrapAmmo($link, "handgun_master_1");                
+                foreach($rows as $row)
+                {
+                    $pageLink = $row['link'];
+
+                    if(!empty($pageLink))
+                    {
+                        $linkMD5 = md5($pageLink);
+                        $existObj = DB::table("scrap_ammo_products")->where("link_md5",$linkMD5)->first();
+                        if(!$existObj)
+                        {
+                            \DB::table("scrap_ammo_products")
+                            ->insert
+                            (
+                                [
+                                    "product_category_id" => $typeID,
+                                    "link" => $pageLink,
+                                    "link_md5" => $linkMD5,
+                                    "from_url" => $link,
+                                    "created_at" => date("Y-m-d H:i:s")
+                                ]
+                            );
+                        }
+
+                        $counter++;                        
+                        echo "\n".$counter;
+                    }
+                }
+            }
+        }        
+        else if($type == "Rifle Ammo")
+        {            
+            $link = "https://www.luckygunner.com/rifle";
+            echo "\n Page: ".$link;
+            $links = Scrapping::scrapAmmo($link, "handgun_master");
+            $counter = 0;
+
+            foreach($links as $link)
+            {
+                $link = $link['link']."?limit=all";
+                echo "\n Sub Page: ".$link;
+                $rows = Scrapping::scrapAmmo($link, "handgun_master_1");                
+                foreach($rows as $row)
+                {
+                    $pageLink = $row['link'];
+
+                    if(!empty($pageLink))
+                    {
+                        $linkMD5 = md5($pageLink);
+                        $existObj = DB::table("scrap_ammo_products")->where("link_md5",$linkMD5)->first();
+                        if(!$existObj)
+                        {
+                            \DB::table("scrap_ammo_products")
+                            ->insert
+                            (
+                                [
+                                    "product_category_id" => $typeID,
+                                    "link" => $pageLink,
+                                    "link_md5" => $linkMD5,
+                                    "from_url" => $link,
+                                    "created_at" => date("Y-m-d H:i:s")
+                                ]
+                            );
+                        }
+
+                        $counter++;                        
+                        echo "\n".$counter;
+                    }
+                }
+            }
+        }        
+        else if($type == "Rimfire Ammo")
+        {            
+            $link = "https://www.luckygunner.com/rimfire?limit=all";
+            echo "\n Page: ".$link;
+
+            $links = Scrapping::scrapAmmo($link, "rimfire_master");
+            $counter = 0;
+            foreach($links as $row)
+            {
+                $pageLink = $row['link'];
+
+                if(!empty($pageLink))
+                {
+                    $linkMD5 = md5($pageLink);
+                    $existObj = DB::table("scrap_ammo_products")->where("link_md5",$linkMD5)->first();
+                    if(!$existObj)
+                    {
+                        \DB::table("scrap_ammo_products")
+                        ->insert
+                        (
+                            [
+                                "product_category_id" => $typeID,
+                                "link" => $pageLink,
+                                "link_md5" => $linkMD5,
+                                "from_url" => $link,
+                                "created_at" => date("Y-m-d H:i:s")
+                            ]
+                        );
+                    }
+
+                    $counter++;                        
+                    echo "\n".$counter;
+                }
+            }
+
+            $links = Scrapping::scrapAmmo($link, "rimfire_master_1");
+            foreach($links as $link)
+            {
+                $link = $link['link']."?limit=all";
+                echo "\n Sub Page: ".$link;
+                $rows = Scrapping::scrapAmmo($link, "rimfire_master_2");                
+                foreach($rows as $row)
+                {
+                    $pageLink = $row['link'];
+
+                    if(!empty($pageLink))
+                    {
+                        $linkMD5 = md5($pageLink);
+                        $existObj = DB::table("scrap_ammo_products")->where("link_md5",$linkMD5)->first();
+                        if(!$existObj)
+                        {
+                            \DB::table("scrap_ammo_products")
+                            ->insert
+                            (
+                                [
+                                    "product_category_id" => $typeID,
+                                    "link" => $pageLink,
+                                    "link_md5" => $linkMD5,
+                                    "from_url" => $link,
+                                    "created_at" => date("Y-m-d H:i:s")
+                                ]
+                            );
+                        }
+
+                        $counter++;                        
+                        echo "\n".$counter;
+                    }
+                }
+
+            }
+
+        }
+        else if($type == "Shotgun Ammo")
+        {            
+            $link = "https://www.luckygunner.com/shotgun";
+            echo "\n Page: ".$link;
+
+            $counter = 0;
+
+            $links = Scrapping::scrapAmmo($link, "shotgun_master");
+            foreach($links as $link)
+            {
+                $link = $link['link']."?limit=all";
+                echo "\n Sub Page: ".$link;
+                $rows = Scrapping::scrapAmmo($link, "rimfire_master_2");                
+                foreach($rows as $row)
+                {
+                    $pageLink = $row['link'];
+
+                    if(!empty($pageLink))
+                    {
+                        $linkMD5 = md5($pageLink);
+                        $existObj = DB::table("scrap_ammo_products")->where("link_md5",$linkMD5)->first();
+                        if(!$existObj)
+                        {
+                            \DB::table("scrap_ammo_products")
+                            ->insert
+                            (
+                                [
+                                    "product_category_id" => $typeID,
+                                    "link" => $pageLink,
+                                    "link_md5" => $linkMD5,
+                                    "from_url" => $link,
+                                    "created_at" => date("Y-m-d H:i:s")
+                                ]
+                            );
+                        }
+
+                        $counter++;                        
+                        echo "\n".$counter;
+                    }
+                }
+            }
+        }
+    }
 }

@@ -3,6 +3,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Models\ScrapSourceUrl;
+use App\Scrapping;
 
 class ScrapDeals extends Command
 {
@@ -12,1468 +14,423 @@ class ScrapDeals extends Command
 
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct();        
     }
 
-    public function mapCategory($categories, $mainID)
+    public function startScrapping($source_id,$params)
     {
-        $lastID = 0;
-        
-        foreach($categories as $key => $val)
+        $scrap_urls = \Config::get("app.scrap_urls");
+        $scrapType = "";
+        if(isset($scrap_urls[$source_id]))
         {
-            $categoryID = \App\Models\Category::getCategory($val,$lastID);
-            $lastID = $categoryID;
+            $scrapType = $scrap_urls[$source_id];
         }
-        
-        \DB::table("deals")
-        ->where("id",$mainID)        
-        ->update(["category_id" => $lastID]);
+
+        $res = [];
+
+        switch($scrapType)
+        {
+            case 'SCRAP_GRABGUN_DEALS':
+                      // $this->scrap_grabgun_deals($params);
+                      break;
+            case 'SCRAP_GRABGUN_PRODUCTS':
+                      $this->scrap_grabgun_products($params);
+                      break;
+            default:
+                      echo "\n No source founded!";  
+                      break;
+        }
+
+        return $res;
     }
 
-    public function scrapEArmsMasterLinks()
+    public function createDeal($res)
     {
-        $flag = true;
-        $i = 1;
-        $cnt = 0;
-        $newAdded = 0;
-        while($flag)
+        $linkMD5 = $res['linkMD5'];
+        $link = $res['link'];
+        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
+        $title = $res['name'];
+
+        $dataToUpdate = 
+        [
+            "source_id" => $res['source_id'],
+            "title" => $title,
+            "link" => $link,            
+            "unique_md5" => $linkMD5,
+            "out_of_stock" => $res["out_of_stock"],
+            "description" => $res["description"],
+            "qty_options" => !empty($res['qty_options']) ? json_encode($res['qty_options']):"",
+            "sale_price" => $res["special_price"],
+            "base_price" => $res["old_price"],
+            "ext_date" => $res["ext_date"],
+            "save_price" => $res["saving_price"],                                            
+        ];        
+
+        $dataToUpdate["last_visit_date"] = date("Y-m-d H:i:s");
+        $dataToUpdate["updated_at"] = date("Y-m-d H:i:s");
+
+        if($res['category_id'] > 0)
+        $dataToUpdate["category_id"] = $res['category_id'];
+
+        if(isset($res['from_url']))
+        {
+            $dataToUpdate["from_url"] = $res['from_url'];
+        }
+    
+
+        $specifications = $res['specification'];    
+        $upc_number = "";
+
+        if(count($specifications) > 0)
         {
 
-            $url = "https://e-arms.com/hot-deals/?page=$i";
-            $rows = \App\Scrapping::deal_scraps("e-arms",$url);
-
-            echo "\n$url";
-
-            if(is_array($rows) && count($rows))
+            foreach($specifications as $row)
             {
-                    foreach($rows as $link)
-                    {
-                        $linkMD5 = md5($link);
-                        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                        if(!$isExist)
-                        {
-                            \DB::table("deals")
-                            ->insert([
-                                "source_id" => 2,
-                                "title" => "",
-                                "link" => $link,
-                                "unique_md5" => $linkMD5,
-                                "created_at" => date("Y-m-d H:i:s")
-                            ]);
+                if(trim(strtolower($row['key'])) == "upc")
+                {
+                    $upc_number = $row['value'];
+                }
+            }                    
+        }               
 
-                            $newAdded++;
-                        }
+        $unique_id = null;
 
-                        $cnt++;
-                        echo "\n".$cnt." records processed.";
+        if(!empty($upc_number))
+        $unique_id = "GR-".$upc_number;
 
-                    }
+        $dataToUpdate["unique_id"] = $unique_id;
+        $dataToUpdate["upc_number"] = $upc_number;
 
-            }
-            else
-            {
-                $flag = false;
-            }
-
-            $i++;
-        }             
-
-        return ['total' => $cnt,"new" => $newAdded];   
-    }
-    public function scrapEArmsDetailLinks()
-    {
-        $rows = \DB::table("deals")
-        ->where("source_id",2)
-        ->get();
-
-        $counter = 0;
-        foreach ($rows as $row) 
+        if(!$isExist)
         {
-            $counter++;
+            $dataToUpdate["created_at"] = date("Y-m-d H:i:s");
+            $deal_id = \DB::table("deals")->insertGetId($dataToUpdate);
 
-            $url = $row->link;
-            $urlMD5 = md5($row->link);
-            $mainID = $row->id;
-
-            echo "\nUrl: ".$url;
-            $res = \App\Scrapping::deal_scraps("earms_detail",$url);
-
-            $categories = $res['categories'];            
-
-            if(count($categories))
-            {
-                unset($categories[count($categories)-1]);
-            }
-
-            $this->mapCategory($categories, $mainID);
-
-            if(array_keys($res) > 0 && false)
-            {
-                $source_id = 2;
-                $dataToUpdate = 
+            // Deal Prices
+            \DB::table("deal_prices")
+            ->insert
+            (
                 [
-                    "source_id" => $source_id,
-                    "title" => $res["name"],
-                    "out_of_stock" => $res["out_of_stock"],
-                    "description" => $res["description"],
-                    "link" => $url,
-                    "from_url" => $url,
-                    "unique_md5" => $urlMD5,
+                    "deal_id" => $deal_id,
                     "sale_price" => $res["special_price"],
                     "base_price" => $res["old_price"],
-                    "ext_date" => $res["ext_date"],
-                    "save_price" => $res["saving_price"],                    
-                ];                
-
-                $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-                $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-
-                $deal_id = $mainID;
-
-                \DB::table("deals")
-                ->where("id",$deal_id)
-                ->update($dataToUpdate);
-
-                // Add Photos
-                \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                $images = $res['images'];    
-                if(count($images) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($images as $row)
-                    {
-                        $image = $row['image'];                        
-                        $dataToInsert[] = [
-                            "deal_id" => $deal_id,
-                            "image_url" => $image,
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_photos")->insert($dataToInsert);
-                }
-
-                // Add Specifications                
-                \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                $specifications = $res['specification'];    
-                if(count($specifications) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($specifications as $row)
-                    {
-                        $dataToInsert[] = 
-                        [
-                            "deal_id" => $deal_id,
-                            "key" => $row['key'],
-                            "value" => $row['value'],
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_specifications")->insert($dataToInsert);
-                }                
-            }
-
-            
-            echo "\ncounter: ".$counter;            
+                    "date" => date("Y-m-d")
+                ]
+            );
         }
+        else
+        {
+            $deal_id = $isExist->id;
+            \DB::table("deals")
+            ->where("id",$deal_id)
+            ->update($dataToUpdate);            
+
+            // Deal Prices
+            if(($isExist->sale_price != $res["special_price"]) || ($isExist->base_price != $res["old_price"]))
+            {
+                \DB::table("deal_prices")
+                ->insert
+                (
+                    [
+                        "deal_id" => $deal_id,
+                        "sale_price" => $res["special_price"],
+                        "base_price" => $res["old_price"],
+                        "date" => date("Y-m-d")
+                    ]
+                );
+            }
+        }
+
+        // Add Photos
+        \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
+        $images = $res['images'];    
+        if(count($images) > 0)
+        {
+            $dataToInsert = [];
+            foreach($images as $row)
+            {
+                $image = $row['image'];                        
+                $dataToInsert[] = [
+                    "deal_id" => $deal_id,
+                    "image_url" => $image,
+                    "created_at" => date("Y-m-d H:i:s"),
+                ];
+            }                    
+
+            \DB::table("deal_photos")->insert($dataToInsert);
+        }
+
+        // Add Specifications                
+        \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
+        
+        if(count($specifications) > 0)
+        {
+            $dataToInsert = [];
+            foreach($specifications as $row)
+            {
+                $dataToInsert[] = 
+                [
+                    "deal_id" => $deal_id,
+                    "key" => $row['key'],
+                    "value" => $row['value'],
+                    "created_at" => date("Y-m-d H:i:s"),
+                ];
+            }                    
+
+            \DB::table("deal_specifications")->insert($dataToInsert);
+        }               
+
     }
 
-    public function scrapPrimaryArmsMasterLinks()
+    public function createProduct($res)
     {
-        $flag = true;
-        $i = 1;
-        $cnt = 0;
-        $newAdded = 0;
-        while($flag)
+        $linkMD5 = $res['linkMD5'];
+        $link = $res['link'];        
+        $title = $res['title'];
+        $isExist = \DB::table("products")->where("link_md5",$linkMD5)->first();
+        $specifications = $res['attr'];
+
+        if(count($specifications) > 0)
         {
-            $url = "https://www.primaryarms.com/AdName+Clearance,Sale?show=96&page=$i";
-            $rows = \App\Scrapping::deal_scraps("primaryarms",$url);
-
-            echo "\n$url";
-            // print_r($rows);
-            if(is_array($rows) && count($rows))
+            foreach($specifications as $row)
             {
-                    foreach($rows as $link)
-                    {
-                        $linkMD5 = md5($link);
-                        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                        if(!$isExist)
-                        {
-                            \DB::table("deals")
-                            ->insert([
-                                "source_id" => 3,
-                                "title" => "",
-                                "link" => $link,
-                                "unique_md5" => $linkMD5,
-                                "created_at" => date("Y-m-d H:i:s")
-                            ]);
+                if(trim(strtolower($row['key'])) == "upc")
+                {
+                    $upc_number = $row['value'];
+                }
+            }                    
+        }               
 
-                            $newAdded++;
-                        }
+        $unique_id = null;
 
-                        $cnt++;
-                        echo "\n".$cnt." records processed.";
-                    }
+        if(!empty($upc_number))
+        $unique_id = "GR-".$upc_number;
 
-            }
-            else
+        $image = "";
+
+        $images = $res['images'];    
+        if(count($images) > 0)
+        {
+            foreach($images as $row)
             {
-                $flag = false;
+                $image = $row['image'];                        
+                break;
+            }                    
+        }        
+
+        $dataToInsert = 
+        [
+            "source_id" => $res['source_id'],
+            "product_id" => $unique_id,
+            "title" => $title,
+            "link" => $link,
+            "link_md5" => $linkMD5,
+            "image" => $image,
+            "upc_number" => $upc_number,
+            "sale_price" => $res["special_price"],
+            "base_price" => $res["old_price"]
+        ];
+
+        if($res['category_id'] > 0)
+        $dataToInsert["product_category_id"] = $res['category_id'];
+
+        if(isset($res['from_url']))
+        {
+            $dataToInsert["from_url"] = $res['from_url'];
+        }
+
+        $dataToInsert["last_visit_date"] = date("Y-m-d H:i:s");
+        $dataToInsert['created_at'] = date("Y-m-d H:i:s");
+
+        if($isExist)
+        {
+            $productId = $isExist->id;
+
+            \DB::table("product_attributes")
+            ->where("id",$productId)
+            ->delete();
+
+            $dataToInsert['updated_at'] = $dataToInsert['created_at'];
+            unset($dataToInsert['created_at']);
+
+            \DB::table("products")
+            ->where("id",$productId)
+            ->update($dataToInsert);
+
+            // Deal Prices
+            if(($isExist->sale_price != $res["special_price"] && !empty($res["special_price"])) || ($isExist->base_price != $res["old_price"] && !empty($res["old_price"])))
+            {
+                \DB::table("product_prices")
+                ->insert
+                (
+                    [
+                        "product_id" => $productId,
+                        "sale_price" => $res["special_price"],
+                        "base_price" => $res["old_price"],
+                        "date" => date("Y-m-d")
+                    ]
+                );
             }
 
-            $i++;
-        }                
+        }
+        else
+        {
+            $productId = \DB::table("products")
+            ->insertGetId($dataToInsert);            
 
-        return ['total' => $cnt,"new" => $newAdded];
+            // Deal Prices
+            \DB::table("product_prices")
+            ->insert
+            (
+                [
+                    "product_id" => $productId,
+                    "sale_price" => $res["special_price"],
+                    "base_price" => $res["old_price"],
+                    "date" => date("Y-m-d")
+                ]
+            );            
+        }        
+
+        if(count($specifications) > 0)
+        {
+            foreach($specifications as $r)
+            {
+                \DB::table("product_attributes")
+                ->insert([
+                    "product_id" => $productId,
+                    "keyname" => $r["key"],
+                    "keyvalue" => $r["value"],
+                ]);
+            }
+        }        
     }
-    public function scrapPrimaryArmsDetailLinks()
+
+    public function scrap_grabgun_products($params)
     {
-        $rows = \DB::table("deals")
-        ->where("source_id",3)
-        ->get();
-
-        $counter = 0;
-        foreach ($rows as $row) 
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $masterLinks = Scrapping::scrapGrabGunsProductLinks($scrap_url);        
+        // $masterLinks[] = [
+        //     "link" => "https://grabagun.com/s-w-642-1-875-38spl-sts-alum-cent.html",            
+        // ];
+        // $masterLinks[] = [
+        //     "link" => "https://grabagun.com/s-w-m-p9shield-10035-9m-3-1-7-8r-nms.html?source=igodigital",
+        // ];
+        echo "Total Links: ".count($masterLinks);
+        foreach($masterLinks as $link)
         {
-            $url = $row->link;
-            $urlMD5 = md5($row->link);
-            $mainID = $row->id;
-
-            echo "\nUrl: ".$url;
-
-            $res = \App\Scrapping::deal_scraps("primaryarms_detail",$url);
-
+            $url = $link['link'];
+            $link = trim($url);
+            $res = \App\Scrapping::deal_scraps("grabagun_detail",$link);            
             if(array_keys($res) > 0)
-            {
-                $source_id = 3;
-                $dataToUpdate = 
-                [
-                    "source_id" => $source_id,
-                    "title" => $res["name"],
-                    "out_of_stock" => $res["out_of_stock"],
-                    "description" => $res["description"],
-                    "link" => $url,
-                    "from_url" => $url,
-                    "unique_md5" => $urlMD5,
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "ext_date" => $res["ext_date"],
-                    "save_price" => $res["saving_price"],                    
-                ];                
+            {                
+                $linkMD5 = md5($link);                                
+                $res['link'] = $link;
+                $res['linkMD5'] = $linkMD5;                
+                $res['category_id'] = $category_id;
+                $res['source_id'] = $source_id;
+                $res['from_url'] = $scrap_url;
 
-                $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-                $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-
-                $deal_id = $mainID;
-
-                \DB::table("deals")
-                ->where("id",$deal_id)
-                ->update($dataToUpdate);
-
-                // Add Photos
-                \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                $images = $res['images'];    
-                if(count($images) > 0)
+                // create/update record
+                if($source_type == 1)
                 {
-                    $dataToInsert = [];
-                    foreach($images as $row)
-                    {
-                        $image = $row['image'];                        
-                        $dataToInsert[] = [
-                            "deal_id" => $deal_id,
-                            "image_url" => $image,
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_photos")->insert($dataToInsert);
-                }
-
-                // Add Specifications                
-                \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                $specifications = $res['specification'];    
-                if(count($specifications) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($specifications as $row)
-                    {
-                        $dataToInsert[] = 
-                        [
-                            "deal_id" => $deal_id,
-                            "key" => $row['key'],
-                            "value" => $row['value'],
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_specifications")->insert($dataToInsert);
-                }                
-            }
-
-            $counter++;
-            echo "\ncounter: ".$counter;            
-        }
-    }
-
-    public function scrapBrownellsMasterLinks()
-    {
-        $flag = true;
-        $i = 1;
-        $cnt = 0;
-        $offset = 1;
-        $newAdded = 0;
-        while($flag)
-        {
-            $url = "https://www.brownells.com/search/index.htm?avs%7cSpecial-Filters_1=Salezz1zzClearance%7cRebate&psize=96";
-
-            if($i > 0)
-            {
-                $offset = $offset + 96;
-                $url .= "&f_a=".$offset;
-            }
-            
-            $rows = \App\Scrapping::deal_scraps("brownells",$url);
-
-            echo "\n$url";
-
-            if(is_array($rows) && count($rows) > 0)
-            {
-                    foreach($rows as $link)
-                    {
-                        $linkMD5 = md5($link);
-                        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                        if(!$isExist)
-                        {
-                            \DB::table("deals")
-                            ->insert([
-                                "source_id" => 4,
-                                "title" => "",
-                                "link" => $link,
-                                "unique_md5" => $linkMD5,
-                                "created_at" => date("Y-m-d H:i:s")
-                            ]);
-
-                            $newAdded++;
-                        }
-
-                        $cnt++;
-                        echo "\n".$cnt." records processed.";
-                    }
-            }
-            else
-            {
-                $flag = false;
-            }
-
-            $i++;
-        }              
-
-        return ['total' => $cnt,"new" => $newAdded];  
-    }
-    public function scrapBrownellsDetailLinks()
-    {
-           $i = 0;
-           $offset = 0;
-           $limit = 100;
-           $counter = 0;
-           while(true)
-           {
-                $rows = \DB::table("deals")
-                ->where("source_id",4)
-                ->limit($limit)
-                ->offset($offset)                
-                ->get();
-
-                $offset = $offset + $limit;
-
-                if($rows && count($rows))
-                {
-                    foreach ($rows as $row) 
-                    {
-                        $counter++;            
-                        
-                        $url = $row->link;
-                        $urlMD5 = md5($row->link);
-                        $mainID = $row->id;
-
-                        echo "\nUrl: ".$url;            
-                        $res = \App\Scrapping::deal_scraps("brownells_detail",$url);                                    
-                        $categories = $res['categories'];            
-                        if(count($categories))
-                        {
-                            unset($categories[count($categories)-1]);
-                        }
-                        
-                        $this->mapCategory($categories, $mainID);
-                        
-                        if(array_keys($res) > 0 && isset($res["name"]) && !empty($res["name"]))
-                        {
-                            $source_id = 4;
-
-                            $dataToUpdate = 
-                            [
-                                "source_id" => $source_id,
-                                "title" => $res["name"],
-                                "out_of_stock" => $res["out_of_stock"],
-                                "description" => $res["description"],
-                                "link" => $url,
-                                "from_url" => $url,
-                                "unique_md5" => $urlMD5,
-                                "sale_price" => $res["special_price"],
-                                "base_price" => $res["old_price"],
-                                "ext_date" => $res["ext_date"],
-                                "save_price" => $res["saving_price"],                    
-                            ];                
-
-                            $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-                            $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-                            $deal_id = $mainID;
-
-                            \DB::table("deals")
-                            ->where("id",$deal_id)
-                            ->update($dataToUpdate);
-
-                            // Add Photos
-                            \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                            $images = $res['images'];    
-                            if(count($images) > 0)
-                            {
-                                $dataToInsert = [];
-                                foreach($images as $row)
-                                {
-                                    $image = $row['image'];                        
-                                    $dataToInsert[] = [
-                                        "deal_id" => $deal_id,
-                                        "image_url" => $image,
-                                        "created_at" => date("Y-m-d H:i:s"),
-                                    ];
-                                }                    
-
-                                \DB::table("deal_photos")->insert($dataToInsert);
-                            }
-
-                            // Add Specifications                
-                            \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                            $specifications = $res['specification'];    
-                            if(count($specifications) > 0)
-                            {
-                                $dataToInsert = [];
-                                foreach($specifications as $row)
-                                {
-                                    $dataToInsert[] = 
-                                    [
-                                        "deal_id" => $deal_id,
-                                        "key" => $row['key'],
-                                        "value" => $row['value'],
-                                        "created_at" => date("Y-m-d H:i:s"),
-                                    ];
-                                }                    
-
-                                \DB::table("deal_specifications")->insert($dataToInsert);
-                            }                
-                        }
-                        
-                        echo "\ncounter: ".$counter;            
-                    }
+                    $response['title'] = $res['name'];
+                    $response['link'] = $res['link'];
+                    $response['linkMD5'] = $res['linkMD5'];
+                    $response['category_id'] = $res['category_id'];
+                    $response['source_id'] = $res['source_id'];
+                    $response['images'] = $res['images'];
+                    $response['attr'] = $res['specification'];
+                    $response['special_price'] = $res['special_price'];
+                    $response['old_price'] = $res['old_price'];                    
+                    $response['from_url'] = $scrap_url;
+                    $this->createProduct($response);                
                 }
                 else
                 {
-                    break;
+                    $this->createDeal($res);                
                 }
-           }
-    }
-
-    public function scrapSgammoMasterLinks()
-    {        
-        $cnt = 0;
-        $url = "https://www.sgammo.com/new-this-month";
-        $totalPages = \App\Scrapping::deal_scraps("sgammo_count",$url);
-        echo "\nTotal Pages: ".$totalPages;        
-        $newAdded = 0;
-        for($j=0;$j<=$totalPages;$j++)
-        {
-            if($j > 0)
-            {
-                $url = "https://www.sgammo.com/new-this-month?page=$j";                
-            }
-            
-            $rows = \App\Scrapping::deal_scraps("sgammo",$url);
-
-            echo "\n$url";
-
-            if(is_array($rows) && count($rows) > 0)
-            {
-                    foreach($rows as $link)
-                    {
-                        $linkMD5 = md5($link);
-                        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                        if(!$isExist)
-                        {
-                            \DB::table("deals")
-                            ->insert([
-                                "source_id" => 5,
-                                "title" => "",
-                                "link" => $link,
-                                "unique_md5" => $linkMD5,
-                                "created_at" => date("Y-m-d H:i:s")
-                            ]);
-
-                            $newAdded++;
-                        }
-
-                        $cnt++;
-                        echo "\n".$cnt." records processed.";
-                    }
-            }
-            
-        }
-
-        return ['total' => $cnt,"new" => $newAdded];
-    }    
-    public function scrapSgammoDetailLinks()
-    {
-        $rows = \DB::table("deals")
-        ->where("source_id",5)
-        ->get();
-
-        $counter = 0;
-        foreach ($rows as $row) 
-        {
-            $counter++;            
-            
-            $url = $row->link;
-            $urlMD5 = md5($row->link);
-            $mainID = $row->id;
-
-            echo "\nUrl: ".$url;            
-            $res = \App\Scrapping::deal_scraps("sgammo_detail",$url);                                    
-
-
-            
-            if(array_keys($res) > 0)
-            {
-
-                $categories = $res['categories'];            
-
-                if(count($categories))
-                {
-                    $this->mapCategory($categories, $mainID);
-                }                                
-
-
-                $source_id = 5;
-                $dataToUpdate = 
-                [
-                    "source_id" => $source_id,
-                    "title" => $res["name"],
-                    "out_of_stock" => $res["out_of_stock"],
-                    "description" => $res["description"],
-                    "qty_options" => !empty($res['qty_options']) ? json_encode($res['qty_options']):"",
-                    "link" => $url,
-                    "from_url" => $url,
-                    "unique_md5" => $urlMD5,
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "ext_date" => $res["ext_date"],
-                    "save_price" => $res["saving_price"],                    
-                ];                
-
-                $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-                $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-                $deal_id = $mainID;
-
-                \DB::table("deals")
-                ->where("id",$deal_id)
-                ->update($dataToUpdate);
-
-                // Add Photos
-                \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                $images = $res['images'];    
-                if(count($images) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($images as $row)
-                    {
-                        $image = $row['image'];                        
-                        $dataToInsert[] = [
-                            "deal_id" => $deal_id,
-                            "image_url" => $image,
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_photos")->insert($dataToInsert);
-                }
-
-                // Add Specifications                
-                \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                $specifications = $res['specification'];    
-                if(count($specifications) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($specifications as $row)
-                    {
-                        $dataToInsert[] = 
-                        [
-                            "deal_id" => $deal_id,
-                            "key" => $row['key'],
-                            "value" => $row['value'],
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_specifications")->insert($dataToInsert);
-                }               
-            }
-            
-            echo "\ncounter: ".$counter;            
+            }            
         }        
     }
 
-    public function scrapRighttoBearMasterLinks(){
-
-        $cnt = 0;
-        $url = "https://www.righttobear.com/dealoftheday.asp";        
-        $rows = \App\Scrapping::deal_scraps("righttobear_deals",$url);
-        echo "\n$url";
-        $newAdded = 0;
-        if(is_array($rows) && count($rows) > 0)
-        {
-                foreach($rows as $link)
-                {
-                    $linkMD5 = md5($link);
-                    $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                    if(!$isExist)
-                    {
-                        \DB::table("deals")
-                        ->insert([
-                            "source_id" => 6,
-                            "title" => "",
-                            "link" => $link,
-                            "unique_md5" => $linkMD5,
-                            "created_at" => date("Y-m-d H:i:s")
-                        ]);
-                        $newAdded++;
-                    }
-
-                    $cnt++;
-                    echo "\n".$cnt." records processed.";
-                }
-        }
-
-        $url = "https://www.righttobear.com/discount-AR-parts-s/1913.htm?searching=Y&sort=11&cat=1913&show=600&page=1";
-        $rows = \App\Scrapping::deal_scraps("righttobear_sales",$url);
-        echo "\n$url";
-
-        if(is_array($rows) && count($rows) > 0)
-        {
-                foreach($rows as $link)
-                {
-                    $linkMD5 = md5($link);
-                    $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                    if(!$isExist)
-                    {
-                        \DB::table("deals")
-                        ->insert([
-                            "source_id" => 6,
-                            "title" => "",
-                            "link" => $link,
-                            "unique_md5" => $linkMD5,
-                            "created_at" => date("Y-m-d H:i:s")
-                        ]);
-
-                        $newAdded++;
-                    }
-
-                    $cnt++;
-                    echo "\n".$cnt." records processed.";
-                }
-        }
-
-        return ['total' => $cnt,"new" => $newAdded];
-    }
-    public function scrapRighttoBearDetailLinks()
+    public function scrap_grabgun_deals($params)
     {
-        $rows = \DB::table("deals")
-        ->where("source_id",6)
-        ->get();
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
 
-        $counter = 0;
-        foreach ($rows as $row) 
+        $masterLinks = Scrapping::scrapGrabGunsListingLinks($scrap_url);        
+
+        echo "\n Total Links: ".count($masterLinks);  
+
+        foreach($masterLinks as $link)
         {
-            $counter++;            
-            
-            $url = $row->link;
-            $urlMD5 = md5($row->link);
-            $mainID = $row->id;
-
-            echo "\nUrl: ".$url;            
-            $res = \App\Scrapping::deal_scraps("righttobear_detail",$url);
-
-            // print_r($res);
-            // exit;
-            
+            $url = $link['link'];
+            $link = trim($url);
+            $res = \App\Scrapping::deal_scraps("grabagun_detail",$link);
             if(array_keys($res) > 0)
-            {
-
-                // $categories = $res['categories'];            
-
-                // if(count($categories))
-                // {
-                //     $this->mapCategory($categories, $mainID);
-                // }                                
-
-                $source_id = 6;
-                $dataToUpdate = 
-                [
-                    "source_id" => $source_id,
-                    "title" => $res["name"],
-                    "out_of_stock" => $res["out_of_stock"],
-                    "description" => $res["description"],
-                    "qty_options" => !empty($res['qty_options']) ? json_encode($res['qty_options']):"",
-                    "link" => $url,
-                    "from_url" => $url,
-                    "unique_md5" => $urlMD5,
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "ext_date" => $res["ext_date"],
-                    "save_price" => $res["saving_price"],                    
-                ];                
-
-                $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-                $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-                $deal_id = $mainID;
-
-                \DB::table("deals")
-                ->where("id",$deal_id)
-                ->update($dataToUpdate);
-
-                // Add Photos
-                \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                $images = $res['images'];    
-                if(count($images) > 0)
+            {                
+                $linkMD5 = md5($link);                                
+                $res['link'] = $link;
+                $res['linkMD5'] = $linkMD5;                
+                $res['category_id'] = $category_id;
+                $res['source_id'] = $source_id;
+                $res['from_url'] = $scrap_url;
+                // create/update record
+                if($source_type == 1)
                 {
-                    $dataToInsert = [];
-                    $tmpI = [];
-                    foreach($images as $row)
-                    {
-                        $image = $row['image'];                        
-                        if(!isset($tmpI[$image]))
-                        {
-                            $tmpI[$image] = 0;                        
-                            $dataToInsert[] = [
-                                "deal_id" => $deal_id,
-                                "image_url" => $image,
-                                "created_at" => date("Y-m-d H:i:s"),
-                            ];
-                        }
-                    }                    
-
-                    \DB::table("deal_photos")->insert($dataToInsert);
+                    $response['title'] = $res['name'];
+                    $response['link'] = $res['link'];
+                    $response['linkMD5'] = $res['linkMD5'];
+                    $response['category_id'] = $res['category_id'];
+                    $response['source_id'] = $res['source_id'];
+                    $response['images'] = $res['images'];
+                    $response['attr'] = $res['specification'];                    
+                    $response['special_price'] = $res['special_price'];
+                    $response['old_price'] = $res['old_price'];                                        
+                    $response['from_url'] = $scrap_url;
+                    $this->createProduct($response);                
                 }
-
-                // Add Specifications                
-                \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                $specifications = $res['specification'];    
-                if(count($specifications) > 0)
+                else
                 {
-                    $dataToInsert = [];
-                    foreach($specifications as $row)
-                    {
-                        $dataToInsert[] = 
-                        [
-                            "deal_id" => $deal_id,
-                            "key" => $row['key'],
-                            "value" => $row['value'],
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_specifications")->insert($dataToInsert);
-                }               
+                    $this->createDeal($res);                
+                }
             }
-            
-            echo "\ncounter: ".$counter;            
         }
     }
-
-    public function scrapPreppergunshopMasterLinks()
-    {
-        $cnt = 0;
-        $url = "https://www.preppergunshop.com/sale?limit=150";
-        $totalPages = \App\Scrapping::deal_scraps("preppergunshop_count",$url);
-        echo "\nTotal Pages: ".$totalPages;        
-
-        $newAdded = 0;  
-
-        for($j=1;$j<=$totalPages;$j++)
-        {
-            $url = "https://www.preppergunshop.com/sale?limit=150&p=$j";                            
-            
-            $rows = \App\Scrapping::deal_scraps("preppergunshop",$url);
-
-            echo "\n$url";
-
-            if(is_array($rows) && count($rows) > 0)
-            {
-                    foreach($rows as $link)
-                    {
-                        $linkMD5 = md5($link);
-                        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-
-                        if(!$isExist)
-                        {
-                            \DB::table("deals")
-                            ->insert([
-                                "source_id" => 9,
-                                "title" => "",
-                                "link" => $link,
-                                "unique_md5" => $linkMD5,
-                                "created_at" => date("Y-m-d H:i:s")
-                            ]);
-
-                            $newAdded++;
-                        }
-
-                        $cnt++;
-                        echo "\n".$cnt." records processed.";
-                    }
-            }
-            
-        }
-
-        return ['total' => $cnt,"new" => $newAdded];
-    }
-    public function scrapPreppergunshopDetailLinks()
-    {
-        $rows = \DB::table("deals")
-        ->where("source_id",9)
-        ->get();
-
-        $counter = 0;
-        foreach ($rows as $row) 
-        {
-            $counter++;            
-            
-            $url = $row->link;
-            $urlMD5 = md5($row->link);
-            $mainID = $row->id;
-
-            echo "\nUrl: ".$url;            
-            $res = \App\Scrapping::deal_scraps("preppergunshop_detail",$url);
-
-            // print_r($res);
-            // exit;
-            
-            if(array_keys($res) > 0)
-            {
-
-                // $categories = $res['categories'];            
-
-                // if(count($categories))
-                // {
-                //     $this->mapCategory($categories, $mainID);
-                // }                                
-
-                $source_id = 9;
-                $dataToUpdate = 
-                [
-                    "source_id" => $source_id,
-                    "title" => $res["name"],
-                    "out_of_stock" => $res["out_of_stock"],
-                    "description" => $res["description"],
-                    "qty_options" => !empty($res['qty_options']) ? json_encode($res['qty_options']):"",
-                    "link" => $url,
-                    "from_url" => $url,
-                    "unique_md5" => $urlMD5,
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "ext_date" => $res["ext_date"],
-                    "save_price" => $res["saving_price"],                    
-                ];                
-
-                $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-                $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-                $deal_id = $mainID;
-
-                \DB::table("deals")
-                ->where("id",$deal_id)
-                ->update($dataToUpdate);
-
-                // Add Photos
-                \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                $images = $res['images'];    
-                if(count($images) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($images as $row)
-                    {
-                        $image = $row['image'];                        
-                        $dataToInsert[] = [
-                            "deal_id" => $deal_id,
-                            "image_url" => $image,
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_photos")->insert($dataToInsert);
-                }
-
-                // Add Specifications                
-                \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                $specifications = $res['specification'];    
-                if(count($specifications) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($specifications as $row)
-                    {
-                        $dataToInsert[] = 
-                        [
-                            "deal_id" => $deal_id,
-                            "key" => $row['key'],
-                            "value" => $row['value'],
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_specifications")->insert($dataToInsert);
-                }               
-            }
-            
-            echo "\ncounter: ".$counter;            
-        }
-    }
-
-    public function scrapPsaMasterLinks()
-    {
-        $url = "https://palmettostatearmory.com/daily-deals-new.html";
-
-        $total_records = \App\Scrapping::deal_scraps("palmettostatearmory_count",$url);
-        
-        $cnt = 0;
-        $newAdded = 0;
-        if($total_records > 0)
-        {
-            $recordsPerPage = 30;
-            $pages = ceil($total_records / $recordsPerPage);
-            for($i = 1;$i<=$pages;$i++)
-            {
-                $url = "https://palmettostatearmory.com/daily-deals-new.html?p=$i";
-                $rows = \App\Scrapping::deal_scraps("palmettostatearmory",$url);
-                if(count($rows) > 0)
-                {
-                    foreach($rows as $row)
-                    {
-                        $name = trim($row['name']);
-                        $link = trim($row['link']);
-                        $linkMD5 = md5($link);
-
-                        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                        if(!$isExist)
-                        {
-                            \DB::table("deals")
-                            ->insert([
-                                "source_id" => 1,
-                                "title" => $name,
-                                "link" => $link,
-                                "unique_md5" => $linkMD5,
-                                "created_at" => date("Y-m-d H:i:s")
-                            ]);
-                            $newAdded++;
-                        }
-
-                        $cnt++;
-                        echo "\n".$cnt." records processed.";
-                    }
-                }
-            }
-        }
-
-        return ['total' => $cnt,"new" => $newAdded];
-    }    
-    public function scrapPsaDetailLinks()
-    {
-        $rows = \DB::table("deals")
-        ->where("source_id",1)
-        ->get();
-
-        $counter = 0;
-        foreach ($rows as $row) 
-        {
-            $url = $row->link;
-            $urlMD5 = md5($row->link);
-            $mainID = $row->id;
-
-            echo "\nUrl: ".$url;
-            $res = \App\Scrapping::deal_scraps("palmettostatearmory_detail",$url);            
-            if(array_keys($res) > 0)
-            {
-                $source_id = 1;
-                $dataToUpdate = 
-                [
-                    "source_id" => $source_id,
-                    "title" => $res["name"],
-                    "out_of_stock" => $res["out_of_stock"],
-                    "image" => $res["image"],                    
-                    "description" => $res["description"],
-                    "link" => $url,
-                    "from_url" => $url,
-                    "unique_md5" => $urlMD5,
-                    "ratings" => $res["stars"],
-                    "reviews_count" => $res["review_count"],
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "ext_date" => $res["ext_date"],
-                    "save_price" => $res["saving_price"],                    
-                ];                
-
-                $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-                $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-                $deal_id = $mainID;
-
-                \DB::table("deals")
-                ->where("id",$deal_id)
-                ->update($dataToUpdate);
-
-                // Add Photos
-                \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                $images = $res['images'];    
-                if(count($images) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($images as $row)
-                    {
-                        $image = $row['image'];                        
-                        $dataToInsert[] = [
-                            "deal_id" => $deal_id,
-                            "image_url" => $image,
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_photos")->insert($dataToInsert);
-                }
-
-                // Add Specifications                
-                \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                $specifications = $res['specification'];    
-                if(count($specifications) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($specifications as $row)
-                    {
-                        $dataToInsert[] = 
-                        [
-                            "deal_id" => $deal_id,
-                            "key" => $row['key'],
-                            "value" => $row['value'],
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_specifications")->insert($dataToInsert);
-                }                
-            }
-
-            $counter++;
-            echo "\ncounter: ".$counter;            
-        }
-    }    
-
-    public function scrapGrabagunMasterLinks()
-    {
-        $url = "https://grabagun.com/sale-items.html?limit=20";
-
-        $total_records = \App\Scrapping::deal_scraps("grabagun_count",$url);
-        
-        $cnt = 0;
-        $newAdded = 0;
-        if($total_records > 0)
-        {
-            $recordsPerPage = 20;
-            $pages = ceil($total_records / $recordsPerPage);
-            
-            echo "<br />Total Pages: ".$pages;
-            
-            for($i = 1;$i<=$pages;$i++)
-            {
-                $url = "https://grabagun.com/sale-items.html?limit=20&p=$i";
-                $rows = \App\Scrapping::deal_scraps("grabagun",$url);
-                
-                if(count($rows) > 0)
-                {
-                    foreach($rows as $row)
-                    {
-                        $name = trim($row['name']);
-                        $link = trim($row['link']);
-                        $linkMD5 = md5($link);
-
-                        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                        if(!$isExist)
-                        {
-
-                            \DB::table("deals")
-                            ->insert([
-                                "source_id" => 8,
-                                "title" => $name,
-                                "link" => $link,
-                                "unique_md5" => $linkMD5,
-                                "created_at" => date("Y-m-d H:i:s")
-                            ]);
-
-                            $newAdded++;
-                        }
-
-                        $cnt++;
-                        echo "<br />".$cnt." records processed.";
-                    }
-                }
-            }
-        }
-
-        return ['total' => $cnt,"new" => $newAdded];
-    }
-    public function scrapGrabagunDetailLinks(){        
-
-        $rows = \DB::table("deals")
-        ->where("source_id",8)
-        ->get();
-
-        $counter = 0;
-        foreach ($rows as $row) 
-        {
-            $counter++;            
-            
-            $url = $row->link;
-            $urlMD5 = md5($row->link);
-            $mainID = $row->id;
-
-            echo "\nUrl: ".$url;            
-            $res = \App\Scrapping::deal_scraps("grabagun_detail",$url);
-
-            if(array_keys($res) > 0)
-            {
-
-                $source_id = 8;
-                $dataToUpdate = 
-                [
-                    "source_id" => $source_id,
-                    "title" => $res["name"],
-                    "out_of_stock" => $res["out_of_stock"],
-                    "description" => $res["description"],
-                    "qty_options" => !empty($res['qty_options']) ? json_encode($res['qty_options']):"",
-                    "link" => $url,
-                    "from_url" => $url,
-                    "unique_md5" => $urlMD5,
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "ext_date" => $res["ext_date"],
-                    "save_price" => $res["saving_price"],                    
-                ];                
-
-                $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-                $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-                $deal_id = $mainID;
-
-                \DB::table("deals")
-                ->where("id",$deal_id)
-                ->update($dataToUpdate);
-
-                // Add Photos
-                \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                $images = $res['images'];    
-                if(count($images) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($images as $row)
-                    {
-                        $image = $row['image'];                        
-                        $dataToInsert[] = [
-                            "deal_id" => $deal_id,
-                            "image_url" => $image,
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_photos")->insert($dataToInsert);
-                }
-
-                // Add Specifications                
-                \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                $specifications = $res['specification'];    
-                if(count($specifications) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($specifications as $row)
-                    {
-                        $dataToInsert[] = 
-                        [
-                            "deal_id" => $deal_id,
-                            "key" => $row['key'],
-                            "value" => $row['value'],
-                            "created_at" => date("Y-m-d H:i:s"),
-                        ];
-                    }                    
-
-                    \DB::table("deal_specifications")->insert($dataToInsert);
-                }               
-            }
-            
-
-            echo "\ncounter: ".$counter;            
-        }        
-    }
-
-    public function scrapClassicfirearmsMasterLinks()
-    {
-        $url = "https://www.classicfirearms.com/product-specials";
-
-        $total_records = \App\Scrapping::deal_scraps("classicfirearms_count",$url);
-        
-        $cnt = 0;
-        $newAdded = 0;
-        if($total_records > 0)
-        {
-            $recordsPerPage = 24;
-            $pages = ceil($total_records / $recordsPerPage);
-            
-            echo "<br />Total Pages: ".$pages;
-            
-            for($i = 1;$i<=$pages;$i++)
-            {
-                $url = "https://www.classicfirearms.com/product-specials?p=$i";
-                $rows = \App\Scrapping::deal_scraps("classicfirearms",$url);
-                
-                if(count($rows) > 0)
-                {
-                    foreach($rows as $row)
-                    {
-                        $name = trim($row['name']);
-                        $link = trim($row['link']);
-                        $linkMD5 = md5($link);
-
-                        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
-                        if(!$isExist)
-                        {
-
-                            \DB::table("deals")
-                            ->insert([
-                                "source_id" => 7,
-                                "title" => $name,
-                                "link" => $link,
-                                "unique_md5" => $linkMD5,
-                                "created_at" => date("Y-m-d H:i:s")
-                            ]);
-
-                            $newAdded++;
-                        }
-
-                        $cnt++;
-                        echo "<br />".$cnt." records processed.";
-                    }
-                }
-            }
-        }
-
-        return ['total' => $cnt,"new" => $newAdded];
-    }
-    public function scrapClassicfirearmsDetailLinks()
-    {
-        $rows = \DB::table("deals")
-        ->where("source_id",7)
-        ->get();
-
-
-        $counter = 0;
-        foreach ($rows as $row) 
-        {
-            $counter++;            
-            
-            $url = $row->link;
-            $urlMD5 = md5($row->link);
-            $mainID = $row->id;
-
-            echo "\nUrl: ".$url;            
-            $res = \App\Scrapping::deal_scraps("classicfirearms_detail",$url);
-            
-            // echo "<pre>";
-            // print_r($res);
-            // exit;
-            
-            if(array_keys($res) > 0)
-            {
-
-                $source_id = 7;
-                $dataToUpdate = 
-                [
-                    "source_id" => $source_id,
-                    "title" => $res["name"],
-                    "out_of_stock" => $res["out_of_stock"],
-                    "description" => $res["description"],
-                    "qty_options" => !empty($res['qty_options']) ? json_encode($res['qty_options']):"",
-                    "link" => $url,
-                    "from_url" => $url,
-                    "unique_md5" => $urlMD5,
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "ext_date" => $res["ext_date"],
-                    "save_price" => $res["saving_price"],                    
-                ];                
-
-                $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
-                $dataToUpdate['last_visit_date'] = date("Y-m-d H:i:s");
-
-                $deal_id = $mainID;
-
-                \DB::table("deals")
-                ->where("id",$deal_id)
-                ->update($dataToUpdate);
-
-                // Add Photos
-                \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
-                $images = $res['images'];    
-                $tmpIMG = [];
-                if(count($images) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($images as $row)
-                    {
-                        $image = $row['image'];                        
-                        if(!isset($tmpIMG[$image]))
-                        {
-                            $dataToInsert[] = [
-                                "deal_id" => $deal_id,
-                                "image_url" => $image,
-                                "created_at" => date("Y-m-d H:i:s"),
-                            ];
-                            
-                            $tmpIMG[$image] = 1;
-                        }
-                    }                    
-
-                    \DB::table("deal_photos")->insert($dataToInsert);
-                }
-
-                // Add Specifications                
-                \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
-                $specifications = $res['specification'];    
-                $tmpOPT = [];
-                if(count($specifications) > 0)
-                {
-                    $dataToInsert = [];
-                    foreach($specifications as $row)
-                    {
-                        if(!isset($tmpOPT[$row['key']]))
-                        {
-                            $dataToInsert[] = 
-                            [
-                                "deal_id" => $deal_id,
-                                "key" => $row['key'],
-                                "value" => $row['value'],
-                                "created_at" => date("Y-m-d H:i:s"),
-                            ];
-                            
-                            $tmpOPT[$row['key']] = 1;
-                        }
-                    }                    
-
-                    \DB::table("deal_specifications")->insert($dataToInsert);
-                }               
-            }
-            
-            echo "\ncounter: ".$counter;            
-        }
-    }
-
 
     public function handle()
     {        
         $type = $this->argument("type");
-
         $scriptStartTime = date("Y-m-d H:i:s");
+        
 
         $content = [];
 
-        if($type == "e-arms")
+        if($type == "all")
         {
-            $cron_id = 1;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+            // $cron_id = 1;            
+            // $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+            $rows = ScrapSourceUrl::where("status",1)->get();
 
-            $res = $this->scrapEArmsMasterLinks();
-            $this->scrapEArmsDetailLinks();            
-            $content = $res;
-        }
-        else if($type == "primaryarms")
-        {
-            $cron_id = 2;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);                
+            foreach($rows as $row)
+            {                
+                $params = 
+                [
+                    "source_id" => $row->source_id,
+                    "category_id" => $row->category_id,
+                    "scrap_url" => $row->scrap_url,
+                    "source_type" => $row->source_type,
+                ];
 
-            $res = $this->scrapPrimaryArmsMasterLinks();
-            $this->scrapPrimaryArmsDetailLinks();            
-            $content = $res;
-        }
-        else if($type == "brownells")
-        {
-            $cron_id = 3;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);                
+                $this->startScrapping($row->source_id,$params);
+            }            
 
-            $res = $this->scrapBrownellsMasterLinks();
-            $this->scrapBrownellsDetailLinks();            
-            $content = $res;            
-        }
-        else if($type == "sgammo")
-        {
-            $cron_id = 4;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);                
-
-            $res = $this->scrapSgammoMasterLinks();
-            $this->scrapSgammoDetailLinks();            
-            $content = $res;
-        }
-        else if($type == "righttobear")
-        {
-            $cron_id = 5;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
-
-            $res = $this->scrapRighttoBearMasterLinks();
-            $this->scrapRighttoBearDetailLinks();
-            $content = $res;
-        }
-        else if($type == "preppergunshop")
-        {
-            $cron_id = 6;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);                
-
-            $res = $this->scrapPreppergunshopMasterLinks();
-            $this->scrapPreppergunshopDetailLinks();                    
-            $content = $res;
-        }
-        else if($type == "palmettostatearmory")
-        {
-            $cron_id = 7;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);                
-
-            $res = $this->scrapPsaMasterLinks();
-            $this->scrapPsaDetailLinks();
-            $content = $res;
-        }
-        else if($type == "classicfirearms")
-        {
-            $cron_id = 8;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);                
-            $res = $this->scrapClassicfirearmsMasterLinks();
-            $this->scrapClassicfirearmsDetailLinks();
-            $content = $res;
-        }
-        else if($type == "grabagun")
-        {
-            $cron_id = 9;            
-            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);                
-
-            $res = $this->scrapGrabagunMasterLinks();
-            $this->scrapGrabagunDetailLinks();
-            $content = $res;
+            exit;
         }
         else
         {
@@ -1482,5 +439,5 @@ class ScrapDeals extends Command
 
         $scriptEndTime = date("Y-m-d H:i:s");                
         storeCronLogs($scriptStartTime, $scriptEndTime, NULL, $content, 'Web Server', $cron_id, $mainLogID);
-    }    
+    }        
 }

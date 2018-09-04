@@ -1,6 +1,19 @@
 <?php
 
+$debugMode = env('APP_DEBUG', false);
+
+if(isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] == "106.201.237.251")
+{
+    // $debugMode = true;
+}
+
 return [
+
+    'scrap_urls' => 
+    [
+        8 => "SCRAP_GRABGUN_DEALS",
+        10 => "SCRAP_GRABGUN_PRODUCTS"
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -13,32 +26,6 @@ return [
     */
 
     'name' => 'Laravel',
-
-    // custom variables
-
-    'product_category_mapping' => [
-        "Pistol: Semi-Auto" => 1,
-        "Pistol: Single Shot" => 1,
-        "Revolver: Double Action" => 1,
-        "Revolver: Double Action Only" => 1,
-        "Revolver: Single Action" => 1,
-        "Rifle: Air Gun" => 1,
-        "Rifle: Bolt Action" => 1,
-        "Rifle: Lever Action" => 1,
-        "Rifle: Muzzleloader" => 1,
-        "Rifle: Pump Action" => 1,
-        "Rifle: Semi-Auto" => 1,
-        "Rifle: Single Shot" => 1,
-        "Rifle|Shotgun Combo: All" => 1,
-        "Rifle|Shotgun: All" => 1,
-        "Shotgun: Bolt Action" => 1,
-        "Shotgun: Lever Action" => 1,
-        "Shotgun: Over and Under" => 1,
-        "Shotgun: Pump Action" => 1,
-        "Shotgun: Semi-Auto" => 1,
-        "Shotgun: Side By Side" => 1,
-        "Shotgun: Single Shot" => 1,
-    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -64,7 +51,7 @@ return [
     |
     */
 
-    'debug' => env('APP_DEBUG', false),
+    'debug' => $debugMode,
 
     /*
     |--------------------------------------------------------------------------

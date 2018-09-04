@@ -18,3 +18,6 @@ define("TBL_DEAL_SOURCE","scrap_sources");
 define("TBL_CATEGORY","categories");
 define("TBL_GALLERYGUNS","galleryofguns");
 define("TBL_PRODUCTS","products");
+define("TBL_AMMO_PRODUCTS","scrap_ammo_products");
+define("TBL_AMMO_PRODUCT_PRICES","scrap_ammo_prices");
+define("TBL_SCRAP_URLS","scrap_source_urls");
