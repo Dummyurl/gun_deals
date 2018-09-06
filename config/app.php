@@ -12,7 +12,8 @@ return [
     'scrap_urls' => 
     [
         8 => "SCRAP_GRABGUN_DEALS",
-        10 => "SCRAP_GRABGUN_PRODUCTS"
+        10 => "SCRAP_GRABGUN_PRODUCTS",
+        9 => "SCRAP_PREP_GUN_SHOP",
     ],
 
     /*

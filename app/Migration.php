@@ -13,6 +13,300 @@ use App\Models\Product;
  */
 class Migration 
 {
+    public static function createDeal($res)
+    {
+        $linkMD5 = $res['linkMD5'];
+        $link = $res['link'];
+        $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
+        $title = $res['name'];
+        $upc_number = "";
+
+        $dataToUpdate = 
+        [
+            "source_id" => $res['source_id'],
+            "title" => $title,
+            "link" => $link,            
+            "unique_md5" => $linkMD5,
+            "out_of_stock" => $res["out_of_stock"],
+            "description" => $res["description"],
+            "qty_options" => !empty($res['qty_options']) ? json_encode($res['qty_options']):"",
+            "sale_price" => $res["special_price"],
+            "base_price" => $res["old_price"],
+            "ext_date" => $res["ext_date"],
+            "save_price" => $res["saving_price"],                                            
+        ];        
+
+        $dataToUpdate["last_visit_date"] = date("Y-m-d H:i:s");
+        $dataToUpdate["updated_at"] = date("Y-m-d H:i:s");
+
+        if($res['category_id'] > 0)
+        $dataToUpdate["category_id"] = $res['category_id'];
+
+        if(isset($res['from_url']))
+        {
+            $dataToUpdate["from_url"] = $res['from_url'];
+        }
+
+        if(isset($res['out_of_stock']))
+        {
+            $dataToUpdate["out_of_stock"] = $res['out_of_stock'];
+        }
+
+        if(isset($res['url_id']))
+        {
+            $dataToUpdate["source_url_id"] = $res['url_id'];
+        }
+
+
+        $specifications = $res['specification'];            
+
+        if(count($specifications) > 0)
+        {
+
+            foreach($specifications as $row)
+            {
+                if(trim(strtolower($row['key'])) == "upc")
+                {
+                    $upc_number = $row['value'];
+                }
+            }                    
+        }               
+
+        $unique_id = null;
+
+        if(!empty($upc_number))
+        $unique_id = "GR-".$upc_number;
+
+        $dataToUpdate["unique_id"] = $unique_id;
+        $dataToUpdate["upc_number"] = $upc_number;
+
+        if(!$isExist)
+        {
+            $dataToUpdate["created_at"] = date("Y-m-d H:i:s");
+            $deal_id = \DB::table("deals")->insertGetId($dataToUpdate);
+
+            // Deal Prices
+            \DB::table("deal_prices")
+            ->insert
+            (
+                [
+                    "deal_id" => $deal_id,
+                    "sale_price" => $res["special_price"],
+                    "base_price" => $res["old_price"],
+                    "date" => date("Y-m-d")
+                ]
+            );
+        }
+        else
+        {
+            $deal_id = $isExist->id;
+            \DB::table("deals")
+            ->where("id",$deal_id)
+            ->update($dataToUpdate);            
+
+            // Deal Prices
+            if(($isExist->sale_price != $res["special_price"]) || ($isExist->base_price != $res["old_price"]))
+            {
+                \DB::table("deal_prices")
+                ->insert
+                (
+                    [
+                        "deal_id" => $deal_id,
+                        "sale_price" => $res["special_price"],
+                        "base_price" => $res["old_price"],
+                        "date" => date("Y-m-d")
+                    ]
+                );
+            }
+        }
+
+        // Add Photos
+        \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
+        $images = $res['images'];    
+        if(count($images) > 0)
+        {
+            $dataToInsert = [];
+            foreach($images as $row)
+            {
+                $image = $row['image'];                        
+                $dataToInsert[] = [
+                    "deal_id" => $deal_id,
+                    "image_url" => $image,
+                    "created_at" => date("Y-m-d H:i:s"),
+                ];
+            }                    
+
+            \DB::table("deal_photos")->insert($dataToInsert);
+        }
+
+        // Add Specifications                
+        \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();
+        
+        if(count($specifications) > 0)
+        {
+            $dataToInsert = [];
+            foreach($specifications as $row)
+            {
+                $dataToInsert[] = 
+                [
+                    "deal_id" => $deal_id,
+                    "key" => $row['key'],
+                    "value" => $row['value'],
+                    "created_at" => date("Y-m-d H:i:s"),
+                ];
+            }                    
+
+            \DB::table("deal_specifications")->insert($dataToInsert);
+        }               
+
+    }
+
+    public static function createProduct($res)
+    {
+        $linkMD5 = $res['linkMD5'];
+        $link = $res['link'];        
+        $title = $res['title'];        
+        $specifications = $res['attr'];
+        $isExist = \DB::table("products")->where("link_md5",$linkMD5)->first();
+        $upc_number = "";
+        $MSRP = "";
+        if(count($specifications) > 0)
+        {
+            foreach($specifications as $row)
+            {
+                if(trim(strtolower($row['key'])) == "upc")
+                {
+                    $upc_number = $row['value'];
+                }
+                else if(trim(strtolower($row['key'])) == "msrp")
+                {
+                    $MSRP = $row['value'];
+                }
+            }                    
+        }               
+
+        $unique_id = null;
+
+        if(!empty($upc_number) && trim(strtolower($upc_number)) != 'no' && trim(strtolower($upc_number)) != 'n/a')
+        {
+            $unique_id = "GR-".$upc_number;
+            $isExist = \DB::table("products")->where("upc_number",$upc_number)->first();
+        }            
+
+        $image = "";
+
+        $images = $res['images'];    
+        if(count($images) > 0)
+        {
+            foreach($images as $row)
+            {
+                $image = $row['image'];                        
+                break;
+            }                    
+        }        
+
+        $dataToInsert = 
+        [
+            "source_id" => $res['source_id'],
+            "product_id" => $unique_id,
+            "title" => $title,
+            "link" => $link,
+            "link_md5" => $linkMD5,
+            "image" => $image,
+            "upc_number" => $upc_number,
+            "sale_price" => $res["special_price"],
+            "base_price" => $res["old_price"]
+        ];
+
+        if($res['category_id'] > 0)
+        $dataToInsert["product_category_id"] = $res['category_id'];
+
+        if(isset($res['url_id']))
+        {
+            $dataToInsert["source_url_id"] = $res['url_id'];
+        }
+
+        if(isset($res['out_of_stock']))
+        {
+            $dataToUpdate["out_of_stock"] = $res['out_of_stock'];
+        }
+
+        if(!empty($MSRP))
+        {
+            $dataToUpdate["msrp"] = $MSRP;
+        }
+
+        if(isset($res['from_url']))
+        {
+            $dataToInsert["from_url"] = $res['from_url'];
+        }
+
+        $dataToInsert["last_visit_date"] = date("Y-m-d H:i:s");
+        $dataToInsert['created_at'] = date("Y-m-d H:i:s");
+
+        if($isExist)
+        {
+            $productId = $isExist->id;
+
+            \DB::table("product_attributes")
+            ->where("id",$productId)
+            ->delete();
+
+            $dataToInsert['updated_at'] = $dataToInsert['created_at'];
+            unset($dataToInsert['created_at']);
+
+            \DB::table("products")
+            ->where("id",$productId)
+            ->update($dataToInsert);
+
+            // Deal Prices
+            if(($isExist->sale_price != $res["special_price"] && !empty($res["special_price"])) || ($isExist->base_price != $res["old_price"] && !empty($res["old_price"])))
+            {
+                \DB::table("product_prices")
+                ->insert
+                (
+                    [
+                        "product_id" => $productId,
+                        "sale_price" => $res["special_price"],
+                        "base_price" => $res["old_price"],
+                        "date" => date("Y-m-d")
+                    ]
+                );
+            }
+
+        }
+        else
+        {
+            $productId = \DB::table("products")
+            ->insertGetId($dataToInsert);            
+
+            // Deal Prices
+            \DB::table("product_prices")
+            ->insert
+            (
+                [
+                    "product_id" => $productId,
+                    "sale_price" => $res["special_price"],
+                    "base_price" => $res["old_price"],
+                    "date" => date("Y-m-d")
+                ]
+            );            
+        }        
+
+        if(count($specifications) > 0)
+        {
+            foreach($specifications as $r)
+            {
+                \DB::table("product_attributes")
+                ->insert([
+                    "product_id" => $productId,
+                    "keyname" => $r["key"],
+                    "keyvalue" => $r["value"],
+                ]);
+            }
+        }        
+    }
+
     public static function mapDeals()
     {
         $i = 0;

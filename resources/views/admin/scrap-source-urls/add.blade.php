@@ -40,7 +40,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label class="control-label">Category</label>
-                                    {!! Form::select('category_id', ['' => 'select category'] + $categories, null, ['class' => 'form-control']) !!}
+                                    {!! $categories !!}
                                 </div>                                
                                 <div class="col-md-4">
                                     <label class="control-label">Status</label>
@@ -99,6 +99,12 @@
 
             return false;
         });
+
+        var category_id = '{{ $formObj->category_id}}';
+        if(category_id != '')
+        {
+            $('#category_id').val(category_id);
+        }
     });
 </script>
 @endsection

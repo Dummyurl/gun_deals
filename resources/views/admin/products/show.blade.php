@@ -28,11 +28,11 @@
                                             {{ date("j M, Y h:i:s A",strtotime($deal->created_at)) }}                                       
                                     </td>
                                 </tr>
-                                <tr>
+<!--                                 <tr>
                                     <td width="30%"><b>Category: </b></td>
                                     <td width="70%">{{ ($deal->category) }}</td>
                                 </tr>                                                     
-                                <tr>
+ -->                                <tr>
                                     <td width="30%"><b>Title: </b></td>
                                     <td width="70%">
                                         <a title="View Deal" href="{{ $deal->link }}" target="_blank">
@@ -52,18 +52,30 @@
                                     <td width="30%"><b>GR ID: </b></td>
                                     <td width="70%">{{ ($deal->product_id) }}</td>
                                 </tr>                                                     
-                                <tr>
+<!--                                 <tr>
                                     <td width="30%"><b>Item #:</b></td>
                                     <td width="70%">{{ $deal->item_unique_id }}</td>
                                 </tr>
-                                <tr>
+ -->                                <tr>
                                     <td width="30%"><b>UPC:</b></td>
                                     <td width="70%">{{ $deal->upc_number }}</td>
                                 </tr>
+                                @if($deal->base_price > 0)
+                                <tr>
+                                    <td width="30%"><b>Base Price: </b></td>
+                                    <td width="70%">{{ $deal->base_price }}</td>
+                                </tr>
+                                @endif                                
+                                @if($deal->sale_price > 0)
+                                <tr>
+                                    <td width="30%"><b>Sale Price: </b></td>
+                                    <td width="70%">{{ $deal->sale_price }}</td>
+                                </tr>
+                                @endif                    
                                 <tr>
                                     <td width="30%"><b>MSRP:</b></td>
                                     <td width="70%">{{ $deal->msrp }}</td>
-                                </tr>                                
+                                </tr>                                                                
                                 <tr>
                                     <td width="30%"><b>Brand:</b></td>
                                     <td width="70%">{{ $deal->brand }}</td>
@@ -76,16 +88,19 @@
 
                             @php
                                 $attrs = $deal->productAttributes ? $deal->productAttributes->toArray():[];
-                            @endphp
-                            
+                                $displayKeys = ["sku","mpn","manufacturer","manufacturer part number","model"];
+                            @endphp         
+
                             @if(count($attrs))
                             <h4><b>Product Attributes</b></h4>
                             <table class="table table-bordered">
                                 @foreach($attrs as $row)
+                                @if(in_array(trim(strtolower($row['keyname'])),$displayKeys))
                                     <tr>
                                         <td width="30%"><b>{{ $row['keyname'] }}</b></td>
                                         <td width="70%">{{ $row['keyvalue'] }}</td>
                                     </tr>                                
+                                @endif    
                                 @endforeach                                
                             </table>                            
                             @endif

@@ -28,6 +28,7 @@
                                             {{ date("j M, Y h:i:s A",strtotime($deal->created_at)) }}                                       
                                     </td>
                                 </tr>
+
                                 <tr>
                                     <td width="30%"><b>Title: </b></td>
                                     <td width="70%">
@@ -36,12 +37,30 @@
                                         </a>
                                     </td>
                                 </tr>
+
                                 <tr>
+                                    <td width="30%"><b>GR ID: </b></td>
+                                    <td width="70%">
+                                        <a title="View Deal" href="{{ $deal->link }}" target="_blank">
+                                            {{ $deal->unique_id }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="30%"><b>UPC: </b></td>
+                                    <td width="70%">
+                                        <a title="View Deal" href="{{ $deal->link }}" target="_blank">
+                                            {{ $deal->upc_number }}
+                                        </a>
+                                    </td>
+                                </tr>
+
+<!--                                 <tr>
                                     <td width="30%"><b>Source: </b></td>
                                     <td width="70%">{{ ($deal->scrapSource) ? $deal->scrapSource->title:"" }}</td>
                                 </tr>                     
-                                
-                                <tr>
+ -->                                
+<!--                                 <tr>
                                     <td width="30%"><b>Category: </b></td>
                                     <td width="70%">
                                         @if($deal->category_id > 0)
@@ -54,7 +73,7 @@
                                         @endif
                                     </td>
                                 </tr>                                
-                                <tr>
+ -->                                <tr>
                                     <td width="30%"><b>In Stock: </b></td>
                                     <td width="70%">
                                         @if($deal->out_of_stock)
@@ -64,21 +83,12 @@
                                         @endif
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td width="30%"><b>Reviews: </b></td>
-                                    <td width="70%">{{ ($deal->reviews_count > 0) ? $deal->reviews_count:"-"}}</td>
-                                </tr>
-                                <tr>
-                                    <td width="30%"><b>Ratings: </b></td>
-                                    <td width="70%">{{ ($deal->ratings > 0) ? $deal->ratings."/ 5":"-"}}</td>
-                                </tr>
                                 @if($deal->base_price > 0)
                                 <tr>
                                     <td width="30%"><b>Base Price: </b></td>
                                     <td width="70%">{{ $deal->base_price }}</td>
                                 </tr>
-                                @endif
-                                
+                                @endif                                
                                 <tr>
                                     <td width="30%"><b>Sale Price: </b></td>
                                     <td width="70%">{{ $deal->sale_price }}</td>
@@ -106,13 +116,20 @@
                                 </table>                                                            
                             @endif                            
                             @if($deal->dealSpecifications && count($deal->dealSpecifications))
+
+                            <?php 
+                                $displayKeys = ["sku","mpn","manufacturer","manufacturer part number","model"];
+                            ?>
+
                             <h4><b>Deal Specifications</b></h4>
                             <table class="table table-bordered">
                                 @foreach($deal->dealSpecifications as $row)
+                                    @if(in_array(trim(strtolower($row->key)),$displayKeys))
                                     <tr>
                                         <td width="30%"><b>{{ $row->key }}: </b></td>
                                         <td width="70%">{{ $row->value }}</td>
-                                    </tr>                                
+                                    </tr>
+                                    @endif                                
                                 @endforeach                                
                             </table>                            
                             @endif

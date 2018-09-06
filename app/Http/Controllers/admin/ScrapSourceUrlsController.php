@@ -22,7 +22,7 @@ class ScrapSourceUrlsController extends Controller {
         $this->moduleViewName = "admin.scrap-source-urls";
         $this->list_url = route($this->moduleRouteText . ".index");
 
-        $module = "Scrap source url";
+        $module = "Scrap Url";
         $this->module = $module;
 
         $this->adminAction = new AdminAction;
@@ -52,7 +52,7 @@ class ScrapSourceUrlsController extends Controller {
         }
 
         $data = array();
-        $data['page_title'] = "Manage Scrap Source Urls";
+        $data['page_title'] = "Manage Scrap Urls";
 
         $data['add_url'] = route($this->moduleRouteText . '.create');
         $data['sources'] = ScrapSource::pluck("title","id")->toArray();        
@@ -76,7 +76,35 @@ class ScrapSourceUrlsController extends Controller {
         $data['buttonText'] = "Save";
         $data["method"] = "POST";
         $data['sources'] = ScrapSource::pluck("title","id")->toArray();
-        $data['categories'] = ProductCategory::pluck("title","id")->toArray();        
+       // $data['categories'] = ProductCategory::pluck("title","id")->toArray();
+        $master = ProductCategory::whereNull('parent_id')->get();
+        $data_filter = "<select class='select form-control' name='category_id' id='category_id'><option value=''>Select Category</option>";
+        foreach ($master as $row)
+        {
+            if ($row->menu_level == 1)
+            {
+                $data_filter .= "<option value=' " . $row->id ."'>" . $row->title . " </option>";
+                $parent = ProductCategory::where('parent_id',$row->id)->get();
+                if($parent)
+                {
+                    foreach ($parent as $key)
+                    {
+                        $data_filter .= "<option value=' " . $key->id ."'> &nbsp;&nbsp;&nbsp; - " . $key->title . " </option>";
+                        
+                        $child = ProductCategory::where('parent_id',$key->id)->get();
+                        if($child)
+                        {
+                            foreach ($child as $child)
+                            {
+                                $data_filter .= "<option value=' " . $child->id ."'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -- " . $child->title . " </option>";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $data_filter .= "</select>";
+        $data['categories'] = $data_filter; 
         return view($this->moduleViewName . '.add', $data);
     }
 
@@ -165,7 +193,36 @@ class ScrapSourceUrlsController extends Controller {
         $data['action_params'] = $model->id;
         $data['method'] = "PUT";
         $data['sources'] = ScrapSource::pluck("title","id")->toArray();
-        $data['categories'] = ProductCategory::pluck("title","id")->toArray();                
+        //$data['categories'] = ProductCategory::pluck("title","id")->toArray();
+        $master = ProductCategory::whereNull('parent_id')->get(); 
+        $data_filter = "<select class='select form-control' name='category_id' id='category_id'><option value=''>Select Source</option>";
+        foreach ($master as $row)
+        {
+            if ($row->menu_level == 1)
+            {
+                $data_filter .= "<option value=' " . $row->id ."'>" . $row->title . " </option>";
+                $parent = ProductCategory::where('parent_id',$row->id)->get();
+                if($parent)
+                {
+                    foreach ($parent as $key)
+                    {
+                        $data_filter .= "<option value=' " . $key->id ."'> &nbsp;&nbsp;&nbsp; - " . $key->title . " </option>";
+                        
+                        $child = ProductCategory::where('parent_id',$key->id)->get();
+                        if($child)
+                        {
+                            foreach ($child as $child)
+                            {
+                                $data_filter .= "<option value=' " . $child->id ."'> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -- " . $child->title . " </option>";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $data_filter .= "</select>";
+        $data['categories'] = $data_filter; 
+                       
         return view($this->moduleViewName . ".add", $data);
     }
 

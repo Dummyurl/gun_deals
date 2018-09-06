@@ -17,6 +17,12 @@ class ScrapDeals extends Command
         parent::__construct();        
     }
 
+    public function scrap_prep_gun_shop_products($params)
+    {
+        $scrap_url = $params['scrap_url'];
+        Scrapping::scrapPrepGunShopProductLinks($scrap_url,$params);
+    }
+
     public function startScrapping($source_id,$params)
     {
         $scrap_urls = \Config::get("app.scrap_urls");
@@ -31,10 +37,13 @@ class ScrapDeals extends Command
         switch($scrapType)
         {
             case 'SCRAP_GRABGUN_DEALS':
-                      // $this->scrap_grabgun_deals($params);
+                      $this->scrap_grabgun_deals($params);
                       break;
             case 'SCRAP_GRABGUN_PRODUCTS':
                       $this->scrap_grabgun_products($params);
+                      break;
+            case 'SCRAP_PREP_GUN_SHOP':
+                      $this->scrap_prep_gun_shop_products($params);
                       break;
             default:
                       echo "\n No source founded!";  
@@ -50,6 +59,7 @@ class ScrapDeals extends Command
         $link = $res['link'];
         $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
         $title = $res['name'];
+        $upc_number = "";
 
         $dataToUpdate = 
         [
@@ -76,10 +86,19 @@ class ScrapDeals extends Command
         {
             $dataToUpdate["from_url"] = $res['from_url'];
         }
-    
 
-        $specifications = $res['specification'];    
-        $upc_number = "";
+        if(isset($res['out_of_stock']))
+        {
+            $dataToUpdate["out_of_stock"] = $res['out_of_stock'];
+        }
+
+        if(isset($res['url_id']))
+        {
+            $dataToUpdate["source_url_id"] = $res['url_id'];
+        }
+
+
+        $specifications = $res['specification'];            
 
         if(count($specifications) > 0)
         {
@@ -190,6 +209,8 @@ class ScrapDeals extends Command
         $isExist = \DB::table("products")->where("link_md5",$linkMD5)->first();
         $specifications = $res['attr'];
 
+        $upc_number = "";
+        $MSRP = "";
         if(count($specifications) > 0)
         {
             foreach($specifications as $row)
@@ -197,6 +218,10 @@ class ScrapDeals extends Command
                 if(trim(strtolower($row['key'])) == "upc")
                 {
                     $upc_number = $row['value'];
+                }
+                else if(trim(strtolower($row['key'])) == "msrp")
+                {
+                    $MSRP = $row['value'];
                 }
             }                    
         }               
@@ -233,6 +258,21 @@ class ScrapDeals extends Command
 
         if($res['category_id'] > 0)
         $dataToInsert["product_category_id"] = $res['category_id'];
+
+        if(isset($res['url_id']))
+        {
+            $dataToInsert["source_url_id"] = $res['url_id'];
+        }
+
+        if(isset($res['out_of_stock']))
+        {
+            $dataToUpdate["out_of_stock"] = $res['out_of_stock'];
+        }
+
+        if(!empty($MSRP))
+        {
+            $dataToUpdate["msrp"] = $MSRP;
+        }
 
         if(isset($res['from_url']))
         {
@@ -308,99 +348,13 @@ class ScrapDeals extends Command
     public function scrap_grabgun_products($params)
     {
         $scrap_url = $params['scrap_url'];
-        $source_type = $params['source_type'];
-        $category_id = $params['category_id'];
-        $source_id = $params['source_id'];
-        $masterLinks = Scrapping::scrapGrabGunsProductLinks($scrap_url);        
-        // $masterLinks[] = [
-        //     "link" => "https://grabagun.com/s-w-642-1-875-38spl-sts-alum-cent.html",            
-        // ];
-        // $masterLinks[] = [
-        //     "link" => "https://grabagun.com/s-w-m-p9shield-10035-9m-3-1-7-8r-nms.html?source=igodigital",
-        // ];
-        echo "Total Links: ".count($masterLinks);
-        foreach($masterLinks as $link)
-        {
-            $url = $link['link'];
-            $link = trim($url);
-            $res = \App\Scrapping::deal_scraps("grabagun_detail",$link);            
-            if(array_keys($res) > 0)
-            {                
-                $linkMD5 = md5($link);                                
-                $res['link'] = $link;
-                $res['linkMD5'] = $linkMD5;                
-                $res['category_id'] = $category_id;
-                $res['source_id'] = $source_id;
-                $res['from_url'] = $scrap_url;
-
-                // create/update record
-                if($source_type == 1)
-                {
-                    $response['title'] = $res['name'];
-                    $response['link'] = $res['link'];
-                    $response['linkMD5'] = $res['linkMD5'];
-                    $response['category_id'] = $res['category_id'];
-                    $response['source_id'] = $res['source_id'];
-                    $response['images'] = $res['images'];
-                    $response['attr'] = $res['specification'];
-                    $response['special_price'] = $res['special_price'];
-                    $response['old_price'] = $res['old_price'];                    
-                    $response['from_url'] = $scrap_url;
-                    $this->createProduct($response);                
-                }
-                else
-                {
-                    $this->createDeal($res);                
-                }
-            }            
-        }        
+        Scrapping::scrapGrabGunsProductLinks($scrap_url,$params);
     }
 
     public function scrap_grabgun_deals($params)
     {
         $scrap_url = $params['scrap_url'];
-        $source_type = $params['source_type'];
-        $category_id = $params['category_id'];
-        $source_id = $params['source_id'];
-
-        $masterLinks = Scrapping::scrapGrabGunsListingLinks($scrap_url);        
-
-        echo "\n Total Links: ".count($masterLinks);  
-
-        foreach($masterLinks as $link)
-        {
-            $url = $link['link'];
-            $link = trim($url);
-            $res = \App\Scrapping::deal_scraps("grabagun_detail",$link);
-            if(array_keys($res) > 0)
-            {                
-                $linkMD5 = md5($link);                                
-                $res['link'] = $link;
-                $res['linkMD5'] = $linkMD5;                
-                $res['category_id'] = $category_id;
-                $res['source_id'] = $source_id;
-                $res['from_url'] = $scrap_url;
-                // create/update record
-                if($source_type == 1)
-                {
-                    $response['title'] = $res['name'];
-                    $response['link'] = $res['link'];
-                    $response['linkMD5'] = $res['linkMD5'];
-                    $response['category_id'] = $res['category_id'];
-                    $response['source_id'] = $res['source_id'];
-                    $response['images'] = $res['images'];
-                    $response['attr'] = $res['specification'];                    
-                    $response['special_price'] = $res['special_price'];
-                    $response['old_price'] = $res['old_price'];                                        
-                    $response['from_url'] = $scrap_url;
-                    $this->createProduct($response);                
-                }
-                else
-                {
-                    $this->createDeal($res);                
-                }
-            }
-        }
+        Scrapping::scrapGrabGunsListingLinks($scrap_url,$params);
     }
 
     public function handle()
@@ -411,16 +365,19 @@ class ScrapDeals extends Command
 
         $content = [];
 
-        if($type == "all")
+        if($type == "grabgun")
         {
-            // $cron_id = 1;            
-            // $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
-            $rows = ScrapSourceUrl::where("status",1)->get();
+            $cron_id = 9;            
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+            $rows = ScrapSourceUrl::where("status",1)
+                    ->where("source_id",10)
+                    ->get();
 
             foreach($rows as $row)
             {                
                 $params = 
                 [
+                    "id" => $row->id,
                     "source_id" => $row->source_id,
                     "category_id" => $row->category_id,
                     "scrap_url" => $row->scrap_url,
@@ -428,9 +385,33 @@ class ScrapDeals extends Command
                 ];
 
                 $this->startScrapping($row->source_id,$params);
+                $row->last_scan_date = date("Y-m-d H:i:s");
+                $row->save();
             }            
+        }
+        else if($type == "preppergunshop")
+        {
+            $cron_id = 6;            
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+            $rows = ScrapSourceUrl::where("status",1)
+                    ->where("source_id",9)
+                    ->get();
 
-            exit;
+            foreach($rows as $row)
+            {                
+                $params = 
+                [
+                    "id" => $row->id,
+                    "source_id" => $row->source_id,
+                    "category_id" => $row->category_id,
+                    "scrap_url" => $row->scrap_url,
+                    "source_type" => $row->source_type,
+                ];
+
+                $this->startScrapping($row->source_id,$params);
+                $row->last_scan_date = date("Y-m-d H:i:s");
+                $row->save();
+            }            
         }
         else
         {

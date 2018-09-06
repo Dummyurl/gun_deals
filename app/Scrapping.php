@@ -18,8 +18,14 @@ class Scrapping {
         return $categoryUrls;
     }
 
-    public static function scrapGrabGunsProductLinks($pageURL)
+    public static function scrapGrabGunsProductLinks($pageURL,$params)
     {
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $id = $params['id'];        
+
         $categoryUrls = self::scrapGrabGunsProductCategory($pageURL);        
         $links = [];
         if(count($categoryUrls) > 0)
@@ -43,25 +49,58 @@ class Scrapping {
             }
         }
 
-        $masterLinks = [];
+        // $masterLinks = [];
         
         foreach($links as $link)
         {
-            $masterUrls = self::scrapGrabGunsListingLinks($link);
-            $masterLinks = array_merge($masterLinks,$masterUrls);
-        }
+            $masterUrls = self::scrapGrabGunsListingLinks($link,$params);            
+            print_r($masterUrls);
+            exit;
+            foreach($masterUrls as $link)
+            {
+                $url = $link['link'];
+                $link = trim($url);
+                $res = \App\Scrapping::deal_scraps("grabagun_detail",$link);                
+                if(array_keys($res) > 0)
+                {
+                    $linkMD5 = md5($link);                                
+                    $res['link'] = $link;
+                    $res['linkMD5'] = $linkMD5;                
+                    $res['category_id'] = $category_id;
+                    $res['source_id'] = $source_id;
+                    $res['from_url'] = $scrap_url;
+                    $res['url_id'] = $id;         
 
-        return $masterLinks;
+                    if($source_type == 1)
+                    {
+                        $res['attr'] = $res['specification'];
+                        $res['title'] = $res['name'];
+                        \App\Migration::createProduct($res);
+                    }                        
+                    else
+                    {
+                        \App\Migration::createDeal($res);
+                    }                        
+                }
+
+            }
+        }
     }
 
-    public static function scrapGrabGunsListingLinks($pageURL)
+    public static function scrapGrabGunsListingLinks($pageURL,$params)
     {
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $id = $params['id'];        
+
         $url = $pageURL."?limit=20";
         echo "\nUrl: ".$url;
         $total_records = self::deal_scraps("grabagun_count",$url);
         $cnt = 0;
         $newAdded = 0;
-        $mainLinks = [];
+        
         echo "\n Total Records: ".$total_records;
         if($total_records > 0)
         {
@@ -74,12 +113,91 @@ class Scrapping {
             {
                 $url = $pageURL."?limit=20&p=$i";
                 echo "\nPage: ".$url;
-                $rows = self::deal_scraps("grabagun",$url);
-                $mainLinks = array_merge($mainLinks,$rows);
+                $rows = self::deal_scraps("grabagun",$url);                
+                foreach($rows as $row)
+                {
+                    $url = $row['link'];
+                    $link = trim($url);
+                    $res = \App\Scrapping::deal_scraps("grabagun_detail",$link);                    
+                    if(array_keys($res) > 0)
+                    {
+                        $linkMD5 = md5($link);                                
+                        $res['link'] = $link;
+                        $res['linkMD5'] = $linkMD5;                
+                        $res['category_id'] = $category_id;
+                        $res['source_id'] = $source_id;
+                        $res['from_url'] = $scrap_url;
+                        $res['url_id'] = $id;         
+
+                        if($source_type == 1)
+                        {
+                            $res['title'] = $res['name'];
+                            $res['attr'] = $res['specification'];
+                            \App\Migration::createProduct($res);
+                        }                        
+                        else
+                        {
+                            \App\Migration::createDeal($res);
+                        }                        
+                    }
+                }
             }
         }    
+    }
 
-        return $mainLinks;            
+    public static function scrapPrepGunShopProductLinks($pageURL,$params)
+    {
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $id = $params['id'];
+
+        $cnt = 0;
+        $url = $pageURL."?limit=150";
+        $totalPages = \App\Scrapping::deal_scraps("preppergunshop_count",$url);
+        echo "\nTotal Pages: ".$totalPages;        
+        $newAdded = 0;  
+        $mainLinks = [];
+
+        for($j=1;$j<=$totalPages;$j++)
+        {
+            $url = $pageURL."?limit=150&p=$j";                            
+            
+            $rows = \App\Scrapping::deal_scraps("preppergunshop",$url);
+
+            echo "\n$url";
+
+            if(is_array($rows) && count($rows) > 0)
+            {
+                foreach($rows as $link)
+                {
+                    $link = trim($link);
+                    $res = \App\Scrapping::deal_scraps("preppergunshop_detail",$link);
+
+                    if(count($res) > 0)
+                    {
+                        $linkMD5 = md5($link);                                
+                        $res['link'] = $link;
+                        $res['linkMD5'] = $linkMD5;                
+                        $res['category_id'] = $category_id;
+                        $res['source_id'] = $source_id;
+                        $res['from_url'] = $scrap_url;
+                        $res['url_id'] = $id;
+                        if($source_type == 1)
+                        {
+                            $res['title'] = $res['name'];
+                            $res['attr'] = $res['specification'];
+                            \App\Migration::createProduct($res);
+                        }                        
+                        else
+                        {
+                            \App\Migration::createDeal($res);
+                        }                                                
+                    }
+                }
+            }            
+        }
     }
 
     public static function scrapAmmo($pageURL,$type)
@@ -615,14 +733,21 @@ class Scrapping {
         {
             if($crawler->filter('.pager p.amount')->count() > 0)
             {
-                $text = $crawler->filter('.pager .amount.amount--has-pages')->first()->text();
-                
-                $text = explode("of ", trim($text));
+                if($crawler->filter('.pager .amount.amount--has-pages')->count() > 0)
+                {
+                    $text = $crawler->filter('.pager .amount.amount--has-pages')->first()->text();
+                    
+                    $text = explode("of ", trim($text));
 
-                if(isset($text[1]))
-                    return intval($text[1]);
+                    if(isset($text[1]))
+                        return intval($text[1]);
+                    else
+                        return 1;
+                }
                 else
-                    return 0;
+                {
+                    return 1;
+                }
             }
 
             return 0;

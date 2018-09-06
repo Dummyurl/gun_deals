@@ -20,7 +20,7 @@ class DealSourcesController extends Controller {
         $this->moduleViewName = "admin.deal_sources";
         $this->list_url = route($this->moduleRouteText . ".index");
 
-        $module = "Deal Source";
+        $module = "Scrap Source";
         $this->module = $module;
 
         $this->adminAction = new AdminAction;
@@ -49,7 +49,7 @@ class DealSourcesController extends Controller {
         }
 
         $data = array();
-        $data['page_title'] = "Manage Deal Sources";
+        $data['page_title'] = "Manage Scrap Sources";
 
         $data['add_url'] = route($this->moduleRouteText . '.create');
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_DEAL_SOURCE);

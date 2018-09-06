@@ -26,9 +26,10 @@
                         <thead>
                             <tr>
                                 <th width="8%">ID</th>                                   
-                                <th width="20%">Source</th>
-                                <th width="35%">Url</th>
-                                <th width="20%">Status</th>                           
+                                <th width="20%">Scrap Source</th>
+                                <th width="35%">Scrap Url</th>
+                                <th width="10%">Status</th>                           
+                                <th width="10%">Last Scan Date</th>
                                 <th width="10%">Created At</th>                           
                                 <th width="7%">Action</th>
                             </tr>
@@ -79,6 +80,7 @@
                 {data: 'source_title', name: 'source_title'},
                 {data: 'scrap_url', name: '{{ TBL_SCRAP_URLS }}.scrap_url'},
                 {data: 'status', name: '{{ TBL_SCRAP_URLS }}.status'},
+                {data: 'last_scan_date', name: '{{ TBL_SCRAP_URLS }}.last_scan_date'},
                 {data: 'created_at', name: '{{ TBL_SCRAP_URLS }}.created_at'},
                 {data: 'action', orderable: false, searchable: false}
             ]
