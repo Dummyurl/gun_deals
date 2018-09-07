@@ -104,6 +104,8 @@ class Admin extends Authenticatable
     public static $ADD_SCRAP_URL = 62;
     public static $EDIT_SCRAP_URL = 63;
     public static $DELETE_SCRAP_URL = 64;
+
+    public static $LIST_DEALER_PRODUCTS = 65;
   
 
 

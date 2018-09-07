@@ -21,3 +21,7 @@ define("TBL_PRODUCTS","products");
 define("TBL_AMMO_PRODUCTS","scrap_ammo_products");
 define("TBL_AMMO_PRODUCT_PRICES","scrap_ammo_prices");
 define("TBL_SCRAP_URLS","scrap_source_urls");
+define("TBL_DEALER_PRODUCTS","dealer_products");
+define("TBL_DEALER_PRODUCT_ATTRIBUTES","dealer_product_attributes");
+define("TBL_DEALER_PRODUCT_PHOTOS","dealer_product_photos");
+define("TBL_DEALER_PRODUCT_PRICES","dealer_product_prices");
