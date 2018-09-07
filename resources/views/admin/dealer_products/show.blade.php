@@ -32,14 +32,20 @@
                                     <td width="30%"><b>Category: </b></td>
                                     <td width="70%">{{ ($dealerProduct->category) }}</td>
                                 </tr>                                                     
- -->                                <tr>
+ -->                             <tr>
                                     <td width="30%"><b>Title: </b></td>
                                     <td width="70%">
-                                        <a title="View Deal" href="{{ $dealerProduct->link }}" target="_blank">
+                                        <a title="View Dealer Product" href="{{ $dealerProduct->link }}" target="_blank">
                                             {{ $dealerProduct->title }}
                                         </a>
                                     </td>
-                                </tr>       
+                                </tr>
+                                <tr>
+                                    <td width="30%"><b>Scrap Source: </b></td>
+                                    <td width="70%">
+                                            {{ $dealerProduct->source_title }}
+                                    </td>
+                                </tr>
                                 @if(!empty($dealerProduct->description))                                                         
                                 <tr>
                                     <td width="30%"><b>Description: </b></td>
@@ -89,7 +95,7 @@
                             @php
                                 $attrs = $dealerProduct->dealerProductAttribute ? $dealerProduct->dealerProductAttribute->toArray():[];
                                 $displayKeys = ["sku","mpn","manufacturer","manufacturer part number","model"];
-                            @endphp         
+                            @endphp
 
                             @if(count($attrs))
                             <h4><b>Product Attributes</b></h4>
@@ -119,7 +125,7 @@
                                 </tr>
                                 @foreach($productPrices as $row)
                                     <tr>
-                                        <td>{{ date("j M, Y h:i:s A",strtotime($row['date'])) }}</td>
+                                        <td>{{ date("j M, Y",strtotime($row['date'])) }}</td>
                                         <td>{{ $row['sale_price'] }}</td>
                                         <td>{{ $row['base_price'] }}</td>
                                     </tr>

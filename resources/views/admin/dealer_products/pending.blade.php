@@ -12,10 +12,10 @@
             @include($moduleViewName.".search")   
 
             <div class="clearfix"></div>    
-            <a class="btn btn-default pull-right" href="{{ route($moduleRouteText.'.pending') }}">
+            <a class="btn btn-primary pull-right" href="{{ route($moduleRouteText.'.pending') }}">
                 Pending Products
             </a>
-            <a class="btn btn-primary pull-right" style="margin-right: 5px;" href="{{ route('products.index') }}">
+            <a class="btn btn-default pull-right" style="margin-right: 5px;" href="{{ route(moduleRouteText.'.index') }}">
                 Completed Products
             </a>
             <div class="clearfix"></div>    
