@@ -88,7 +88,7 @@
 
                             @php
                                 $attrs = $deal->productAttributes ? $deal->productAttributes->toArray():[];
-                                $displayKeys = ["sku","mpn","manufacturer","manufacturer part number","model"];
+                                $displayKeys = ["sku","mpn","manufacturer","manufacturer part number","model","type","action"];
                             @endphp         
 
                             @if(count($attrs))

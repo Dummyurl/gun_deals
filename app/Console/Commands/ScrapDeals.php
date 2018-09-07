@@ -370,7 +370,7 @@ class ScrapDeals extends Command
             $cron_id = 9;            
             $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
             $rows = ScrapSourceUrl::where("status",1)
-                    ->where("source_id",10)
+                    ->whereIn("source_id",[8,10])
                     ->get();
 
             foreach($rows as $row)

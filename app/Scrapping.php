@@ -53,37 +53,7 @@ class Scrapping {
         
         foreach($links as $link)
         {
-            $masterUrls = self::scrapGrabGunsListingLinks($link,$params);            
-            print_r($masterUrls);
-            exit;
-            foreach($masterUrls as $link)
-            {
-                $url = $link['link'];
-                $link = trim($url);
-                $res = \App\Scrapping::deal_scraps("grabagun_detail",$link);                
-                if(array_keys($res) > 0)
-                {
-                    $linkMD5 = md5($link);                                
-                    $res['link'] = $link;
-                    $res['linkMD5'] = $linkMD5;                
-                    $res['category_id'] = $category_id;
-                    $res['source_id'] = $source_id;
-                    $res['from_url'] = $scrap_url;
-                    $res['url_id'] = $id;         
-
-                    if($source_type == 1)
-                    {
-                        $res['attr'] = $res['specification'];
-                        $res['title'] = $res['name'];
-                        \App\Migration::createProduct($res);
-                    }                        
-                    else
-                    {
-                        \App\Migration::createDeal($res);
-                    }                        
-                }
-
-            }
+            self::scrapGrabGunsListingLinks($link,$params);            
         }
     }
 
