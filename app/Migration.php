@@ -165,9 +165,10 @@ class Migration
     {
         $linkMD5 = $res['linkMD5'];
         $link = $res['link'];        
-        $title = $res['title'];        
+        $title = $res['title'];
+        $isExist = \DB::table("dealer_products")->where("link_md5",$linkMD5)->first();
         $specifications = $res['attr'];
-        $isExist = \DB::table("products")->where("link_md5",$linkMD5)->first();
+
         $upc_number = "";
         $MSRP = "";
         if(count($specifications) > 0)
@@ -187,23 +188,12 @@ class Migration
 
         $unique_id = null;
 
-        if(!empty($upc_number) && trim(strtolower($upc_number)) != 'no' && trim(strtolower($upc_number)) != 'n/a')
-        {
-            $unique_id = "GR-".$upc_number;
-            $isExist = \DB::table("products")->where("upc_number",$upc_number)->first();
-        }            
+        if(!empty($upc_number))
+        $unique_id = "GR-".$upc_number;
 
         $image = "";
 
         $images = $res['images'];    
-        if(count($images) > 0)
-        {
-            foreach($images as $row)
-            {
-                $image = $row['image'];                        
-                break;
-            }                    
-        }        
 
         $dataToInsert = 
         [
@@ -248,21 +238,21 @@ class Migration
         {
             $productId = $isExist->id;
 
-            \DB::table("product_attributes")
+            \DB::table("dealer_product_attributes")
             ->where("id",$productId)
             ->delete();
 
             $dataToInsert['updated_at'] = $dataToInsert['created_at'];
             unset($dataToInsert['created_at']);
 
-            \DB::table("products")
+            \DB::table("dealer_products")
             ->where("id",$productId)
             ->update($dataToInsert);
 
             // Deal Prices
             if(($isExist->sale_price != $res["special_price"] && !empty($res["special_price"])) || ($isExist->base_price != $res["old_price"] && !empty($res["old_price"])))
             {
-                \DB::table("product_prices")
+                \DB::table("dealer_product_prices")
                 ->insert
                 (
                     [
@@ -277,11 +267,11 @@ class Migration
         }
         else
         {
-            $productId = \DB::table("products")
+            $productId = \DB::table("dealer_products")
             ->insertGetId($dataToInsert);            
 
             // Deal Prices
-            \DB::table("product_prices")
+            \DB::table("dealer_product_prices")
             ->insert
             (
                 [
@@ -297,7 +287,7 @@ class Migration
         {
             foreach($specifications as $r)
             {
-                \DB::table("product_attributes")
+                \DB::table("dealer_product_attributes")
                 ->insert([
                     "product_id" => $productId,
                     "keyname" => $r["key"],
@@ -305,6 +295,21 @@ class Migration
                 ]);
             }
         }        
+
+        if(count($images) > 0)
+        {
+            foreach($images as $row)
+            {
+                $image = $row['image'];                        
+                \DB::table("dealer_product_photos")
+                ->insert([
+                    "product_id" => $productId,
+                    "image_url" => $image,
+                    "created_at" => date("Y-m-d H:i:s")
+                ]);                
+            }                    
+        }        
+
     }
 
     public static function mapDeals()
