@@ -362,18 +362,29 @@ class ScrapSourceUrlsController extends Controller {
                             else
                                 return '-';    
                         })                        
+                        ->editColumn('scrap_url', function($row){
+
+                            $labelText = $row->scrap_url;
+
+                            if(strlen($labelText) > 50)
+                            {
+                                $labelText = substr($labelText, 0,50)."...";
+                            }
+
+                            return "<a href='".$row->scrap_url."' target='_blank'>".$labelText."</a>";
+                        })                        
                         ->editColumn('status', function($row){
                             if ($row->status == 1)
                                 return '<span class="label label-success">Active</span>';
                             else
                                 return '<span class="label label-danger">Inactive</span>';                            
                         })                        
-                        ->rawColumns(['action','status'])
+                        ->rawColumns(['action','status','scrap_url'])
                         ->filter(function ($query) {     
                             $category = request()->get("search_category");
                             if(!empty($category)) 
                             {
-                                $query = $query->where(TBL_SCRAP_URLS.".category_id", 'LIKE', $category);
+                                $query = $query->where(TBL_SCRAP_URLS.".source_id", 'LIKE', $category);
                             }   
                         })
                         ->make(true);

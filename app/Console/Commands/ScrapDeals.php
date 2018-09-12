@@ -23,6 +23,12 @@ class ScrapDeals extends Command
         Scrapping::scrapPrepGunShopProductLinks($scrap_url,$params);
     }
 
+    public function scrap_midwayusa_products($params)
+    {
+        $scrap_url = $params['scrap_url'];
+        Scrapping::scrapMidwayUsaLinks($scrap_url,$params);
+    }
+
     public function startScrapping($source_id,$params)
     {
         $scrap_urls = \Config::get("app.scrap_urls");
@@ -44,6 +50,9 @@ class ScrapDeals extends Command
                       break;
             case 'SCRAP_PREP_GUN_SHOP':
                       $this->scrap_prep_gun_shop_products($params);
+                      break;
+            case 'SCRAP_MIDWAYUSA':
+                      $this->scrap_midwayusa_products($params);
                       break;
             default:
                       echo "\n No source founded!";  
@@ -412,6 +421,35 @@ class ScrapDeals extends Command
                 $row->last_scan_date = date("Y-m-d H:i:s");
                 $row->save();
             }            
+        }
+        else if($type == "midwayusa")
+        {
+            // $cron_id = 54;            
+
+            // $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+
+            $rows = ScrapSourceUrl::where("status",1)
+                    ->where("source_id",11)
+                    ->get();
+
+            foreach($rows as $row)
+            {                
+                $params = 
+                [
+                    "id" => $row->id,
+                    "source_id" => $row->source_id,
+                    "category_id" => $row->category_id,
+                    "scrap_url" => $row->scrap_url,
+                    "source_type" => $row->source_type,
+                ];
+
+                $this->startScrapping($row->source_id,$params);
+                $row->last_scan_date = date("Y-m-d H:i:s");
+                $row->save();
+                exit;
+            }          
+
+            exit;  
         }
         else
         {

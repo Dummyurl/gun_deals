@@ -57,15 +57,42 @@
                                 <tr>
                                     <td width="30%"><b>GR ID: </b></td>
                                     <td width="70%">{{ ($dealerProduct->product_id) }}</td>
-                                </tr>                                                     
+                                </tr>    
+
+                                @if(!empty($dealerProduct->breadcrumbs))
+                                <tr>
+                                    <td width="30%">Breadcrumbs</td>
+                                    <td width="70%">
+                                        <?php 
+                                            $breadcrumbs = json_decode($dealerProduct->breadcrumbs,1);
+                                            $breadcrumbs = implode(" >> ", $breadcrumbs);
+                                            echo $breadcrumbs;
+                                        ?>
+                                    </td>
+                                </tr>
+                                @endif
+                                                                                 
 <!--                                 <tr>
                                     <td width="30%"><b>Item #:</b></td>
                                     <td width="70%">{{ $dealerProduct->item_unique_id }}</td>
                                 </tr>
- -->                                <tr>
+ -->                                
+                                <tr>
                                     <td width="30%"><b>UPC:</b></td>
                                     <td width="70%">{{ $dealerProduct->upc_number }}</td>
                                 </tr>
+                                @if(!empty($dealerProduct->mpn))
+                                <tr>
+                                    <td width="30%"><b>MPN:</b></td>
+                                    <td width="70%">{{ $dealerProduct->mpn }}</td>
+                                </tr>
+                                @endif
+                                @if(!empty($dealerProduct->mfg_name))
+                                <tr>
+                                    <td width="30%"><b>MFG Name:</b></td>
+                                    <td width="70%">{{ $dealerProduct->mfg_name }}</td>
+                                </tr>
+                                @endif
                                 @if($dealerProduct->base_price > 0)
                                 <tr>
                                     <td width="30%"><b>Base Price: </b></td>
@@ -89,7 +116,15 @@
                                 <tr>
                                     <td width="30%"><b>Model:</b></td>
                                     <td width="70%">{{ $dealerProduct->model }}</td>
+                                </tr>               
+                                @if(!empty($dealerProduct->vendor_image))                 
+                                <tr>
+                                    <td width="30%"><b>Vendor Image:</b></td>
+                                    <td width="70%">
+                                        <img src="{{ $dealerProduct->vendor_image }}" width="150" />
+                                    </td>
                                 </tr>                                
+                                @endif
                             </table>
 
                             @php
@@ -101,7 +136,12 @@
                             <h4><b>Product Attributes</b></h4>
                             <table class="table table-bordered">
                                 @foreach($attrs as $row)
-                                @if(in_array(trim(strtolower($row['keyname'])),$displayKeys))
+                                @if($dealerProduct->source_id == 1)
+                                    <tr>
+                                        <td width="30%"><b>{{ $row['keyname'] }}</b></td>
+                                        <td width="70%">{{ $row['keyvalue'] }}</td>
+                                    </tr>                                
+                                @elseif(in_array(trim(strtolower($row['keyname'])),$displayKeys))
                                     <tr>
                                         <td width="30%"><b>{{ $row['keyname'] }}</b></td>
                                         <td width="70%">{{ $row['keyvalue'] }}</td>
@@ -119,15 +159,17 @@
                             <h4><b>Product Prices</b></h4>
                             <table class="table table-bordered">
                                 <tr>
-                                    <th width="33%">Date</th>
-                                    <th width="33%">Sale Price</th>
-                                    <th width="33%">Base Price</th>
+                                    <th width="25%">Date</th>
+                                    <th width="25%">Sale Price</th>
+                                    <th width="25%">Base Price</th>
+                                    <th width="25%">Quantity</th>
                                 </tr>
                                 @foreach($productPrices as $row)
                                     <tr>
                                         <td>{{ date("j M, Y",strtotime($row['date'])) }}</td>
                                         <td>{{ $row['sale_price'] }}</td>
                                         <td>{{ $row['base_price'] }}</td>
+                                        <td>{{ $row['qty'] }}</td>
                                     </tr>
                                 @endforeach
                             </table>

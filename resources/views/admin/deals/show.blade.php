@@ -55,6 +55,20 @@
                                     </td>
                                 </tr>
 
+                                @if(!empty($deal->mpn))
+                                <tr>
+                                    <td width="30%"><b>MPN:</b></td>
+                                    <td width="70%">{{ $deal->mpn }}</td>
+                                </tr>
+                                @endif
+                                @if(!empty($deal->mfg_name))
+                                <tr>
+                                    <td width="30%"><b>MFG Name:</b></td>
+                                    <td width="70%">{{ $deal->mfg_name }}</td>
+                                </tr>
+                                @endif
+
+
 <!--                                 <tr>
                                     <td width="30%"><b>Source: </b></td>
                                     <td width="70%">{{ ($deal->scrapSource) ? $deal->scrapSource->title:"" }}</td>
@@ -73,7 +87,20 @@
                                         @endif
                                     </td>
                                 </tr>                                
- -->                                <tr>
+ -->                                
+                                @if(!empty($deal->breadcrumbs))
+                                <tr>
+                                    <td width="30%">Breadcrumbs</td>
+                                    <td width="70%">
+                                        <?php 
+                                            $breadcrumbs = json_decode($deal->breadcrumbs,1);
+                                            $breadcrumbs = implode(" >> ", $breadcrumbs);
+                                            echo $breadcrumbs;
+                                        ?>
+                                    </td>
+                                </tr>
+                                @endif
+                                <tr>
                                     <td width="30%"><b>In Stock: </b></td>
                                     <td width="70%">
                                         @if($deal->out_of_stock)
@@ -94,6 +121,15 @@
                                     <td width="70%">{{ $deal->sale_price }}</td>
                                 </tr>
                                 
+                                @if(!empty($deal->vendor_image))                 
+                                <tr>
+                                    <td width="30%"><b>Vendor Image:</b></td>
+                                    <td width="70%">
+                                        <img src="{{ $deal->vendor_image }}" width="150" />
+                                    </td>
+                                </tr>                                
+                                @endif
+
                             </table>
                             
                             @php
@@ -121,10 +157,15 @@
                                 $displayKeys = ["sku","mpn","manufacturer","manufacturer part number","model"];
                             ?>
 
-                            <h4><b>Deal Specifications</b></h4>
+                            <h4><b>Deal Specifications: {{ $deal->source_id }}</b></h4>
                             <table class="table table-bordered">
                                 @foreach($deal->dealSpecifications as $row)
-                                    @if(in_array(trim(strtolower($row->key)),$displayKeys))
+                                    @if($deal->source_id == 11)                        
+                                    <tr>
+                                        <td width="30%"><b>{{ $row->key }}: </b></td>
+                                        <td width="70%">{{ $row->value }}</td>
+                                    </tr>                                    
+                                    @elseif(in_array(trim(strtolower($row->key)),$displayKeys))
                                     <tr>
                                         <td width="30%"><b>{{ $row->key }}: </b></td>
                                         <td width="70%">{{ $row->value }}</td>

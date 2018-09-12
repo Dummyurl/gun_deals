@@ -161,6 +161,199 @@ class Migration
 
     }
 
+    public static function createProductFromMidUsa($res)
+    {
+        $description = $res['description'];
+        $images = $res['images'];
+        $specifications = $res['specification'];
+        $products = $res['products'];
+        $link = $res['link'];
+
+        foreach($products as $product)
+        {
+            $linkMD5 = $res['linkMD5'];
+            $title = $res['title'];
+
+            $status = $product['status'];                        
+            $upc_number = $product['upc'];
+            $mpn = $product['mpn'];
+            $mfg_name = $product['mfg_name'];
+            $sale_price = $product['sale_price'];
+            $old_price = $product['old_price'];
+            $image_path = $product['image_path'];
+            if(!empty($image_path))
+            {
+                $image_path = explode(".", $image_path);
+                $image_path = $image_path[0];
+            }
+            $logoImage = $res['logoImage'];
+
+            $res["special_price"] = $product['sale_price'];
+            $res["old_price"] = $old_price;
+
+            $qty = $product['qty'];            
+
+            if(strtolower(trim($status)) == "available")
+                $out_of_stock = 0;
+            else
+                $out_of_stock = 1;
+
+            $attr = $product['attr'];
+            $productImages = [];
+            $productAttr = [];
+
+            foreach($images as  $image)
+            {
+                $image = $image['image'];
+                if(!empty($image_path))
+                {
+                    if(count($products) == 1)
+                    {
+                        $productImages[] = $image;
+                    }
+                    else if(strpos($image, $image_path) !== false)
+                    {
+                        $productImages[] = $image;
+                    }
+                }
+            }
+
+            foreach($attr as $r)
+            {   
+                $productAttr[] = [
+                    "key" => $r['key'],
+                    "value" => $r['value'],
+                ];
+            }
+
+            foreach($specifications as $r)
+            {   
+                $productAttr[] = [
+                    "key" => $r['key'],
+                    "value" => $r['value'],
+                ];
+            }
+
+
+            $unique_id = null;
+
+            if(!empty($upc_number))
+            {
+                $unique_id = "GR-".$upc_number;
+                $linkMD5 = md5($unique_id);
+            }            
+
+            $isExist = \DB::table("dealer_products")->where("link_md5",$linkMD5)->first();
+
+            $dataToInsert = 
+            [
+                "source_id" => $res['source_id'],
+                "breadcrumbs" => json_encode($res['categories']),
+                "product_id" => $unique_id,
+                "title" => $title,
+                "description" => $res['description'],
+                "link" => $link,
+                "link_md5" => $linkMD5,                
+                "image" => $image,
+                "upc_number" => $upc_number,
+                "mpn" => $mpn,
+                "mfg_name" => $mfg_name,
+                "vendor_image" => $logoImage,
+                "sale_price" => $sale_price,
+                "base_price" => $old_price
+            ];
+
+            if($res['category_id'] > 0)
+            $dataToInsert["product_category_id"] = $res['category_id'];
+
+            if(isset($res['url_id']))
+            {
+                $dataToInsert["source_url_id"] = $res['url_id'];
+            }
+
+            $dataToUpdate["out_of_stock"] = $out_of_stock;
+
+            if(isset($res['from_url']))
+            {
+                $dataToInsert["from_url"] = $res['from_url'];
+            }
+
+            $dataToInsert["last_visit_date"] = date("Y-m-d H:i:s");
+            $dataToInsert['created_at'] = date("Y-m-d H:i:s");
+
+
+            if($isExist)
+            {
+                $productId = $isExist->id;
+
+                \DB::table("dealer_product_attributes")
+                ->where("id",$productId)
+                ->delete();
+
+                $dataToInsert['updated_at'] = $dataToInsert['created_at'];
+                unset($dataToInsert['created_at']);
+
+                \DB::table("dealer_products")
+                ->where("id",$productId)
+                ->update($dataToInsert);
+
+
+                \DB::table("dealer_product_attributes")
+                ->where("product_id",$productId)
+                ->delete();
+
+                \DB::table("dealer_product_photos")
+                ->where("product_id",$productId)
+                ->delete();
+
+            }
+            else
+            {
+                $productId = \DB::table("dealer_products")
+                ->insertGetId($dataToInsert);            
+            }        
+
+            \DB::table("dealer_product_prices")
+            ->insert
+            (
+                [
+                    "product_id" => $productId,
+                    "sale_price" => $res["special_price"],
+                    "base_price" => $res["old_price"],
+                    "qty" => $qty,
+                    "date" => date("Y-m-d")
+                ]
+            );            
+
+            if(count($productAttr) > 0)
+            {
+                foreach($productAttr as $r)
+                {
+                    \DB::table("dealer_product_attributes")
+                    ->insert([
+                        "product_id" => $productId,
+                        "keyname" => $r["key"],
+                        "keyvalue" => $r["value"],
+                    ]);
+                }
+            }        
+
+            if(count($productImages) > 0)
+            {
+                foreach($productImages as $image)
+                {
+                    \DB::table("dealer_product_photos")
+                    ->insert([
+                        "product_id" => $productId,
+                        "image_url" => $image,
+                        "created_at" => date("Y-m-d H:i:s")
+                    ]);                
+                }                    
+            }        
+
+        }
+    }
+
     public static function createProduct($res)
     {
         $linkMD5 = $res['linkMD5'];
@@ -249,39 +442,33 @@ class Migration
             ->where("id",$productId)
             ->update($dataToInsert);
 
-            // Deal Prices
-            if(($isExist->sale_price != $res["special_price"] && !empty($res["special_price"])) || ($isExist->base_price != $res["old_price"] && !empty($res["old_price"])))
-            {
-                \DB::table("dealer_product_prices")
-                ->insert
-                (
-                    [
-                        "product_id" => $productId,
-                        "sale_price" => $res["special_price"],
-                        "base_price" => $res["old_price"],
-                        "date" => date("Y-m-d")
-                    ]
-                );
-            }
+                \DB::table("dealer_product_attributes")
+                ->where("product_id",$productId)
+                ->delete();
+
+                \DB::table("dealer_product_photos")
+                ->where("product_id",$productId)
+                ->delete();
 
         }
         else
         {
             $productId = \DB::table("dealer_products")
             ->insertGetId($dataToInsert);            
-
-            // Deal Prices
-            \DB::table("dealer_product_prices")
-            ->insert
-            (
-                [
-                    "product_id" => $productId,
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "date" => date("Y-m-d")
-                ]
-            );            
         }        
+
+
+        \DB::table("dealer_product_prices")
+        ->insert
+        (
+            [
+                "product_id" => $productId,
+                "sale_price" => $res["special_price"],
+                "base_price" => $res["old_price"],
+                "date" => date("Y-m-d")
+            ]
+        );
+
 
         if(count($specifications) > 0)
         {
@@ -310,6 +497,190 @@ class Migration
             }                    
         }        
 
+    }
+
+    public static function createDealFromMidUsa($res)
+    {
+        $description = $res['description'];
+        $images = $res['images'];
+        $specifications = $res['specification'];
+        $products = $res['products'];
+        $link = $res['link'];
+
+        foreach($products as $product)
+        {
+            $linkMD5 = $res['linkMD5'];
+            $title = isset($product['title']) ? $product['title']:'';
+
+            $status = $product['status'];                        
+            $upc_number = $product['upc'];
+            $mpn = $product['mpn'];
+            $mfg_name = $product['mfg_name'];
+            $sale_price = $product['sale_price'];
+            $old_price = $product['old_price'];
+            $image_path = $product['image_path'];
+            if(!empty($image_path))
+            {
+                $image_path = explode(".", $image_path);
+                $image_path = $image_path[0];
+            }
+            $logoImage = $res['logoImage'];
+
+            $res["special_price"] = $product['sale_price'];
+            $res["old_price"] = $old_price;
+
+            $qty = $product['qty'];            
+
+            if(strtolower(trim($status)) == "available")
+                $out_of_stock = 0;
+            else
+                $out_of_stock = 1;
+
+            $attr = $product['attr'];
+            $productImages = [];
+            $productAttr = [];
+
+            foreach($images as  $image)
+            {
+                $image = $image['image'];
+                if(!empty($image_path))
+                {
+                    if(count($products) == 1)
+                    {
+                        $productImages[] = $image;
+                    }
+                    else if(strpos($image, $image_path) !== false)
+                    {
+                        $productImages[] = $image;
+                    }
+                }
+            }
+
+            foreach($attr as $r)
+            {   
+                $productAttr[] = [
+                    "key" => $r['key'],
+                    "value" => $r['value'],
+                ];
+            }
+
+            foreach($specifications as $r)
+            {   
+                $productAttr[] = [
+                    "key" => $r['key'],
+                    "value" => $r['value'],
+                ];
+            }
+
+
+            $unique_id = null;
+
+            if(!empty($upc_number))
+            {
+                $unique_id = "GR-".$upc_number;
+                $linkMD5 = md5($unique_id);
+            }            
+
+            $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
+
+            $dataToInsert = 
+            [
+                "unique_id" => $unique_id,
+                "breadcrumbs" => json_encode($res['categories']),
+                "source_id" => $res['source_id'],
+                "title" => $title,
+                "link" => $link,            
+                "unique_md5" => $linkMD5,   
+                "upc_number" => $upc_number,             
+                "description" => $res['description'],                
+                "mpn" => $mpn,
+                "mfg_name" => $mfg_name,
+                "vendor_image" => $logoImage,
+                "sale_price" => $sale_price,
+                "base_price" => $old_price                
+            ];
+
+            if($res['category_id'] > 0)
+            $dataToInsert["category_id"] = $res['category_id'];
+
+            if(isset($res['url_id']))
+            {
+                $dataToInsert["source_url_id"] = $res['url_id'];
+            }
+
+            $dataToUpdate["out_of_stock"] = $out_of_stock;
+
+            if(isset($res['from_url']))
+            {
+                $dataToInsert["from_url"] = $res['from_url'];
+            }
+
+            $dataToInsert["last_visit_date"] = date("Y-m-d H:i:s");            
+            $dataToInsert["updated_at"] = date("Y-m-d H:i:s");                        
+
+            if(!$isExist)
+            {
+                $dataToInsert["created_at"] = date("Y-m-d H:i:s");
+                $deal_id = \DB::table("deals")->insertGetId($dataToInsert);
+            }
+            else
+            {
+                $deal_id = $isExist->id;
+
+                \DB::table("deals")
+                ->where("id",$deal_id)
+                ->update($dataToInsert);            
+            }
+
+            \DB::table("deal_prices")
+            ->insert
+            (
+                [
+                    "deal_id" => $deal_id,
+                    "sale_price" => $res["special_price"],
+                    "base_price" => $res["old_price"],
+                    "date" => date("Y-m-d"),
+                    "qty" => $qty
+                ]
+            );
+
+            // Add Photos
+            \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
+            
+            if(count($productImages) > 0)
+            {
+                $dataToInsert = [];
+                foreach($productImages as $image)
+                {                    
+                    $dataToInsert[] = [
+                        "deal_id" => $deal_id,
+                        "image_url" => $image,
+                        "created_at" => date("Y-m-d H:i:s"),
+                    ];
+                }                    
+
+                \DB::table("deal_photos")->insert($dataToInsert);
+            }
+
+            // Add Specifications                
+            \DB::table("deal_specifications")->where("deal_id",$deal_id)->delete();            
+            if(count($productAttr) > 0)
+            {
+                $dataToInsert = [];
+                foreach($productAttr as $row)
+                {
+                    $dataToInsert[] = 
+                    [
+                        "deal_id" => $deal_id,
+                        "key" => $row['key'],
+                        "value" => $row['value'],
+                        "created_at" => date("Y-m-d H:i:s"),
+                    ];
+                }                    
+
+                \DB::table("deal_specifications")->insert($dataToInsert);
+            }               
+        }
     }
 
     public static function mapDeals()
