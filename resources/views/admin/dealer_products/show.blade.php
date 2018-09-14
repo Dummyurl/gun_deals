@@ -71,6 +71,8 @@
                                     </td>
                                 </tr>
                                 @endif
+                                                
+
                                                                                  
 <!--                                 <tr>
                                     <td width="30%"><b>Item #:</b></td>
@@ -136,7 +138,7 @@
                             <h4><b>Product Attributes</b></h4>
                             <table class="table table-bordered">
                                 @foreach($attrs as $row)
-                                @if($dealerProduct->source_id == 1)
+                                @if(true)
                                     <tr>
                                         <td width="30%"><b>{{ $row['keyname'] }}</b></td>
                                         <td width="70%">{{ $row['keyvalue'] }}</td>

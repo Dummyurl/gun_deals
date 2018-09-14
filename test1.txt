@@ -1,0 +1,61 @@
+
+ Detail Page: https://www.primaryarms.com/anderson-manufacturing-mil-spec-stock-hardware-kit-am-21-buffer-kitArray
+(
+    [out_of_stock] => 0
+    [name] => Anderson Manufacturing AR-15 Stock Hardware Kit - MIL-SPEC
+    [description] => Anderson Manufacturing builds rifles, pistols, and parts utilizing the latest in computerized manufacturing. By keeping manufacturing in house, Anderson can offer quality, American-made products at an affordable price, backed by a limited lifetime warranty.<br><br>The Anderson Manufacturing MIL-SPEC Stock Hardware Kit includes an impact extruded 7075-T6 aluminum receiver extension with a durable hardcoat anodized finish. Featuring an extended bottom lip reducing carrier tilt, the buffer tube is compatible with MIL-SPEC AR-15 stocks.<br><br><b>Kit includes:</b><br><ul><li>6-position MIL-SPEC tube</li><li>Carbine recoil spring</li><li>Carbine recoil buffer</li><li>End plate</li><li>Castle nut</li></ul>
+    [special_price] => 27.99
+    [old_price] => 34.99
+    [qty] => 737
+    [ext_date] => 
+    [saving_price] => 7
+    [images] => Array
+        (
+            [0] => Array
+                (
+                    [image] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/AM-21-BUFFER-KIT_00.jpg
+                )
+
+        )
+
+    [specification] => Array
+        (
+            [0] => Array
+                (
+                    [key] => mpn
+                    [value] => AM-21-BUFFER-KIT
+                )
+
+            [1] => Array
+                (
+                    [key] => sku
+                    [value] => AM-21-BUFFER-KIT
+                )
+
+            [2] => Array
+                (
+                    [key] => manufacturer
+                    [value] => Anderson Manufacturing
+                )
+
+            [3] => Array
+                (
+                    [key] => Buffer
+                    [value] => 3.25 Carbine - Standard 3.00 oz
+                )
+
+            [4] => Array
+                (
+                    [key] => Platform
+                    [value] => AR-15
+                )
+
+            [5] => Array
+                (
+                    [key] => Type
+                    [value] => Stock Hardware Kit
+                )
+
+        )
+
+)

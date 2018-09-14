@@ -144,23 +144,57 @@
                                 <h4><b>Quantity Pricing</b></h4>
                                 <table class="table table-bordered">
                                     @foreach($qty_options as $r)
+                                        @if(isset($r['key']))
                                         <tr>
                                             <td width="40%"><b>{{ $r['key'] }}</b></td>
                                             <td width="60%">{{ $r['value'] }}</td>
-                                        </tr>                                
+                                        </tr>               
+                                        @elseif(isset($r['title']))
+                                        <tr>
+                                            <td width="40%"><b>{{ $r['title'] }}</b></td>
+                                            <td width="60%">{{ $r['price'] }}</td>
+                                        </tr>               
+                                        @endif                 
                                     @endforeach                                
                                 </table>                                                            
-                            @endif                            
+                            @endif              
+
+                            @php
+                                $productPrices = $deal->dealPrice ? $deal->dealPrice->toArray():[];
+                            @endphp         
+
+                            @if(count($productPrices))
+                            <h4><b>Product Prices</b></h4>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th width="25%">Date</th>
+                                    <th width="25%">Sale Price</th>
+                                    <th width="25%">Base Price</th>
+                                    <th width="25%">Quantity</th>
+                                </tr>
+                                @foreach($productPrices as $row)
+                                    <tr>
+                                        <td>{{ date("j M, Y",strtotime($row['date'])) }}</td>
+                                        <td>{{ $row['sale_price'] }}</td>
+                                        <td>{{ $row['base_price'] }}</td>
+                                        <td>{{ $row['qty'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                            @endif                           
+
+
+
                             @if($deal->dealSpecifications && count($deal->dealSpecifications))
 
                             <?php 
                                 $displayKeys = ["sku","mpn","manufacturer","manufacturer part number","model"];
                             ?>
 
-                            <h4><b>Deal Specifications: {{ $deal->source_id }}</b></h4>
+                            <h4><b>Deal Specifications:</b></h4>
                             <table class="table table-bordered">
                                 @foreach($deal->dealSpecifications as $row)
-                                    @if($deal->source_id == 11)                        
+                                    @if($deal->source_id == 11 || $deal->source_id == 3 && $row->key != 'Manufacturer.')                        
                                     <tr>
                                         <td width="30%"><b>{{ $row->key }}: </b></td>
                                         <td width="70%">{{ $row->value }}</td>

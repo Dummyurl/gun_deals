@@ -20,13 +20,15 @@ class Migration
         $isExist = \DB::table("deals")->where("unique_md5",$linkMD5)->first();
         $title = $res['name'];
         $upc_number = "";
+        $qty = isset($res['qty']) ? $res['qty']:null;
+
 
         $dataToUpdate = 
         [
             "source_id" => $res['source_id'],
             "title" => $title,
             "link" => $link,            
-            "unique_md5" => $linkMD5,
+            "unique_md5" => $linkMD5,            
             "out_of_stock" => $res["out_of_stock"],
             "description" => $res["description"],
             "qty_options" => !empty($res['qty_options']) ? json_encode($res['qty_options']):"",
@@ -59,7 +61,8 @@ class Migration
 
 
         $specifications = $res['specification'];            
-
+        $mpn = "";
+        $j = 0;
         if(count($specifications) > 0)
         {
 
@@ -69,14 +72,26 @@ class Migration
                 {
                     $upc_number = $row['value'];
                 }
+                else if(trim(strtolower($row['key'])) == "mpn")
+                {
+                    $mpn = $row['value'];
+
+                    if(isset($specifications[$j]))
+                    unset($specifications[$j]);
+                }
+
+                $j++;
             }                    
         }               
 
         $unique_id = null;
 
         if(!empty($upc_number))
-        $unique_id = "GR-".$upc_number;
-
+        {
+            $unique_id = "GR-".$upc_number;
+        }
+        
+        $dataToUpdate["mpn"] = $mpn;
         $dataToUpdate["unique_id"] = $unique_id;
         $dataToUpdate["upc_number"] = $upc_number;
 
@@ -85,17 +100,9 @@ class Migration
             $dataToUpdate["created_at"] = date("Y-m-d H:i:s");
             $deal_id = \DB::table("deals")->insertGetId($dataToUpdate);
 
-            // Deal Prices
-            \DB::table("deal_prices")
-            ->insert
-            (
-                [
-                    "deal_id" => $deal_id,
-                    "sale_price" => $res["special_price"],
-                    "base_price" => $res["old_price"],
-                    "date" => date("Y-m-d")
-                ]
-            );
+            $new_count = session("new_count");
+            $new_count++;
+            session(["new_count" => $new_count]);            
         }
         else
         {
@@ -103,22 +110,21 @@ class Migration
             \DB::table("deals")
             ->where("id",$deal_id)
             ->update($dataToUpdate);            
-
-            // Deal Prices
-            if(($isExist->sale_price != $res["special_price"]) || ($isExist->base_price != $res["old_price"]))
-            {
-                \DB::table("deal_prices")
-                ->insert
-                (
-                    [
-                        "deal_id" => $deal_id,
-                        "sale_price" => $res["special_price"],
-                        "base_price" => $res["old_price"],
-                        "date" => date("Y-m-d")
-                    ]
-                );
-            }
         }
+
+        // Deal Prices
+        \DB::table("deal_prices")
+        ->insert
+        (
+            [
+                "deal_id" => $deal_id,
+                "sale_price" => $res["special_price"],
+                "base_price" => $res["old_price"],
+                "date" => date("Y-m-d"),
+                "qty" => $qty
+            ]
+        );
+
 
         // Add Photos
         \DB::table("deal_photos")->where("deal_id",$deal_id)->delete();
@@ -254,7 +260,7 @@ class Migration
                 "description" => $res['description'],
                 "link" => $link,
                 "link_md5" => $linkMD5,                
-                "image" => $image,
+                // "image" => $image,
                 "upc_number" => $upc_number,
                 "mpn" => $mpn,
                 "mfg_name" => $mfg_name,
@@ -359,11 +365,15 @@ class Migration
         $linkMD5 = $res['linkMD5'];
         $link = $res['link'];        
         $title = $res['title'];
+        $description = isset($res['description']) ? $res['description']:"";
         $isExist = \DB::table("dealer_products")->where("link_md5",$linkMD5)->first();
         $specifications = $res['attr'];
+        $qty = isset($res['qty']) ? $res['qty']:null;
 
         $upc_number = "";
         $MSRP = "";
+        $mpn = "";
+        $j = 0;
         if(count($specifications) > 0)
         {
             foreach($specifications as $row)
@@ -376,6 +386,15 @@ class Migration
                 {
                     $MSRP = $row['value'];
                 }
+                else if(trim(strtolower($row['key'])) == "mpn")
+                {
+                    $mpn = $row['value'];
+                    if(isset($specifications[$j]))
+                    {
+                        unset($specifications[$j]);
+                    }
+                }
+                $j++;
             }                    
         }               
 
@@ -393,6 +412,7 @@ class Migration
             "source_id" => $res['source_id'],
             "product_id" => $unique_id,
             "title" => $title,
+            "description" => $description,
             "link" => $link,
             "link_md5" => $linkMD5,
             "image" => $image,
@@ -424,6 +444,7 @@ class Migration
             $dataToInsert["from_url"] = $res['from_url'];
         }
 
+        $dataToInsert["mpn"] = $mpn;
         $dataToInsert["last_visit_date"] = date("Y-m-d H:i:s");
         $dataToInsert['created_at'] = date("Y-m-d H:i:s");
 
@@ -455,6 +476,10 @@ class Migration
         {
             $productId = \DB::table("dealer_products")
             ->insertGetId($dataToInsert);            
+     
+            $new_count = session("new_count");
+            $new_count++;
+            session(["new_count" => $new_count]);                 
         }        
 
 
@@ -465,7 +490,8 @@ class Migration
                 "product_id" => $productId,
                 "sale_price" => $res["special_price"],
                 "base_price" => $res["old_price"],
-                "date" => date("Y-m-d")
+                "date" => date("Y-m-d"),
+                "qty" => $qty
             ]
         );
 

@@ -54,6 +54,11 @@ class Deal extends Model
         return $this->belongsTo('App\Models\ScrapSource', 'source_id');
     }
 
+    public function dealPrice()
+    {
+        return $this->hasMany('App\Models\DealPrice');
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */

@@ -13,8 +13,11 @@ return [
     [
         8 => "SCRAP_GRABGUN_DEALS",
         10 => "SCRAP_GRABGUN_PRODUCTS",
+        3 => "SCRAP_PRIMARYARMS",
         11 => "SCRAP_MIDWAYUSA",
         9 => "SCRAP_PREP_GUN_SHOP",
+        6 => "SCRAP_RIGHTOTBEAR",
+        1 => "SCRAP_PALMETTOSTATE",
     ],
 
     /*

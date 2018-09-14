@@ -1,0 +1,2124 @@
+Array
+(
+    [rows] => Array
+        (
+            [0] => Array
+                (
+                    [link] => https://www.primaryarms.com/anderson-manufacturing-mil-spec-stock-hardware-kit-am-21-buffer-kit
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 4.6
+                            [searchkeywords] => 3.25 Carbine - Standard 3.00 oz,AR-15,Stock Hardware Kit,,Stock Components,Gun Parts,AR 15 Stocks,AR 15 Stock Component,AR 15 Lower Parts,AR 15,,Complete Buffer Kits,
+                            [custitem_ns_pr_count] => 136
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => {}
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 737
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => The Anderson Buttstock assembly kit comes with all you need to attach an AR-15 stock to your rifle
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/AM-21-BUFFER-KIT_00.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $34.99
+                                    [onlinecustomerprice] => 34.99
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 34.99
+                                                    [price_formatted] => $34.99
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 27.99
+                                                    [price_formatted] => $27.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {"3":"1","2":"3","1":"8","4":"14","5":"110"}
+                            [custitem_pa_commission] => 
+                            [internalid] => 1029
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Anderson Manufacturing AR-15 Stock Hardware Kit - MIL-SPEC
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 34.99
+                            [manufacturer] => Anderson Manufacturing
+                            [itemid] => AM-21-BUFFER-KIT
+                            [onlinecustomerprice_formatted] => $34.99
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 737
+                            [displayname] => AM-21-BUFFER-KIT
+                            [storedisplayname2] => AM-21-BUFFER-KIT
+                            [pagetitle] => Anderson Manufacturing AR-15 Stock Hardware Kit - MIL-SPEC
+                            [urlcomponent] => anderson-manufacturing-mil-spec-stock-hardware-kit-am-21-buffer-kit
+                            [custitem_ranking_score] => 827
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [link] => https://www.primaryarms.com/high-standard-front-sight-detent-spring-ar-b80-61709
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [searchkeywords] => High Standard,High standard firearms ltd,AR-15/AR-308,Front Sight Detent Spring,,Upper Parts,Gun Parts,Clearance,AR 308 Upper Parts,AR 308,AR 15 Upper Parts,AR 15,,Small Parts and Components,
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => 
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 141
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/AR-B80-61709_00.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $0.77
+                                    [onlinecustomerprice] => 0.77
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 0.77
+                                                    [price_formatted] => $0.77
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 0.1
+                                                    [price_formatted] => $0.10
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => 
+                            [custitem_pa_commission] => 
+                            [internalid] => 7962
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => High Standard AR-15 Front Sight Detent Spring
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 0.77
+                            [manufacturer] => High standard firearms ltd
+                            [itemid] => AR-B80-61709
+                            [onlinecustomerprice_formatted] => $0.77
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 141
+                            [displayname] => AR-B80-61709
+                            [storedisplayname2] => AR-B80-61709
+                            [pagetitle] => High Standard AR-15 Front Sight Detent Spring
+                            [urlcomponent] => high-standard-front-sight-detent-spring-ar-b80-61709
+                            [custitem_ranking_score] => 456
+                        )
+
+                )
+
+            [2] => Array
+                (
+                    [link] => https://www.primaryarms.com/magpul-pmag-40rd-non-window-gen-m3-black-mag233-blk
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 5
+                            [searchkeywords] => Magpul,5.56 NATO,40,Magpul Industries,AR-15 Magazines,8 Oz,,Magazines,Magazines,AR 15 Magazines,AR 15,,,magazine,mag,magazines,
+                            [custitem_ns_pr_count] => 40
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => {}
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 203
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/MAG233-BLK_00.jpg
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/MAG233-BLK_01.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $19.95
+                                    [onlinecustomerprice] => 19.95
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 19.95
+                                                    [price_formatted] => $19.95
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 15.99
+                                                    [price_formatted] => $15.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {"3":"1","5":"39"}
+                            [custitem_pa_commission] => 
+                            [internalid] => 2048
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Magpul PMAG 40 AR/M4 GEN M3 5.56 NATO Magazine Magazine - Black
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 19.95
+                            [custitem_map_type] => PRICE IN CART
+                            [manufacturer] => Magpul Industries
+                            [itemid] => MAG233-BLK
+                            [onlinecustomerprice_formatted] => $19.95
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 203
+                            [displayname] => MAG233-BLK
+                            [storedisplayname2] => MAG233-BLK
+                            [pagetitle] => Magpul PMAG 40 AR/M4 GEN M3 5.56 NATO Magazine Magazine - Black
+                            [urlcomponent] => magpul-pmag-40rd-non-window-gen-m3-black-mag233-blk
+                            [custitem_ranking_score] => 323
+                        )
+
+                )
+
+            [3] => Array
+                (
+                    [link] => https://www.primaryarms.com/strike-ind-enhanced-lower-parts-kit-no-grip-si-ar-e-lrpth
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 4.3
+                            [searchkeywords] => Strike Industries,Strike Industries,AR-15,,Lower Parts and Kits,Gun Parts,AR 15 Part Kits,AR 15 Lower Parts,AR 15,,Lower Parts Kits,
+                            [custitem_ns_pr_count] => 6
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => {}
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 66
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/SI-AR-E-LRPTH_00.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $69.95
+                                    [onlinecustomerprice] => 69.95
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 69.95
+                                                    [price_formatted] => $69.95
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 59.99
+                                                    [price_formatted] => $59.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {"3":"2","5":"4"}
+                            [custitem_pa_commission] => 
+                            [internalid] => 13520
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Strike Industries Enhanced Lower Parts Kit - No Pistol Grip
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 69.95
+                            [custitem_map_type] => PRICE IN CART
+                            [manufacturer] => Strike Industries
+                            [itemid] => SI-AR-E-LRPTH
+                            [onlinecustomerprice_formatted] => $69.95
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 66
+                            [displayname] => SI-AR-E-LRPTH
+                            [storedisplayname2] => SI-AR-E-LRPTH
+                            [pagetitle] => Strike Industries Enhanced Lower Receiver Parts Kit - No Pistol Grip
+                            [urlcomponent] => strike-ind-enhanced-lower-parts-kit-no-grip-si-ar-e-lrpth
+                            [custitem_ranking_score] => 289
+                        )
+
+                )
+
+            [4] => Array
+                (
+                    [link] => https://www.primaryarms.com/bear-creek-arsenal-7-5-in-heavy-barrel-1-8-parkerized-300-blackout-barrel-b300phb7-518p
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 4
+                            [searchkeywords] => Manganese Phosphate,Heavy,7.5,41V50 Chrome Moly Vanadium Steel,Bear Creek Arsenal,300 BLK,M4,.750,Pistol,Bear Creek Arsenal,AR-15,5/8 X 24,1:8,,Barrels & Accessories,Gun Parts,AR 15 Barrels,AR 15,,Barrels,AR15,AR 15,AR-15,5/8x24,5/8 by 24,5/8 x 24,
+                            [custitem_ns_pr_count] => 1
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => {}
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 24
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B300PHB7.518P_00.jpg
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B300PHB7.518P_01.jpg
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B300PHB7.518P_02.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $76.99
+                                    [onlinecustomerprice] => 76.99
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 76.99
+                                                    [price_formatted] => $76.99
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 59.99
+                                                    [price_formatted] => $59.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {"4":"1"}
+                            [custitem_pa_commission] => 
+                            [internalid] => 9863
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Bear Creek Arsenal 7.5" 300 BLK Heavy Contour 1:8 Pistol 41V50 Barrel - Parkerized
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 76.99
+                            [manufacturer] => Bear Creek Arsenal
+                            [itemid] => B300PHB7.518P
+                            [onlinecustomerprice_formatted] => $76.99
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 24
+                            [displayname] => B300PHB7.518P
+                            [storedisplayname2] => B300PHB7.518P
+                            [pagetitle] => Bear Creek Arsenal 7.5" 300 BLK Heavy Contour 1:8 Pistol 41V50 Barrel - Parkerized
+                            [urlcomponent] => bear-creek-arsenal-7-5-in-heavy-barrel-1-8-parkerized-300-blackout-barrel-b300phb7-518p
+                            [custitem_ranking_score] => 240
+                        )
+
+                )
+
+            [5] => Array
+                (
+                    [link] => https://www.primaryarms.com/eotech-g23-g33-mounting-screw-set-2-short-2-long-absent-thread-lock-m5014_2
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [searchkeywords] => EOTech,EOTech G23/G33 Magnifier Mount,Mounting Hardware,,Magnifier Mounts,Optics,Mounts,Magnifier Mounts,,Small Parts and Components,
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => 
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 454
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/M5015_00.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $9.77
+                                    [onlinecustomerprice] => 9.77
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 9.77
+                                                    [price_formatted] => $9.77
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 0.05
+                                                    [price_formatted] => $0.05
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => 
+                            [custitem_pa_commission] => 
+                            [internalid] => 12698
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => EOTech Magnifier Mounting Screw Set - G23/G33 - 2 Screws
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 9.77
+                            [manufacturer] => EOTech
+                            [itemid] => M5015
+                            [onlinecustomerprice_formatted] => $9.77
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 907
+                            [displayname] => M5015
+                            [storedisplayname2] => M5015
+                            [pagetitle] => EOTech Magnifier Mounting Screw Set - G23/G33 - 2 Screws
+                            [urlcomponent] => eotech-g23-g33-mounting-screw-set-2-short-2-long-absent-thread-lock-m5014_2
+                            [custitem_ranking_score] => 220
+                        )
+
+                )
+
+            [6] => Array
+                (
+                    [link] => https://www.primaryarms.com/magpul-pmag-40rd-non-window-ar-m4-gen-m3-sand-mag233-snd
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 5
+                            [searchkeywords] => Magpul,5.56 NATO,40,Magpul Industries,AR-15 Magazines,8 Oz,,Magazines,Magazines,Clearance,AR 15 Magazines,AR 15,,,magazine,mag,magazines,
+                            [custitem_ns_pr_count] => 1
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => {}
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 478
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/MAG233-SND_00.jpg
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/MAG233-SND_01.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $18.95
+                                    [onlinecustomerprice] => 18.95
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 18.95
+                                                    [price_formatted] => $18.95
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 15.99
+                                                    [price_formatted] => $15.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {"5":"1"}
+                            [custitem_pa_commission] => 
+                            [internalid] => 5223
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Magpul PMAG 40 AR/M4 GEN M3 5.56 NATO Magazine - Sand
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 18.95
+                            [custitem_map_type] => PRICE IN CART
+                            [manufacturer] => Magpul Industries
+                            [itemid] => MAG233-SND
+                            [onlinecustomerprice_formatted] => $18.95
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 478
+                            [displayname] => MAG233-SND
+                            [storedisplayname2] => MAG233-SND
+                            [pagetitle] => Magpul PMAG 40 AR/M4 GEN M3 5.56 NATO Magazine - Sand
+                            [urlcomponent] => magpul-pmag-40rd-non-window-ar-m4-gen-m3-sand-mag233-snd
+                            [custitem_ranking_score] => 214
+                        )
+
+                )
+
+            [7] => Array
+                (
+                    [link] => https://www.primaryarms.com/bear-creek-16-in-223-wylde-ar-15-barrel-flutes-nitride
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 0
+                            [searchkeywords] => Salt Bath Nitride,Heavy,16,Salt Bath Nitride,4150 Chrome Moly Vanadium Steel,Bear Creek Arsenal,.223 Wylde,M4,.750,Carbine,AR-15,1/2 X 28,1:9,2.5 lbs,,Barrels & Accessories,Gun Parts,AR 15 Upper Parts,AR 15 Barrels,AR 15,,Barrels,
+                            [custitem_ns_pr_count] => 0
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => 
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 35
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in AR-15 barrel with 1:9 twist rate, heavy contour, and spiral fluting
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1619-MSF_00.jpg
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal .223 Wylde 16in AR-15 barrel with carbine gas system and eye catching nitrided spiral flutes
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1619-MSF_01.jpg
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in .223 Wylde AR15 barrel is threaded for 1/2x28 muzzle devices
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1619-MSF_02.jpg
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal heavy contour 16 inch AR-15 fluted barrel has a .750 gas seat for carbine gas tubes
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1619-MSF_03.jpg
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in .223 Wylde heavy fluted AR 15 barrel with parkerized finish features an M4 barrel extension
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1619-MSF_04.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $121.77
+                                    [onlinecustomerprice] => 121.77
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 121.77
+                                                    [price_formatted] => $121.77
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 59.99
+                                                    [price_formatted] => $59.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {}
+                            [custitem_pa_commission] => 
+                            [internalid] => 16254
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Bear Creek Arsenal 16" .223 Wylde 1:9 Carbine Length Heavy Contour AR-15 Barrel - Spiral Flutes - Black Nitride
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 121.77
+                            [manufacturer] => Bear Creek Arsenal
+                            [itemid] => B223WCHB1619-MSF
+                            [onlinecustomerprice_formatted] => $121.77
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 35
+                            [displayname] => B223WCHB1619-MSF
+                            [storedisplayname2] => B223WCHB1619-MSF
+                            [pagetitle] => Bear Creek Arsenal 16" .223 Wylde 1:9 Carbine Length Heavy Contour AR-15 Barrel - Spiral Flutes - Black Nitride
+                            [urlcomponent] => bear-creek-16-in-223-wylde-ar-15-barrel-flutes-nitride
+                            [custitem_ranking_score] => 164
+                        )
+
+                )
+
+            [8] => Array
+                (
+                    [link] => https://www.primaryarms.com/bear-creek-arsenal-16in-556-nato-government-contour-stainless-steel-ar-15-barrel
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 0
+                            [searchkeywords] => Stainless Steel,Government,16,Stainless Steel,416R Stainless Steel,Bear Creek Arsenal,5.56 NATO,M4,.750,Mid-Length,Bear Creek Arsenal,AR-15,1/2 X 28,1:8,1.9 lbs,,Firearm Parts,AR 15 Barrels,AR 15,,Barrels,
+                            [custitem_ns_pr_count] => 0
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => 
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 768
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in 5.56 NATO Government contour mid-length 416R stainless steel barrel has a polished finished
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B556MM41618-SS_00.jpg
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal polished stainless steel is 16in long and chambered in 5.56 NATO compatible with .223 Remington
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B556MM41618-SS_01.jpg
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in 5.56 NATO stainless steel mid-length barrel is threaded 1/2x28 for your favorite muzzle brake
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B556MM41618-SS_03.jpg
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in government contour 5.56 NATO barrel has a mid-length gas system and accepts .750in gas blocks
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B556MM41618-SS_04.jpg
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal stainless steel 16in 5.56 NATO AR-15 barrel has M4 feed ramps and a durable phosphate barrel extension
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B556MM41618-SS_05.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $85.99
+                                    [onlinecustomerprice] => 85.99
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {}
+                            [custitem_pa_commission] => 
+                            [internalid] => 17689
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Bear Creek Arsenal 16" 5.56 NATO Government Contour 1:8 Mid-Length 416R Barrel - Stainless
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 85.99
+                            [manufacturer] => Bear Creek Arsenal
+                            [itemid] => B556MM41618-SS
+                            [onlinecustomerprice_formatted] => $85.99
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 768
+                            [displayname] => B556MM41618-SS
+                            [storedisplayname2] => B556MM41618-SS
+                            [pagetitle] => Bear Creek Arsenal 16" 5.56 NATO Government Contour 1:8 Mid-Length 416R Barrel - Stainless
+                            [urlcomponent] => bear-creek-arsenal-16in-556-nato-government-contour-stainless-steel-ar-15-barrel
+                            [custitem_ranking_score] => 161
+                        )
+
+                )
+
+            [9] => Array
+                (
+                    [link] => https://www.primaryarms.com/bear-creek-arsenal-16in-223-wylde-carbine-length-heavy-fluted-ar-15-barrel-b223wchb1618-sfssm
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 0
+                            [searchkeywords] => Salt Bath Nitride,Heavy,16,Salt Bath Nitride,416R Stainless Steel,Bear Creek Arsenal,.223 Wylde,M4,.750,Carbine,AR-15,1/2 X 28,1:8,2.5 lbs,,Barrels & Accessories,Gun Parts,AR 15 Upper Parts,AR 15 Barrels,AR 15,,Barrels,
+                            [custitem_ns_pr_count] => 0
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => 
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 1
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in .223 Wylde carbine length AR-15 barrel is machined to a heavy contour and spiral fluted.
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1618-SFSSM_00.jpg
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in .223 Wylde spiral fluted heavy AR-15 barrel uses a soft shooting carbine length gas port location
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1618-SFSSM_01.jpg
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal .223 Wylde 16in carbine length AR-15 heavy barrel is threaded 1/2x28 for muzzle brakes and flash hiders
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1618-SFSSM_02.jpg
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in AR-15 barrel uses standard .750in gas blocks with a 0.070in diameter carbine length gas port
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1618-SFSSM_03.jpg
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal 16in carbine length heavy fluted AR-15 barrel is chambered for .223 Wylde with an M4 barrel extension
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WCHB1618-SFSSM_04.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $129.77
+                                    [onlinecustomerprice] => 129.77
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 129.77
+                                                    [price_formatted] => $129.77
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 69.99
+                                                    [price_formatted] => $69.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {}
+                            [custitem_pa_commission] => 
+                            [internalid] => 16276
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Bear Creek Arsenal 16" .223 Wylde 1:8 Carbine Length Heavy Contour Barrel - Spiral Flutes - Black Nitride
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 129.77
+                            [manufacturer] => Bear Creek Arsenal
+                            [itemid] => B223WCHB1618-SFSSM
+                            [onlinecustomerprice_formatted] => $129.77
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 1
+                            [displayname] => B223WCHB1618-SFSSM
+                            [storedisplayname2] => B223WCHB1618-SFSSM
+                            [pagetitle] => Bear Creek Arsenal 16" .223 Wylde 1:8 Carbine Length Heavy Contour Barrel - Spiral Flutes - Black Nitride
+                            [urlcomponent] => bear-creek-arsenal-16in-223-wylde-carbine-length-heavy-fluted-ar-15-barrel-b223wchb1618-sfssm
+                            [custitem_ranking_score] => 129
+                        )
+
+                )
+
+            [10] => Array
+                (
+                    [link] => https://www.primaryarms.com/B223WMHB1818-HCSSF
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 3.6
+                            [searchkeywords] => Stainless Steel,Heavy,18,416R Stainless Steel,Bear Creek Arsenal,.223 Wylde,M4,.750,Mid-Length,AR-15,1/2 X 28,1:8,,Barrels & Accessories,Gun Parts,AR 15 Barrels,AR 15,,Barrels,mid-length,mid length,middy,midlength,barrell,barrel,Barrel,bbl,berrel,berel,barrul,
+                            [custitem_ns_pr_count] => 5
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => {}
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 117
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WMHB1818-HCSSF_00.jpg
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WMHB1818-HCSSF_01.jpg
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WMHB1818-HCSSF_02.jpg
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WMHB1818-HCSSF_03.jpg
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [altimagetext] => 
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223WMHB1818-HCSSF_04.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $164.99
+                                    [onlinecustomerprice] => 164.99
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 164.99
+                                                    [price_formatted] => $164.99
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 99.99
+                                                    [price_formatted] => $99.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {"1":"1","2":"1","5":"3"}
+                            [custitem_pa_commission] => 
+                            [internalid] => 12573
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Bear Creek Arsenal 18" .223 Wylde Heavy Contour 1:8 Mid-Length 416R Barrel - Hornets Nest Fluted - Stainless
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 164.99
+                            [manufacturer] => Bear Creek Arsenal
+                            [itemid] => B223WMHB1818-HCSSF
+                            [onlinecustomerprice_formatted] => $164.99
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 117
+                            [displayname] => B223WMHB1818-HCSSF
+                            [storedisplayname2] => B223WMHB1818-HCSSF
+                            [pagetitle] => Bear Creek Arsenal 18" .223 Wylde Heavy Contour 1:8 Mid-Length 416R Barrel - Hornets Nest Fluted - Stainless
+                            [urlcomponent] => B223WMHB1818-HCSSF
+                            [custitem_ranking_score] => 113
+                        )
+
+                )
+
+            [11] => Array
+                (
+                    [link] => https://www.primaryarms.com/bear-creek-arsenal-18in-223-wylde-mid-length-heavy-fluted-ar-15-barrel-b223-5-56mhb1819-pfs
+                    [data] => Array
+                        (
+                            [custitem_ns_pr_item_attributes] => &nbsp;
+                            [custitem_ns_pr_rating] => 0
+                            [searchkeywords] => Parkerized,Heavy,18,41V50 Chrome Moly Vanadium Steel,Bear Creek Arsenal,.223 Wylde,M4,.750,Mid-Length,AR-15,1/2 X 28,1:9,,Barrels & Accessories,Gun Parts,AR 15 Upper Parts,AR 15 Barrels,AR 15,,Barrels,
+                            [custitem_ns_pr_count] => 0
+                            [ispurchasable] => 1
+                            [custitem_ns_pr_attributes_rating] => 
+                            [stockdescription] => 
+                            [pricelevel13] => 0
+                            [custitem_primary_inventory] => 60
+                            [itemimages_detail] => Array
+                                (
+                                    [urls] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal's 18in .223 Wylde AR-15 barrel has a spiral fluted heavy contour and parkerized finish
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223-5-56MHB1819-PFS_00.jpg
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal's spiral fluted heavy AR-15 carbine barrel accepts standard .750in gas blocks
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223-5-56MHB1819-PFS_01.jpg
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [altimagetext] => BCA's heavy fluted AR-15 barrel with parkerized finish has 1/2x28 threading for your favorite muzzle brakes and flash hiders
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223-5-56MHB1819-PFS_02.jpg
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal's AR-15 heavy contour fluted barrel has 1:8 twist rifling and carbine length gas system
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223-5-56MHB1819-PFS_03.jpg
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [altimagetext] => Bear Creek Arsenal's heavy fluted barrel for AR-15 rifles is chambered for .223 Wylde
+                                                    [url] => https://www.primaryarms.com/SSP Applications/NetSuite Inc. - SCA Mont Blanc/Development/img/B223-5-56MHB1819-PFS_04.jpg
+                                                )
+
+                                        )
+
+                                )
+
+                            [onlinecustomerprice_detail] => Array
+                                (
+                                    [onlinecustomerprice_formatted] => $109.77
+                                    [onlinecustomerprice] => 109.77
+                                    [priceschedule] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [maximumquantity] => 1
+                                                    [minimumquantity] => 0
+                                                    [price] => 109.77
+                                                    [price_formatted] => $109.77
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [minimumquantity] => 1
+                                                    [price] => 59.99
+                                                    [price_formatted] => $59.99
+                                                )
+
+                                        )
+
+                                )
+
+                            [custitem_ns_pr_rating_by_rate] => {}
+                            [custitem_pa_commission] => 
+                            [internalid] => 16263
+                            [itemoptions_detail] => Array
+                                (
+                                    [fields] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [internalid] => custcol_gc_amount
+                                                    [label] => Gift Certificate Amount
+                                                    [type] => text
+                                                )
+
+                                            [1] => Array
+                                                (
+                                                    [internalid] => custcol_pco
+                                                    [label] => PCO
+                                                    [type] => text
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [internalid] => custcol_what_belong
+                                                    [label] => What Belong
+                                                    [type] => text
+                                                )
+
+                                            [3] => Array
+                                                (
+                                                    [internalid] => custcol_child_price
+                                                    [label] => Child Price
+                                                    [type] => text
+                                                )
+
+                                            [4] => Array
+                                                (
+                                                    [internalid] => custcol_ad_name
+                                                    [label] => Ad Name
+                                                    [type] => text
+                                                )
+
+                                            [5] => Array
+                                                (
+                                                    [internalid] => custcol_regular_price
+                                                    [label] => Regular Price
+                                                    [type] => currency
+                                                )
+
+                                            [6] => Array
+                                                (
+                                                    [internalid] => custcol_parent_options
+                                                    [label] => Parent Options
+                                                    [type] => textarea
+                                                )
+
+                                            [7] => Array
+                                                (
+                                                    [internalid] => custcol_original_description
+                                                    [label] => Original Description
+                                                    [type] => textarea
+                                                )
+
+                                            [8] => Array
+                                                (
+                                                    [internalid] => custcol_free_shipping
+                                                    [label] => Free Shipping
+                                                    [type] => checkbox
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [internalid] => custcol_affiliate
+                                                    [label] => Affiliate
+                                                    [type] => checkbox
+                                                )
+
+                                        )
+
+                                )
+
+                            [outofstockmessage] => 
+                            [storedescription] => Bear Creek Arsenal 18" .223 Wylde 1:9 Mid-Length Heavy Contour AR-15 Barrel - Spiral Flutes - Parkerized
+                            [isinstock] => 1
+                            [quantitybackordered_detail] => Array
+                                (
+                                    [locations] => Array
+                                        (
+                                        )
+
+                                    [quantitybackordered] => 0
+                                )
+
+                            [onlinecustomerprice] => 109.77
+                            [manufacturer] => Bear Creek Arsenal
+                            [itemid] => B223-5-56MHB1819-PFS
+                            [onlinecustomerprice_formatted] => $109.77
+                            [custitem_sc_ns_enable_pre_order] => 
+                            [isbackorderable] => 
+                            [custitem_promo_link] => 
+                            [showoutofstockmessage] => 
+                            [outofstockbehavior] => Disallow back orders but display out-of-stock message
+                            [itemtype] => InvtPart
+                            [quantityavailable] => 60
+                            [displayname] => B223-5-56MHB1819-PFS
+                            [storedisplayname2] => B223-5-56MHB1819-PFS
+                            [pagetitle] => Bear Creek Arsenal 18" .223 Wylde 1:9 Mid-Length Heavy Contour AR-15 Barrel - Spiral Flutes - Parkerized
+                            [urlcomponent] => bear-creek-arsenal-18in-223-wylde-mid-length-heavy-fluted-ar-15-barrel-b223-5-56mhb1819-pfs
+                            [custitem_ranking_score] => 92
+                        )
+
+                )
+
+        )
+
+    [nextlink] => https://www.primaryarms.com/api/items?country=US&include=facets&pricelevel=5&c=3901023&offset=12&fieldset=search&language=en&facet.exclude=custitem_1%2Ccustitem_2%2Ccustitem_accessory_attachment%2Ccustitem_action%2Ccustitem_adjustable%2Ccustitem_ambidextrous%2Ccustitem_armor_type%2Ccustitem_assembly%2Ccustitem_barrel_length%2Ccustitem_brand%2Ccustitem_bullet_weight%2Ccustitem_caliber_gauge%2Ccustitem_caliber_marking%2Ccustitem_carrier_style%2Ccustitem_color%2Ccustitem_decibel_reduction%2Cpricelevel2%2Cpricelevel6%2Cpricelevel7%2Ccustitem_fitment%2Ccustitem_fixed_folding%2Ccustitem_focal_plane%2Ccustitem_forward_cant%2Ccustitem_frame_size%2Ccustitem_gas_system_length%2Ccustitem_illuminated%2Ccustitem_in_stock%2Ccustitem_latch_size%2Ccustitem_leg_style%2Cpricelevel10%2Ccustitem_magnification%2Ccustitem_material%2Ccustitem_night_vision_compatible%2Cpricelevel5%2Ccustitem_optic_type%2Ccustitem_pa_featured_products%2Ccustitem_pa_staff_picks%2Ccustitem_pa_top_selling%2Ccustitem_padded%2Ccustitem_platform%2Ccustitem_position%2Cpricelevel%2Ccustitem_quick_release%2Ccustitem_ring_height%2Ccustitem_size%2Ccustitem_storage%2Ccustitem_style%2Ccustitem_thread_pattern%2Ccustitem_throw%2Ccustitem_tube_diameter%2Ccustitem_type%2Citemtype%2Ccustitem_user_serviceable%2Conlinecustomerprice&sort=custitem_ranking_score%3Adesc&n=2&limit=12&currency=USD&AdName=Clearance%2CSale
+)
