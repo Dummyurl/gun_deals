@@ -105,6 +105,230 @@ class Scrapping {
 
     }
 
+    public static function scrapSgammoLinks($pageURL,$params)
+    {
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $id = $params['id'];        
+        $i = 0;
+        $url = $pageURL;
+
+        // $url = "https://www.sgammo.com/catalog/rimfire-ammo-sale";
+
+        $categories = \App\Scrapping::deal_scraps("sgammo_categories",$url);
+        if(count($categories) == 0)
+        {
+            $categories = [$url];
+        }                
+
+        foreach($categories as $url)
+        {
+            $mainUrl = $url;
+            $totalPages = \App\Scrapping::deal_scraps("sgammo_count",$url);
+            echo "\nTotal Pages: ".$totalPages;
+
+            if($totalPages == 0)
+                $totalPages = 1;
+
+            if($totalPages > 0)
+            {
+                for($j=0;$j<=$totalPages;$j++)
+                {
+                    if($j > 0)
+                    {
+                        $url = $mainUrl."?page=$j";                
+                    }
+                    
+                    $rows = \App\Scrapping::deal_scraps("sgammo",$url);
+                    
+                    
+                    if(count($rows) > 0)
+                    {
+                        foreach($rows as $link)
+                        {                        
+                            $link = trim($link);
+                            echo "\n Detail Page: ".$link;
+                            $res = Scrapping::deal_scraps("sgammo_detail",$link);
+
+                            if(count(array_keys($res)) > 0)
+                            {
+                                $linkMD5 = md5($link);                                
+                                $res['link'] = $link;
+                                $res['linkMD5'] = $linkMD5;                
+                                $res['category_id'] = $category_id;
+                                $res['source_id'] = $source_id;
+                                $res['from_url'] = $scrap_url;
+                                $res['url_id'] = $id;
+                                if($source_type == 1)
+                                {
+                                    $res['title'] = $res['name'];
+                                    $res['attr'] = $res['specification'];
+                                    \App\Migration::createProduct($res);
+                                }                        
+                                else
+                                {
+                                    \App\Migration::createDeal($res);
+                                }                                                
+                            }
+
+                            $total_count = session("total_count");
+                            $total_count++;
+                            session(["total_count" => $total_count]);                 
+                            
+                            
+                            echo "\n$i";
+                            // $i++;
+
+                        }
+                    }
+                }
+            }        
+
+        }
+    }
+
+    public static function scrapLuckyGunnerLinks($pageURL,$params)
+    {
+        // $pageURL = "https://www.luckygunner.com/accessories";
+        $url = $pageURL;
+        $res = self::deal_scraps("LuckyGunner_Category",$url);
+        $urls = [];
+        if($res['type'] == "listing")
+        {
+            self::processLuckyGunnerLinks($url,$params);   
+        }    
+        else if($res['type'] == "category")
+        {
+            $urls = $res['rows'];
+            foreach($urls as $url)
+            {
+                self::processLuckyGunnerLinks($url,$params);
+            }                                
+        }            
+        else if($res['type'] == "sub_category")
+        {
+            $categories = $res['rows'];
+            
+            foreach($categories as $categoryUrl)
+            {
+                $res = self::deal_scraps("LuckyGunner_Category",$categoryUrl);
+                if($res['type'] == "listing")
+                {
+                    $urls[] = $categoryUrl;       
+                }    
+                else
+                {
+                    $sub_categories = $res['rows'];    
+                    foreach($sub_categories as $categoryUrl)
+                    {
+                        $res = self::deal_scraps("LuckyGunner_Category",$categoryUrl);
+                        if($res['type'] == "listing")
+                        {
+                            $urls[] = $categoryUrl;       
+                        }                            
+                    }
+                }                
+            }      
+
+            foreach($urls as $url)
+            {
+               self::processLuckyGunnerLinks($url,$params);
+            }                                                                      
+        }          
+    }
+
+    public static function processLuckyGunnerLinks($pageURL,$params)
+    {
+        
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $id = $params['id'];
+        $flag = true;
+        $i = 0;
+        $url = $pageURL;
+
+        $startTag = "?";
+
+        if(strpos($pageURL, '?') !== false)
+            $startTag = "&";
+
+
+        while($flag)
+        {
+            if($i > 0)
+            {
+                $url = $pageURL.$startTag."p=".($i+1);
+            }
+            else
+            {
+                $url = $pageURL;
+            }
+
+            echo "\n List Page: ".$url;
+
+
+            $res = self::deal_scraps("LuckyGunner_Listing",$url);
+
+            $rows = $res['rows'];
+            $nextLink = $res['nextlink'];
+
+            if(count($rows) > 0)
+            {
+
+                if(empty($nextLink))
+                {
+                    $flag = false;
+
+                    if($i > 0)
+                        continue;
+                }                                
+
+                foreach($rows as $link)
+                {
+                    echo "\n Detail Page: ".$link;
+                    $res = self::deal_scraps("LuckyGunner_detail",$link);
+
+                    if(count(array_keys($res)) > 0)
+                    {
+                        $linkMD5 = md5($link);                                
+                        $res['link'] = $link;
+                        $res['linkMD5'] = $linkMD5;                
+                        $res['category_id'] = $category_id;
+                        $res['source_id'] = $source_id;
+                        $res['from_url'] = $scrap_url;
+                        $res['url_id'] = $id;
+                        if($source_type == 1)
+                        {
+                            $res['title'] = $res['name'];
+                            $res['attr'] = $res['specification'];
+                            \App\Migration::createProduct($res);
+                        }                        
+                        else
+                        {
+                            \App\Migration::createDeal($res);
+                        }                                                
+                    }
+
+                    $total_count = session("total_count");
+                    $total_count++;
+                    session(["total_count" => $total_count]);                 
+                }
+
+            }
+            else
+            {
+                $flag = false;                
+            }
+
+            $i++;
+        }
+
+    }
+
     public static function scrapRightToBearLinks($pageURL,$params)
     {
         $scrap_url = $params['scrap_url'];
@@ -169,6 +393,79 @@ class Scrapping {
             {
                 $flag = false;                
             }
+        }
+
+    }
+
+    public static function scrapBrownellsLinks($pageURL,$params)
+    {
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $id = $params['id'];
+        $flag = true;
+        $i = 0;
+        $url = $pageURL;
+        $offset = 1;
+
+        $startTag = "?";
+
+        if(strpos($pageURL, '?') !== false)
+            $startTag = "&";
+
+        while($flag)
+        {
+            if($i > 0)
+            {
+                $offset = $offset + 96;
+                $url = $pageURL.$startTag."psize=96&f_a=".$offset;
+            }
+            else
+            {
+                $url = $pageURL.$startTag."psize=96";
+            }
+            
+            $rows = \App\Scrapping::deal_scraps("brownells",$url);            
+            if(count($rows) > 0)
+            {
+                foreach($rows as $link)
+                {
+                     echo "\n Detail Page: ".$link;
+                     $res = Scrapping::deal_scraps("brownells_detail",$link);
+
+                    if(count(array_keys($res)) > 0)
+                    {
+                        $linkMD5 = md5($link);                                
+                        $res['link'] = $link;
+                        $res['linkMD5'] = $linkMD5;                
+                        $res['category_id'] = $category_id;
+                        $res['source_id'] = $source_id;
+                        $res['from_url'] = $scrap_url;
+                        $res['url_id'] = $id;
+                        if($source_type == 1)
+                        {
+                            $res['title'] = $res['name'];
+                            $res['attr'] = $res['specification'];
+                            \App\Migration::createProduct($res);
+                        }                        
+                        else
+                        {
+                            \App\Migration::createDeal($res);
+                        }                                                
+                    }
+
+                    $total_count = session("total_count");
+                    $total_count++;
+                    session(["total_count" => $total_count]);                 
+                }
+            }
+            else
+            {
+                $flag = false;                
+            }
+
+            $i++;
         }
 
     }
@@ -1932,6 +2229,238 @@ class Scrapping {
 
             return ["rows" => $rows,'nextlink' => $nextLink];
         }
+        else if($type == "LuckyGunner_Listing")
+        {
+            $rows = [];
+            $nextLink = "";
+
+            if($crawler->filter("ol.products-list li.item")->count() >0 )
+            {
+                $crawler->filter("ol.products-list li.item")->each(function($tr){                    
+                    if($tr->filter("a")->count() > 0)
+                    {
+                        $rows = session("rows");
+                        $link = $tr->filter("a")->first()->attr("href");
+                        if(!empty($link))
+                        {
+                            $rows[] = $link;
+                            session(["rows" => $rows]);
+                        }                            
+                    }
+                });
+            }
+
+            if($crawler->filter(".pages li.current")->count() >0 )
+            {
+                $nextLink = "1";
+            }            
+
+            return ["rows" => session("rows"),'nextlink' => $nextLink];
+        }
+        else if($type == "LuckyGunner_detail")
+        {
+            if($crawler->filter("h1.product-name")->count() > 0)
+            {
+                $base_image = "";
+                $name = "";
+                $description = "";
+                $reviewCount = 0;
+                $stars = 0;
+                $old_price = 0;
+                $special_price = 0;
+                $ext_date = null;
+                $qty = 0;
+
+                $name = trim($crawler->filter("h1.product-name")->text());
+
+                if($crawler->filter(".product-section-details .std")->count() > 0)
+                {
+                    $description = trim($crawler->filter(".product-section-details .std")->first()->html());   
+                }
+
+                if($crawler->filter(".availability-in-stock span.stock-qty")->count() > 0)
+                {
+                    $qty = trim($crawler->filter("span.stock-qty")->first()->text());
+                }
+
+                if($crawler->filter(".old-price .price")->count() > 0 && $crawler->filter(".special-price .price")->count() > 0)
+                {
+                    $old_price = trim($crawler->filter(".old-price .price")->first()->text());
+                    $old_price = filterPrice($old_price);
+
+                    $special_price = trim($crawler->filter(".special-price .price")->first()->text());
+                    $special_price = filterPrice($special_price);
+                }    
+                else if($crawler->filter(".product-shop .regular-price")->count() > 0)
+                {
+                    $old_price = trim($crawler->filter(".product-shop .regular-price")->first()->text());   
+                    $old_price = filterPrice($old_price);
+                }
+
+                
+                
+                session(["tmp_options" => []]);
+                session(["qty" => 0]);
+
+                if($crawler->filter("#product-attribute-specs-table tr")->count() > 0)
+                {
+                    $crawler->filter("#product-attribute-specs-table tr")->each(function($row){
+
+                        if($row->filter(".label")->count() > 0 && $row->filter(".data")->count() > 0)
+                        {
+                            $optionText = trim($row->filter(".label")->text());
+                            $optionValue = trim($row->filter(".data")->text());                        
+                            $optionText = rtrim($optionText,":");
+                            $optionValue = ltrim($optionValue,":");
+
+                            if(!empty($optionText) && !empty($optionValue))
+                            {
+                                $tmp_options = session("tmp_options");
+
+                                if($optionText == "Manufacturer SKU")
+                                {
+                                    $optionText = "mpn";
+                                }                                
+                                else if($optionText == "UPC Barcode" || $optionText == "upc")
+                                {
+                                    $optionText = "upc";
+                                }
+                                else if($optionText == "Quantity")
+                                {
+                                    session(["qty" => $optionValue]);
+                                }
+
+                                $tmp_options[] = ["key" => $optionText,"value" => $optionValue];
+                                session(["tmp_options" => $tmp_options]);
+                            }                        
+                        }    
+                    });
+                }       
+                
+                session(["tmp_images" => []]);
+
+                if($crawler->filter("#imageGallery li")->count() > 0)
+                {
+                    $crawler->filter("#imageGallery li")->each(function($li){                        
+                        $image = trim($li->attr("data-src"));                        
+                        if(!empty($image))
+                        {
+                            $tmp_options = session("tmp_images");
+                            $tmp_options[] = ['image' => $image];
+                            session(["tmp_images" => $tmp_options]);
+                        }
+                    });
+                }             
+
+
+                session(["tmp_categories" => []]);
+                if($crawler->filter(".breadcrumbs ul li")->count() > 0)
+                {
+                   $crawler->filter(".breadcrumbs ul li")->each(function($li){
+                       if(trim(strtolower($li->text())) != "home" && trim(strtolower($li->text())) != strtolower("HOT Deals") && $li->filter("a")->count() > 0)
+                       {
+                           $categories = session("tmp_categories");
+                           $categories[] = trim($li->filter("a")->text());
+                           session(["tmp_categories" => $categories]);
+                       }
+                   }); 
+                }
+
+
+                $out_of_stock = 1;
+
+                if($crawler->filter(".availability-in-stock")->count() > 0)
+                {
+                    $out_of_stock = 0;
+                }
+             
+                $rows = session("rows");            
+                $rows['out_of_stock'] = $out_of_stock;
+                $rows['image'] = "";
+                $rows['name'] = $name;
+                $rows['description'] = $description;
+                $rows['special_price'] = $special_price;
+                $rows['old_price'] = $old_price;
+                $rows['ext_date'] = $ext_date;
+
+                if($old_price >0 && $special_price > 0)
+                {
+                    $rows['saving_price'] = $old_price - $special_price;
+                }
+                else
+                {
+                    $rows['saving_price'] = 0;
+                }
+                
+                $rows['images'] = session("tmp_images");
+                $rows['qty'] = $qty;
+                $rows['specification'] = session("tmp_options");
+                $rows['qty_options'] = session("tmp_qty_options");            
+                $rows['categories'] = session("tmp_categories");
+
+                session(["rows" => $rows]);
+
+            }
+        }
+        else if($type == "LuckyGunner_Category")
+        {
+            $rows = [];
+            $type = "";
+
+            if($crawler->filter("ol.products-list li.item")->count() >0 )
+            {
+                $type = "listing";
+            }
+            else if($crawler->filter("table.subcategories-with-filters tr")->count() >0 )
+            {
+                $type = "sub_category";
+                if($crawler->filter("table.subcategories-with-filters tr")->count() >0 )
+                {
+                    $crawler->filter("table.subcategories-with-filters tr")->each(function($tr){                    
+                        if($tr->filter("td")->count() > 0)
+                        {
+                            $tr->filter("td")->each(function($td){
+                                if($td->filter("a")->count() > 0)
+                                {
+                                    $rows = session("rows");
+                                    $link = $td->filter("a")->first()->attr("href");
+                                    if(!empty($link))
+                                    {
+                                        $rows[] = $link;
+                                        session(["rows" => $rows]);
+                                    }                            
+                                }
+                            });
+                        }
+                    });
+                }                                
+            }
+            else if($crawler->filter(".main-category-cols .col li")->count() >0 )
+            {
+                $type = "category";
+                if($crawler->filter(".main-category-cols .col li")->count() >0 )
+                {
+                    $crawler->filter(".main-category-cols .col li")->each(function($tr){                    
+                        if($tr->filter("a")->count() > 0)
+                        {
+                            $rows = session("rows");
+                            $link = $tr->filter("a")->first()->attr("href");
+                            if(!empty($link))
+                            {
+                                $rows[] = $link;
+                                session(["rows" => $rows]);
+                            }                            
+                        }
+                    });
+                }                
+            }
+            else
+            {
+                $type = "listing";
+            }
+
+            return ["rows" => session("rows"),'type' => $type];
+        }
         else if($type == "primaryarms_detail_api")
         {
             $rows = [];
@@ -2227,10 +2756,17 @@ class Scrapping {
 
             session(["tmp_options" => []]);
 
+            $mpn = "";
+
 
             if($crawler->filter("h1.mbm")->count() > 0)
             {
                 $name = trim($crawler->filter("h1.mbm")->text());
+            }
+
+            if($crawler->filter('span[itemprop="mpn"]')->count() > 0)
+            {
+                $mpn = trim($crawler->filter('span[itemprop="mpn"]')->text());
             }
 
             if($crawler->filter("#producttabDescription")->count() > 0)
@@ -2258,6 +2794,43 @@ class Scrapping {
             }
 
             session(["tmp_options" => []]);
+
+            if(!empty($mpn))
+            {
+                $tmp_options[] = ["key" => "mpn",'value' => $mpn];
+                session(["tmp_options" => $tmp_options]);
+            }
+
+            if($crawler->filter("#colorRow .media.group3 .bd p")->count() > 0)
+            {                
+                $crawler->filter("#colorRow .media.group3 .bd p")->each(function ($row){                    
+
+                    if($row->filter("strong")->count() > 0)
+                    {
+                        $label = trim($row->filter("strong")->text());
+                        $label = rtrim($label,":");
+                        $value = trim($row->html());   
+                        $value = explode("</strong>", $value);
+                        if(isset($value[1]))
+                        {
+                            $value = trim($value[1]);
+                        }
+                        else
+                        {
+                            $value = "";
+                        }
+
+                        if(!empty($label) && !empty($label))
+                        {
+                            $tmp_options = session("tmp_options");
+                            $tmp_options[] = ["key" => $label, "value" => $value];
+                            session(["tmp_options" => $tmp_options]);
+                        }
+                    }
+                });
+            }
+
+
             if($crawler->filter("#rawData")->count() > 0)
             {
                 $jsonData = trim($crawler->filter("#rawData")->html());
@@ -2427,11 +3000,54 @@ class Scrapping {
             return 0;
             
         }        
+        else if($type == "sgammo_categories")
+        {
+            if($crawler->filter("table.category tr")->count() >0 )
+            {
+                $crawler->filter("table.category tr")->each(function($tr){                    
+                        if($tr->filter("td")->count() > 0)
+                        {
+                            $tr->filter("td")->each(function($td){
+                                if($td->filter("a")->count() > 0)
+                                {
+                                    $rows = session("rows");
+                                    $link = "https://www.sgammo.com".$td->filter("a")->first()->attr("href");
+                                    if(!empty($link))
+                                    {
+                                        $rows[] = $link;    
+                                        session(["rows" => $rows]);
+                                    }                            
+                                }
+                            });
+                        }
+                });
+            }            
+        }        
         else if($type == "sgammo")
         {
             if($crawler->filter(".views-view-grid tr")->count() >0 )
             {
                 $crawler->filter(".views-view-grid tr")->each(function($tr){                    
+                        if($tr->filter("td")->count() > 0)
+                        {
+                            $tr->filter("td")->each(function($td){
+                                if($td->filter("a")->count() > 0)
+                                {
+                                    $rows = session("rows");
+                                    $link = "https://www.sgammo.com".$td->filter("a")->first()->attr("href");
+                                    if(!empty($link))
+                                    {
+                                        $rows[] = $link;    
+                                        session(["rows" => $rows]);
+                                    }                            
+                                }
+                            });
+                        }
+                });
+            }            
+            else if($crawler->filter("table.category-products tr")->count() >0 )
+            {
+                $crawler->filter("table.category-products tr")->each(function($tr){                    
                         if($tr->filter("td")->count() > 0)
                         {
                             $tr->filter("td")->each(function($td){
@@ -2460,6 +3076,7 @@ class Scrapping {
             $old_price = 0;
             $special_price = 0;
             $ext_date = null;
+            $qty = null;
             
             if($crawler->filter("h1.title")->count() > 0)
             {
@@ -2469,6 +3086,11 @@ class Scrapping {
             if($crawler->filter("#content-body .product-body")->count() > 0)
             {
                 $description = trim($crawler->filter("#content-body .product-body")->html());
+            }
+
+            if($crawler->filter(".stock-level .quantity")->count() > 0)
+            {
+                $qty = trim($crawler->filter(".stock-level .quantity")->text());
             }
             
             if($crawler->filter("#product-details .uc-price-product")->count() > 0)
@@ -2566,6 +3188,7 @@ class Scrapping {
             $rows['special_price'] = $special_price;
             $rows['old_price'] = $old_price;
             $rows['ext_date'] = $ext_date;
+            $rows['qty'] = $qty;
 
             if($old_price >0 && $special_price > 0)
             {

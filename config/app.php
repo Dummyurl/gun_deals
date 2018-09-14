@@ -18,6 +18,9 @@ return [
         9 => "SCRAP_PREP_GUN_SHOP",
         6 => "SCRAP_RIGHTOTBEAR",
         1 => "SCRAP_PALMETTOSTATE",
+        5 => "SCRAP_SGAMMO",
+        4 => "SCRAP_BROWNELLS",
+        12 => "SCRAP_LUCKYGUNNER",
     ],
 
     /*

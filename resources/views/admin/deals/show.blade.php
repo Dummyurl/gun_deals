@@ -38,6 +38,8 @@
                                     </td>
                                 </tr>
 
+
+
                                 <tr>
                                     <td width="30%"><b>GR ID: </b></td>
                                     <td width="70%">
@@ -90,7 +92,7 @@
  -->                                
                                 @if(!empty($deal->breadcrumbs))
                                 <tr>
-                                    <td width="30%">Breadcrumbs</td>
+                                    <td width="30%"><b>Breadcrumbs:</b></td>
                                     <td width="70%">
                                         <?php 
                                             $breadcrumbs = json_decode($deal->breadcrumbs,1);
@@ -191,10 +193,10 @@
                                 $displayKeys = ["sku","mpn","manufacturer","manufacturer part number","model"];
                             ?>
 
-                            <h4><b>Deal Specifications:</b></h4>
+                            <h4><b>Product Specifications:</b></h4>
                             <table class="table table-bordered">
                                 @foreach($deal->dealSpecifications as $row)
-                                    @if($deal->source_id == 11 || $deal->source_id == 3 && $row->key != 'Manufacturer.')                        
+                                    @if($deal->source_id == 11 || $deal->source_id == 3 || $deal->source_id == 4 || $deal->source_id == 12)                        
                                     <tr>
                                         <td width="30%"><b>{{ $row->key }}: </b></td>
                                         <td width="70%">{{ $row->value }}</td>
