@@ -41,7 +41,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td width="30%"><b>Scrap Source: </b></td>
+                                    <td width="30%"><b>Scrape Source: </b></td>
                                     <td width="70%">
                                             {{ $dealerProduct->source_title }}
                                     </td>

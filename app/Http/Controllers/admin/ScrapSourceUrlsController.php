@@ -22,7 +22,7 @@ class ScrapSourceUrlsController extends Controller {
         $this->moduleViewName = "admin.scrap-source-urls";
         $this->list_url = route($this->moduleRouteText . ".index");
 
-        $module = "Scrap Url";
+        $module = "Scrape Url";
         $this->module = $module;
 
         $this->adminAction = new AdminAction;
@@ -52,7 +52,7 @@ class ScrapSourceUrlsController extends Controller {
         }
 
         $data = array();
-        $data['page_title'] = "Manage Scrap Urls";
+        $data['page_title'] = "Manage Scrape Urls";
 
         $data['add_url'] = route($this->moduleRouteText . '.create');
         $data['sources'] = ScrapSource::pluck("title","id")->toArray();        
@@ -362,6 +362,27 @@ class ScrapSourceUrlsController extends Controller {
                             else
                                 return '-';    
                         })                        
+                        ->editColumn('last_scan_date', function($row){
+                            $html = '';
+                            if(!empty($row->last_scan_date))                    
+                                $html = "#".date("j M, Y",strtotime($row->last_scan_date))."<br />";
+                            else
+                                $html = '# -<br />';    
+
+                            if($row->source_type == 1)
+                            {
+                                $productsCount = \DB::table("dealer_products")->where("source_url_id",$row->id)->count();
+                                $html .= "#Products: ".$productsCount;
+                            }
+                            else
+                            {
+                                $dealsCount = \DB::table("deals")->where("source_url_id",$row->id)->count();                            
+                                $html .= "#Deals: ".$dealsCount."<br />";
+                            }
+
+
+                            return $html;
+                        })                        
                         ->editColumn('scrap_url', function($row){
 
                             $labelText = $row->scrap_url;
@@ -375,11 +396,11 @@ class ScrapSourceUrlsController extends Controller {
                         })                        
                         ->editColumn('status', function($row){
                             if ($row->status == 1)
-                                return '<span class="label label-success">Active</span>';
+                                return '<span class="label label-success label-xs">Active</span>';
                             else
-                                return '<span class="label label-danger">Inactive</span>';                            
+                                return '<span class="label label-danger label-xs">Inactive</span>';                            
                         })                        
-                        ->rawColumns(['action','status','scrap_url'])
+                        ->rawColumns(['action','status','scrap_url','last_scan_date'])
                         ->filter(function ($query) {     
                             $category = request()->get("search_category");
                             if(!empty($category)) 

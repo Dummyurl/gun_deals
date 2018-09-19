@@ -196,7 +196,7 @@
                             <h4><b>Product Specifications:</b></h4>
                             <table class="table table-bordered">
                                 @foreach($deal->dealSpecifications as $row)
-                                    @if($deal->source_id == 11 || $deal->source_id == 3 || $deal->source_id == 4 || $deal->source_id == 12)                        
+                                    @if($deal->source_id == 11 || $deal->source_id == 3 || $deal->source_id == 4 || $deal->source_id == 12 || $deal->source_id == 13)                        
                                     <tr>
                                         <td width="30%"><b>{{ $row->key }}: </b></td>
                                         <td width="70%">{{ $row->value }}</td>

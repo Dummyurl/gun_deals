@@ -189,10 +189,60 @@ class Scrapping {
         }
     }
 
+    public static function scrapBudsGunShopLinks($pageURL,$params)
+    {
+        $url = $pageURL;
+        $res = self::deal_scraps("BudsGunShop_Category",$url);
+
+        $urls = [];
+
+        if($res['type'] == "listing")
+        {
+            self::processBudsGunShopLinks($url,$params);
+        }    
+        else if($res['type'] == "category")
+        {
+            $urls = $res['rows'];
+            foreach($urls as $url)
+            {
+                $res = self::deal_scraps("BudsGunShop_Category",$url);
+                if($res['type'] == "listing")
+                {
+                    self::processBudsGunShopLinks($url,$params);
+                }
+                else if($res['type'] == "category")
+                {
+                    $urls2 = $res['rows'];
+                    foreach($urls2 as $url)
+                    {
+                        $res = self::deal_scraps("BudsGunShop_Category",$url);
+                        if($res['type'] == "listing")
+                        {
+                            self::processBudsGunShopLinks($url,$params);
+                        }
+                        else if($res['type'] == "category")
+                        {
+                            $urls3 = $res['rows'];
+                            foreach($urls3 as $url)
+                            {
+                                $res = self::deal_scraps("BudsGunShop_Category",$url);
+                                if($res['type'] == "listing")
+                                {
+                                    self::processBudsGunShopLinks($url,$params);
+                                }
+                            }
+                        }
+                    }
+                }
+            }                                            
+        }    
+    }
+
     public static function scrapLuckyGunnerLinks($pageURL,$params)
     {
         // $pageURL = "https://www.luckygunner.com/accessories";
         $url = $pageURL;
+
         $res = self::deal_scraps("LuckyGunner_Category",$url);
         $urls = [];
         if($res['type'] == "listing")
@@ -318,6 +368,88 @@ class Scrapping {
                     session(["total_count" => $total_count]);                 
                 }
 
+            }
+            else
+            {
+                $flag = false;                
+            }
+
+            $i++;
+        }
+
+    }
+
+    public static function processBudsGunShopLinks($pageURL,$params)
+    {
+        
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $id = $params['id'];
+        $flag = true;
+        $i = 0;
+        $url = $pageURL;
+
+        $startTag = "?";
+
+        if(strpos($pageURL, '?') !== false)
+            $startTag = "&";
+
+
+        while($flag)
+        {
+            echo "\n List Page: ".$url;
+
+
+            $res = self::deal_scraps("BudsGunShop_Listing",$url);
+
+            $rows = $res['rows'];
+            $nextLink = $res['nextlink'];
+
+            if(count($rows) > 0)
+            {
+
+                foreach($rows as $link)
+                {
+                    echo "\n Detail Page: ".$link;
+                    $res = self::deal_scraps("BudsGunShop_detail",$link);
+
+                    if(count(array_keys($res)) > 0)
+                    {
+                        $linkMD5 = md5($link);                                
+                        $res['link'] = $link;
+                        $res['linkMD5'] = $linkMD5;                
+                        $res['category_id'] = $category_id;
+                        $res['source_id'] = $source_id;
+                        $res['from_url'] = $scrap_url;
+                        $res['url_id'] = $id;
+                        if($source_type == 1)
+                        {
+                            $res['title'] = $res['name'];
+                            $res['attr'] = $res['specification'];
+
+                            \App\Migration::createProduct($res);
+                        }                        
+                        else
+                        {
+                            \App\Migration::createDeal($res);
+                        }                                                
+                    }
+
+                    $total_count = session("total_count");
+                    $total_count++;
+                    session(["total_count" => $total_count]);
+                }
+
+                if(!empty($nextLink))
+                {
+                    $url = $nextLink;                    
+                }                                
+                else
+                {
+                    $flag = false;
+                }                
             }
             else
             {
@@ -469,6 +601,74 @@ class Scrapping {
         }
 
     }
+
+    public static function scrapEarmsLinks($pageURL,$params)
+    {
+        $scrap_url = $params['scrap_url'];
+        $source_type = $params['source_type'];
+        $category_id = $params['category_id'];
+        $source_id = $params['source_id'];
+        $id = $params['id'];
+
+        $flag = true;
+        $i = 1;
+        $url = $pageURL;
+        $offset = 1;
+
+        $startTag = "?";
+
+        if(strpos($pageURL, '?') !== false)
+            $startTag = "&";
+
+        while($flag)
+        {
+            $url = $pageURL.$startTag."page=$i";
+            echo "\nPage: ".$url;
+            $rows = \App\Scrapping::deal_scraps("e-arms",$url);            
+            if(count($rows) > 0)
+            {
+                foreach($rows as $link)
+                {
+                    echo "\n Detail Page: ".$link;
+                    $res = Scrapping::deal_scraps("earms_detail",$link);
+                    // print_r($res);
+                    // exit;
+                    if(count(array_keys($res)) > 0)
+                    {
+                        $linkMD5 = md5($link);                                
+                        $res['link'] = $link;
+                        $res['linkMD5'] = $linkMD5;                
+                        $res['category_id'] = $category_id;
+                        $res['source_id'] = $source_id;
+                        $res['from_url'] = $scrap_url;
+                        $res['url_id'] = $id;
+                        if($source_type == 1)
+                        {
+                            $res['title'] = $res['name'];
+                            $res['attr'] = $res['specification'];
+                            \App\Migration::createProduct($res);
+                        }                        
+                        else
+                        {
+                            \App\Migration::createDeal($res);
+                        }                                                
+                    }
+
+                    $total_count = session("total_count");
+                    $total_count++;
+                    session(["total_count" => $total_count]);                 
+                }
+            }
+            else
+            {
+                $flag = false;                
+            }
+
+            $i++;
+        }
+
+    }
+
 
     public static function scrapMidwayUsaLinks($pageURL,$params)
     {
@@ -2257,6 +2457,38 @@ class Scrapping {
 
             return ["rows" => session("rows"),'nextlink' => $nextLink];
         }
+        else if($type == "BudsGunShop_Listing")
+        {
+            $rows = [];
+            $nextLink = "";
+
+            if($crawler->filter(".productListing-data table tr")->count() >0 )
+            {
+                $crawler->filter(".productListing-data table tr")->each(function($tr){                    
+                    if($tr->filter("a")->count() > 0)
+                    {
+                        $rows = session("rows");
+                        $link = $tr->filter("a")->first()->attr("href");
+                        if(!empty($link))
+                        {
+                            $rows[] = $link;
+                            session(["rows" => $rows]);
+                        }                            
+                    }
+                });
+            }
+
+            if($crawler->filter("a.pageResults[title='Next Page']")->count() >0 )
+            {
+                $nextLink = trim($crawler->filter("a.pageResults[title='Next Page']")->first()->attr("href"));
+            }            
+            else if($crawler->filter("a.pageResults[title=' Next Page ']")->count() >0 )
+            {
+                $nextLink = trim($crawler->filter("a.pageResults[title=' Next Page ']")->first()->attr("href"));
+            }            
+
+            return ["rows" => session("rows"),'nextlink' => $nextLink];
+        }
         else if($type == "LuckyGunner_detail")
         {
             if($crawler->filter("h1.product-name")->count() > 0)
@@ -2402,6 +2634,242 @@ class Scrapping {
 
             }
         }
+        else if($type == "BudsGunShop_detail")
+        {
+            if($crawler->filter("h1.item_header")->count() > 0)
+            {
+                $base_image = "";
+                $name = "";
+                $description = "";
+                $reviewCount = 0;
+                $stars = 0;
+                $old_price = 0;
+                $special_price = 0;
+                $ext_date = null;
+                $qty = 0;
+
+                $name = trim($crawler->filter("h1.item_header")->text());
+
+                if($crawler->filter('#product_content div[itemprop="description"]')->count() > 0)
+                {
+                    $description = trim($crawler->filter('#product_content div[itemprop="description"]')->first()->html());   
+                }
+
+                if($crawler->filter('.price_button_outside.pull-right strong')->count() > 0)
+                {
+                    $old_price = trim($crawler->filter('.price_button_outside.pull-right strong')->first()->text());
+                    $old_price = filterPrice($old_price);
+                }    
+                
+                if($crawler->filter('span[itemprop="price"]')->count() > 0)
+                {
+                    $special_price = trim($crawler->filter('span[itemprop="price"]')->first()->text());
+                    $special_price = filterPrice($special_price);                                    
+                }
+
+                
+                
+                session(["tmp_options" => []]);
+                session(["qty" => 0]);
+                session(['full_html' => $crawler->html()]);
+
+                if($crawler->filter('span[itemprop="model"]')->count() > 0)
+                {
+                    $optionValue = trim($crawler->filter('span[itemprop="model"]')->text());
+                    if(!empty($optionValue))
+                    {
+                        $tmp_options = session("tmp_options");
+                        $tmp_options[] = ["key" => "mpn","value" => $optionValue];
+                        session(["tmp_options" => $tmp_options]);
+                    }
+                }
+
+                if($crawler->filter('span[itemprop="gtin12"]')->count() > 0)
+                {
+                    $optionValue = trim($crawler->filter('span[itemprop="gtin12"]')->text());
+                    if(!empty($optionValue))
+                    {
+                        $tmp_options = session("tmp_options");
+                        $tmp_options[] = ["key" => "upc","value" => $optionValue];
+                        session(["tmp_options" => $tmp_options]);
+                    }
+                }
+
+                if($crawler->filter('span[itemprop="sku"]')->count() > 0)
+                {
+                    $optionValue = trim($crawler->filter('span[itemprop="sku"]')->text());
+                    if(!empty($optionValue))
+                    {
+                        $tmp_options = session("tmp_options");
+                        $tmp_options[] = ["key" => "sku","value" => $optionValue];
+                        session(["tmp_options" => $tmp_options]);
+                    }
+                }
+
+                if($crawler->filter('span[itemprop="brand"]')->count() > 0)
+                {
+                    $optionValue = trim($crawler->filter('span[itemprop="brand"]')->text());
+                    if(!empty($optionValue))
+                    {
+                        $tmp_options = session("tmp_options");
+                        $tmp_options[] = ["key" => "brand","value" => $optionValue];
+                        session(["tmp_options" => $tmp_options]);
+                    }
+                }
+
+
+
+                if($crawler->filter("#item_specs td.main table")->count() > 0)
+                {
+                    $crawler->filter("#item_specs td.main table")->each(function($table){
+
+                        $id = $table->attr("id");
+                        $counter = substr_count(session('full_html'),$id);
+                        echo "$id => $counter";
+                        if($counter == 1)
+                        {
+                            $table->filter("tr")->each(function($row){
+                                if($row->filter("td")->count() == 2)
+                                {
+                                    $optionText  = trim($row->filter("td")->first()->text());
+                                    $optionValue = trim($row->filter("td")->last()->text());
+
+                                    if(!empty($optionText) && !empty($optionValue))
+                                    {
+                                        $tmp_options = session("tmp_options");
+
+                                        if($optionText == "Manufacturer SKU")
+                                        {
+                                            $optionText = "mpn";
+                                        }                                
+                                        else if($optionText == "UPC Barcode" || $optionText == "upc")
+                                        {
+                                            $optionText = "upc";
+                                        }
+                                        else if($optionText == "Quantity")
+                                        {
+                                            session(["qty" => $optionValue]);
+                                        }
+
+                                        $tmp_options[] = ["key" => $optionText,"value" => $optionValue];
+                                        session(["tmp_options" => $tmp_options]);
+                                    }                        
+                                }    
+                            });
+                        }
+                    }); 
+                }       
+                
+                session(["tmp_images" => []]);
+
+                if($crawler->filter("img.mainloadimage")->count() > 0)
+                {
+                    $image = trim($crawler->filter("img.mainloadimage")->first()->attr("src"));
+                    if(!empty($image))
+                    {
+                        $tmp_options = session("tmp_images");
+                        $tmp_options[] = ['image' => "https://www.budsgunshop.com/catalog/".$image];
+                        session(["tmp_images" => $tmp_options]);
+                    }                    
+                }             
+
+
+                session(["tmp_categories" => []]);
+                if($crawler->filter(".breadcrumb_sep_link")->count() > 0)
+                {
+                   $crawler->filter(".breadcrumb_sep_link")->each(function($li){
+                       $label = $li->text(); 
+                       if(trim(strtolower($label)) != "home" && trim(strtolower($label)) != strtolower("HOT Deals"))
+                       {
+                           $categories = session("tmp_categories");
+                           $categories[] = trim($label);
+                           session(["tmp_categories" => $categories]);
+                       }
+                   }); 
+                }
+
+
+                $out_of_stock = 0;
+
+                if($crawler->filter("div.no_stock_btn")->count() > 0)
+                {
+                    $out_of_stock = 1;
+                }
+             
+                $rows = session("rows");            
+                $rows['out_of_stock'] = $out_of_stock;
+                $rows['image'] = "";
+                $rows['name'] = $name;
+                $rows['description'] = $description;
+                $rows['special_price'] = $special_price;
+                $rows['old_price'] = $old_price;
+                $rows['ext_date'] = $ext_date;
+
+                if($old_price >0 && $special_price > 0)
+                {
+                    $rows['saving_price'] = $old_price - $special_price;
+                }
+                else
+                {
+                    $rows['saving_price'] = 0;
+                }
+                
+                $rows['images'] = session("tmp_images");
+                $rows['qty'] = $qty;
+                $rows['specification'] = session("tmp_options");
+                $rows['qty_options'] = session("tmp_qty_options");            
+                $rows['categories'] = session("tmp_categories");
+                session(["rows" => $rows]);
+            }
+        }
+        else if($type == "BudsGunShop_Category")
+        {
+            $rows = [];
+            $type = "";
+
+            if($crawler->filter(".productListing-data table tr")->count() > 0)
+            {
+                $type = "listing";
+            }
+            else if($crawler->filter("table tr .pageHeading .cat_item")->count() > 0)
+            {
+                $type = "category";
+                $crawler->filter("table tr .pageHeading .cat_item")->each(function($row){
+                        if($row->filter("a")->count() > 0)
+                        {
+                            $rows = session("rows");
+                            $link = $row->filter("a")->first()->attr("href");
+                            if(!empty($link))
+                            {
+                                $rows[] = $link;
+                                session(["rows" => $rows]);
+                            }                            
+                        }
+                });
+            }
+            else if($crawler->filter("ul.caliberList li")->count() > 0)
+            {
+                $type = "category";
+                $crawler->filter("ul.caliberList li")->each(function($row){
+                        if($row->filter("a")->count() > 0)
+                        {
+                            $rows = session("rows");
+                            $link = $row->filter("a")->first()->attr("href");
+                            if(!empty($link))
+                            {
+                                $rows[] = "https://www.budsgunshop.com".$link;
+                                session(["rows" => $rows]);
+                            }                            
+                        }
+                });
+            }
+            else
+            {
+                $type = "listing";
+            }
+
+            return ["rows" => session("rows"),'type' => $type];
+        }
         else if($type == "LuckyGunner_Category")
         {
             $rows = [];
@@ -2450,6 +2918,31 @@ class Scrapping {
                                 $rows[] = $link;
                                 session(["rows" => $rows]);
                             }                            
+                        }
+                    });
+                }                
+            }
+            else if($crawler->filter(".subcategories table tr")->count() >0 )
+            {
+                $type = "category";
+                if($crawler->filter(".subcategories table tr")->count() >0 )
+                {
+                    $crawler->filter(".subcategories table tr")->each(function($tr){                    
+                        if($tr->filter("td")->count() > 0)
+                        {
+                            $tr->filter("td")->each(function($td){
+
+                                if($td->filter("a")->count() > 0)
+                                {
+                                    $rows = session("rows");
+                                    $link = $td->filter("a")->first()->attr("href");
+                                    if(!empty($link))
+                                    {
+                                        $rows[] = $link;
+                                        session(["rows" => $rows]);
+                                    }                            
+                                }                                
+                            });
                         }
                     });
                 }                
@@ -2831,14 +3324,18 @@ class Scrapping {
             }
 
 
+
+
             if($crawler->filter("#rawData")->count() > 0)
             {
                 $jsonData = trim($crawler->filter("#rawData")->html());
                 $jsonData = json_decode($jsonData,1);
+
                 if(is_array($jsonData))
                 {
                     foreach($jsonData as $key => $val)
                     {
+                        $mainKey = $key;
                         if(isset($jsonData[$key]['LoadSKUSpecificInfo']['PriceText']) && $old_price == 0)
                         {
                             $html = $jsonData[$key]['LoadSKUSpecificInfo']['PriceText'];
@@ -2865,13 +3362,48 @@ class Scrapping {
                                     session(["tmp_options" => $tmp_options]);
                                 }                                                    
                             }
+                        }
+
+                        if(isset($jsonData[$mainKey]['LoadSKUDetail']['html']))
+                        {
+                            $html = $jsonData[$mainKey]['LoadSKUDetail']['html'];
+                            $pageURL1 = "http://localhost";        
+                            $crawler1 = $client->request('GET', $pageURL1);
+                            $crawler1->clear();
+                            $crawler1->addHtmlContent($html);
+                            if($crawler1->filter("section")->count() > 0)
+                            {
+                                if($crawler1->filter("section")->first()->filter("p")->count() > 0)
+                                {   
+                                    $crawler1->filter("section")->first()->filter("p")->each(function($row){
+
+                                            if($row->filter("strong")->count() > 0)
+                                            {
+                                                $optionText = trim($row->filter("strong")->text());
+                                                $optionText = rtrim($optionText,":");                    
+                                                $optionValue = trim($row->text());
+                                                $optionValue = str_replace($optionText, "", $optionValue);
+                                                $optionValue = trim($optionValue);
+                                                $optionValue = ltrim($optionValue,": ");
+                                                $optionValue = ltrim($optionValue,":");
+
+                                                if(!empty($optionText) && !empty($optionValue))
+                                                {
+                                                    $tmp_options = session("tmp_options");
+                                                    $tmp_options[] = ["key" => $optionText,"value" => $optionValue];
+                                                    session(["tmp_options" => $tmp_options]);
+                                                }                        
+                                            }
+                                    });
+                                }
+                            }
                         }                        
                     }
                 }
             }            
 
             $out_of_stock = 0;
-            if($crawler->filter("#rawData")->count() > 0)
+            if($crawler->filter("#generalData")->count() > 0)
             {
                 $jsonData = trim($crawler->filter("#generalData")->html());
                 $jsonData = json_decode($jsonData,1);
@@ -2978,9 +3510,31 @@ class Scrapping {
             {
                 $rows['saving_price'] = 0;
             }
+
+            $finalOptions = [];
+            $tmp = [];
+            $tmp_options = session("tmp_options");
+            foreach($tmp_options as $r)
+            {
+                $key = $r['key'];
+                $value = $r['value'];
+                if(isset($tmp[$key]))
+                {
+
+                }
+                else
+                {
+                    $tmp[$key] = $key;
+                    $finalOptions[] = 
+                    [
+                        'key' => $key,
+                        'value' => $value
+                    ];
+                }
+            }            
             
             $rows['images'] = session("tmp_images");
-            $rows['specification'] = session("tmp_options");            
+            $rows['specification'] = $finalOptions;            
             $rows['categories'] = session("tmp_categories");
             session(["rows" => $rows]);            
         }             

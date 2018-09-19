@@ -26,10 +26,10 @@
                         <thead>
                             <tr>
                                 <th width="8%">ID</th>                                   
-                                <th width="20%">Scrap Source</th>
-                                <th width="35%">Scrap Url</th>
-                                <th width="10%">Status</th>                           
-                                <th width="10%">Last Scan Date</th>
+                                <th width="20%">Scrape Source</th>
+                                <th width="35%">Scrape Url</th>
+                                <th width="08%">Status</th>                           
+                                <th width="12%">#Last Scan Date<br />#Data Counter</th>
                                 <th width="10%">Created At</th>                           
                                 <th width="7%">Action</th>
                             </tr>

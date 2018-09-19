@@ -65,6 +65,18 @@ class ScrapDeals extends Command
         Scrapping::scrapLuckyGunnerLinks($scrap_url,$params);
     }
 
+    public function scrap_budsgunshop_products($params)
+    {
+        $scrap_url = $params['scrap_url'];
+        Scrapping::scrapBudsGunShopLinks($scrap_url,$params);
+    }
+
+    public function scrap_earms_products($params)
+    {
+        $scrap_url = $params['scrap_url'];
+        Scrapping::scrapEarmsLinks($scrap_url,$params);
+    }
+
     public function startScrapping($source_id,$params)
     {
         $scrap_urls = \Config::get("app.scrap_urls");
@@ -107,6 +119,12 @@ class ScrapDeals extends Command
                       break;                      
             case 'SCRAP_LUCKYGUNNER':
                       $this->scrap_luckygunner_products($params);
+                      break;                      
+            case 'SCRAP_BUDSGUNSHOP':
+                      $this->scrap_budsgunshop_products($params);
+                      break;                      
+            case 'SCRAP_EARMS':
+                      $this->scrap_earms_products($params);
                       break;                      
             default:
                       echo "\n No source founded!";  
@@ -421,14 +439,43 @@ class ScrapDeals extends Command
     }
 
     public function handle()
-    {        
+    {   
         $type = $this->argument("type");
         $scriptStartTime = date("Y-m-d H:i:s");
+
+        echo "\nType: ".$type;
         
 
         $content = [];
 
-        if($type == "luckygunner")
+        if($type == "budsgunshop.com")
+        {
+            $cron_id = 56;      
+            session(["total_count" => 0,"new_count" => 0]);      
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+            $rows = ScrapSourceUrl::where("status",1)
+                    ->whereIn("source_id",[13])
+                    ->get();
+
+            foreach($rows as $row)
+            {                
+                $params = 
+                [
+                    "id" => $row->id,
+                    "source_id" => $row->source_id,
+                    "category_id" => $row->category_id,
+                    "scrap_url" => $row->scrap_url,
+                    "source_type" => $row->source_type,
+                ];
+
+                $this->startScrapping($row->source_id,$params);
+                $row->last_scan_date = date("Y-m-d H:i:s");
+                $row->save();
+            }            
+
+            $content = ['total' => session("total_count"),"new" => session("new_count")];
+        }
+        else if($type == "luckygunner")
         {
             $cron_id = 55;      
             session(["total_count" => 0,"new_count" => 0]);      
@@ -588,6 +635,34 @@ class ScrapDeals extends Command
                 $row->save();
             }            
         }
+        else if($type == "e-arms")
+        {
+            $cron_id = 1;            
+
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+
+            $rows = ScrapSourceUrl::where("status",1)
+                    ->whereIn("source_id",[2])
+                    ->get();
+
+            foreach($rows as $row)
+            {                
+                $params = 
+                [
+                    "id" => $row->id,
+                    "source_id" => $row->source_id,
+                    "category_id" => $row->category_id,
+                    "scrap_url" => $row->scrap_url,
+                    "source_type" => $row->source_type,
+                ];
+
+                $this->startScrapping($row->source_id,$params);
+                $row->last_scan_date = date("Y-m-d H:i:s");
+                $row->save();
+            }            
+
+            $content = ['total' => session("total_count"),"new" => session("new_count")];
+        }
         else if($type == "grabgun")
         {
             $cron_id = 9;            
@@ -611,6 +686,8 @@ class ScrapDeals extends Command
                 $row->last_scan_date = date("Y-m-d H:i:s");
                 $row->save();
             }            
+
+            $content = ['total' => session("total_count"),"new" => session("new_count")];
         }
         else if($type == "preppergunshop")
         {
