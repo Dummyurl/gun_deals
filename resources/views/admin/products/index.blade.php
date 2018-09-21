@@ -38,7 +38,7 @@
                                 <th width="8%">ID</th>                                   
                                 <th width="20%">GR ID</th>
                                 <th width="30%">Title</th>
-                                <th width="20%">Category</th>                           
+                                <th width="20%">Scrape Source</th>                           
                                 <th width="10%">Created At</th>                           
                                 <th width="12%">Action</th>
                             </tr>
@@ -91,7 +91,7 @@
                 {data: 'id', name: 'id'},
                 {data: 'product_id', name: '{{ TBL_PRODUCTS }}.product_id'},
                 {data: 'title', name: '{{ TBL_PRODUCTS }}.title'},
-                {data: 'category', name: '{{ TBL_PRODUCTS }}.category'},
+                {data: 'source_id', name: '{{ TBL_PRODUCTS }}.source_id'},
                 {data: 'created_at', name: '{{ TBL_PRODUCTS }}.created_at'},
                 {data: 'action', orderable: false, searchable: false}
             ]

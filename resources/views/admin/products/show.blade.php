@@ -51,15 +51,37 @@
                                 <tr>
                                     <td width="30%"><b>GR ID: </b></td>
                                     <td width="70%">{{ ($deal->product_id) }}</td>
-                                </tr>                                                     
+                                </tr>    
+
+                                @if(!empty($deal->breadcrumbs))
+                                <tr>
+                                    <td width="30%"><b>Breadcrumbs: </b></td>
+                                    <td width="70%">
+                                        <?php 
+                                            $breadcrumbs = json_decode($deal->breadcrumbs,1);
+                                            $breadcrumbs = implode(" >> ", $breadcrumbs);
+                                            echo $breadcrumbs;
+                                        ?>
+                                    </td>
+                                </tr>
+                                @endif
+
+
 <!--                                 <tr>
                                     <td width="30%"><b>Item #:</b></td>
                                     <td width="70%">{{ $deal->item_unique_id }}</td>
                                 </tr>
- -->                                <tr>
+ -->                                
+                                <tr>
                                     <td width="30%"><b>UPC:</b></td>
                                     <td width="70%">{{ $deal->upc_number }}</td>
                                 </tr>
+                                @if(!empty($deal->mpn))
+                                <tr>
+                                    <td width="30%"><b>MPN:</b></td>
+                                    <td width="70%">{{ $deal->mpn }}</td>
+                                </tr>
+                                @endif
                                 @if($deal->base_price > 0)
                                 <tr>
                                     <td width="30%"><b>Base Price: </b></td>
@@ -95,7 +117,7 @@
                             <h4><b>Product Attributes</b></h4>
                             <table class="table table-bordered">
                                 @foreach($attrs as $row)
-                                @if(in_array(trim(strtolower($row['keyname'])),$displayKeys))
+                                @if(in_array(trim(strtolower($row['keyname'])),$displayKeys) || true)
                                     <tr>
                                         <td width="30%"><b>{{ $row['keyname'] }}</b></td>
                                         <td width="70%">{{ $row['keyvalue'] }}</td>
@@ -105,11 +127,37 @@
                             </table>                            
                             @endif
 
+                            @php
+                                $productPrices = $deal->productPrice ? $deal->productPrice->toArray():[];
+                            @endphp         
+
+                            @if(count($productPrices))
+                            <h4><b>Product Prices</b></h4>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th width="25%">Date</th>
+                                    <th width="25%">Sale Price</th>
+                                    <th width="25%">Base Price</th>
+                                    <th width="25%">Quantity</th>
+                                </tr>
+                                @foreach($productPrices as $row)
+                                    <tr>
+                                        <td>{{ date("j M, Y",strtotime($row['date'])) }}</td>
+                                        <td>{{ $row['sale_price'] }}</td>
+                                        <td>{{ $row['base_price'] }}</td>
+                                        <td>{{ $row['qty'] }}</td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                            @endif                           
+
+
+
                             
                             <h4><b>Photo (Thumb Image, Main Image)</b></h4>
                             <table class="table table-bordered">
                                 <tr>
-                                    <td>
+                                    <td>                                        
                                         <div class="row">
                                             <div class="col-md-4" style="margin-bottom: 10px;">
                                                 <img src="{{ $deal->thumb_image }}" class="img-responsive" />

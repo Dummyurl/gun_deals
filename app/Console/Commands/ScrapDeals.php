@@ -77,6 +77,25 @@ class ScrapDeals extends Command
         Scrapping::scrapEarmsLinks($scrap_url,$params);
     }
 
+    public function scrap_classicfirearms_products($params)
+    {
+        $scrap_url = $params['scrap_url'];
+        Scrapping::scrapClassicFireArmsLinks($scrap_url,$params);
+    }
+
+    public function scrap_lipseys_products($params)
+    {
+        $scrap_url = $params['scrap_url'];
+        Scrapping::scrapLipseysLinks($scrap_url,$params);
+    }
+
+    public function scrap_GOGGUNS_products($params)
+    {
+        $scrap_url = $params['scrap_url'];
+        Scrapping::scrapGogunsLinks($scrap_url,$params);
+    }
+
+
     public function startScrapping($source_id,$params)
     {
         $scrap_urls = \Config::get("app.scrap_urls");
@@ -120,11 +139,20 @@ class ScrapDeals extends Command
             case 'SCRAP_LUCKYGUNNER':
                       $this->scrap_luckygunner_products($params);
                       break;                      
+            case 'SCRAP_CLASSICFIREARMS':
+                      $this->scrap_classicfirearms_products($params);
+                      break;                      
             case 'SCRAP_BUDSGUNSHOP':
                       $this->scrap_budsgunshop_products($params);
                       break;                      
             case 'SCRAP_EARMS':
                       $this->scrap_earms_products($params);
+                      break;                      
+            case 'SCRAP_LIPSEYS':
+                      $this->scrap_lipseys_products($params);
+                      break;                      
+            case 'SCRAP_GOGUNS':
+                      $this->scrap_GOGGUNS_products($params);
                       break;                      
             default:
                       echo "\n No source founded!";  
@@ -440,6 +468,14 @@ class ScrapDeals extends Command
 
     public function handle()
     {   
+
+        // $link = "https://www.galleryofguns.com/genie/Default.aspx?item=51280&zipcode=49464";
+        // echo "\n Detail Page: ".$link;                    
+        // $res = Scrapping::scrapGuns($link, "detail");
+        // print_r($res);
+        // exit;
+
+
         $type = $this->argument("type");
         $scriptStartTime = date("Y-m-d H:i:s");
 
@@ -455,6 +491,60 @@ class ScrapDeals extends Command
             $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
             $rows = ScrapSourceUrl::where("status",1)
                     ->whereIn("source_id",[13])
+                    ->get();
+
+            foreach($rows as $row)
+            {                
+                $params = 
+                [
+                    "id" => $row->id,
+                    "source_id" => $row->source_id,
+                    "category_id" => $row->category_id,
+                    "scrap_url" => $row->scrap_url,
+                    "source_type" => $row->source_type,
+                ];
+
+                $this->startScrapping($row->source_id,$params);
+                $row->last_scan_date = date("Y-m-d H:i:s");
+                $row->save();
+            }            
+
+            $content = ['total' => session("total_count"),"new" => session("new_count")];
+        }
+        if($type == "galleryofguns")
+        {
+            $cron_id = 58;      
+            session(["total_count" => 0,"new_count" => 0]);      
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+            $rows = ScrapSourceUrl::where("status",1)
+                    ->whereIn("source_id",[15])
+                    ->get();
+
+            foreach($rows as $row)
+            {                
+                $params = 
+                [
+                    "id" => $row->id,
+                    "source_id" => $row->source_id,
+                    "category_id" => $row->category_id,
+                    "scrap_url" => $row->scrap_url,
+                    "source_type" => $row->source_type,
+                ];
+
+                $this->startScrapping($row->source_id,$params);
+                $row->last_scan_date = date("Y-m-d H:i:s");
+                $row->save();
+            }            
+
+            $content = ['total' => session("total_count"),"new" => session("new_count")];
+        }
+        else if($type == "lipseys")
+        {
+            $cron_id = 57;      
+            session(["total_count" => 0,"new_count" => 0]);      
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+            $rows = ScrapSourceUrl::where("status",1)
+                    ->whereIn("source_id",[14])
                     ->get();
 
             foreach($rows as $row)
@@ -634,6 +724,34 @@ class ScrapDeals extends Command
                 $row->last_scan_date = date("Y-m-d H:i:s");
                 $row->save();
             }            
+        }
+        else if($type == "classicfirearms")
+        {
+            $cron_id = 8;            
+
+            $mainLogID = storeCronLogs($scriptStartTime, NULL, NULL, NULL, 'Web Server', $cron_id);
+
+            $rows = ScrapSourceUrl::where("status",1)
+                    ->whereIn("source_id",[7])
+                    ->get();
+
+            foreach($rows as $row)
+            {                
+                $params = 
+                [
+                    "id" => $row->id,
+                    "source_id" => $row->source_id,
+                    "category_id" => $row->category_id,
+                    "scrap_url" => $row->scrap_url,
+                    "source_type" => $row->source_type,
+                ];
+
+                $this->startScrapping($row->source_id,$params);
+                $row->last_scan_date = date("Y-m-d H:i:s");
+                $row->save();
+            }            
+
+            $content = ['total' => session("total_count"),"new" => session("new_count")];
         }
         else if($type == "e-arms")
         {

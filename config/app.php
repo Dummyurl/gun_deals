@@ -22,7 +22,10 @@ return [
         4 => "SCRAP_BROWNELLS",
         12 => "SCRAP_LUCKYGUNNER",
         13 => "SCRAP_BUDSGUNSHOP",
-        2 => "SCRAP_EARMS"
+        2 => "SCRAP_EARMS",
+        7 => "SCRAP_CLASSICFIREARMS",
+        14 => "SCRAP_LIPSEYS",
+        15 => "SCRAP_GOGUNS",
     ],
 
     /*

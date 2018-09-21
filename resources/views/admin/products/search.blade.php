@@ -19,8 +19,8 @@
                     <input type="text" value="{{ \Request::get("search_title") }}" class="form-control" name="search_title" />                     
                 </div>                
                 <div class="col-md-3">
-                    <label class="control-label">Category</label>
-                    {!! Form::select('search_category', [''=>'Select Category'] + $sources, null, ['class' => 'form-control']) !!}
+                    <label class="control-label">Scrape Source</label>
+                    {!! Form::select('search_category', [''=>'Search Scrape source'] + $sources, null, ['class' => 'form-control']) !!}
                 </div>
                 <div class="col-md-3">
                     <input type="hidden" name="record_per_page" id="record_per_page" />

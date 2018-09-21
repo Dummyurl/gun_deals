@@ -374,6 +374,11 @@ class ScrapSourceUrlsController extends Controller {
                                 $productsCount = \DB::table("dealer_products")->where("source_url_id",$row->id)->count();
                                 $html .= "#Products: ".$productsCount;
                             }
+                            else if($row->source_type == 3)
+                            {
+                                $productsCount = \DB::table("products")->where("source_url_id",$row->id)->count();
+                                $html .= "#Baseline: ".$productsCount;
+                            }
                             else
                             {
                                 $dealsCount = \DB::table("deals")->where("source_url_id",$row->id)->count();                            

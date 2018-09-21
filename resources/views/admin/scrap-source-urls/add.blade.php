@@ -28,11 +28,11 @@
                                     {!! Form::select('source_id', [''=>'Select Source'] + $sources, null, ['class' => 'form-control']) !!}
                                 </div>                                
                                 <div class="col-md-4">
-                                    <label class="control-label">Scrap Type</label>
-                                    {!! Form::select('source_type', [1 =>'Products',2 =>'Deals'], null, ['class' => 'form-control']) !!}
+                                    <label class="control-label">Scrape Type</label>
+                                    {!! Form::select('source_type', [1 =>'Products',2 =>'Deals',3 =>'Baseline Products'], null, ['class' => 'form-control']) !!}
                                 </div>                                
                                 <div class="col-md-4">
-                                    <label class="control-label">Scrap URL</label>
+                                    <label class="control-label">Scrape URL</label>
                                     {!! Form::text('scrap_url',null,['class' => 'form-control']) !!}
                                 </div>                                                                
                             </div>                                  

@@ -454,9 +454,9 @@ class Migration
         {
             $productId = $isExist->id;
 
-            \DB::table("dealer_product_attributes")
-            ->where("id",$productId)
-            ->delete();
+            // \DB::table("dealer_product_attributes")
+            // ->where("id",$productId)
+            // ->delete();            
 
             $dataToInsert['updated_at'] = $dataToInsert['created_at'];
             unset($dataToInsert['created_at']);
@@ -525,6 +525,210 @@ class Migration
             }                    
         }        
 
+    }
+
+    public static function createMasterProduct($res)
+    {
+        $linkMD5 = $res['linkMD5'];
+        $link_md5 = $linkMD5;
+        $link = $res['link'];        
+        $title = $res['title'];
+        $description = isset($res['description']) ? $res['description']:"";
+
+
+        $isExist = \DB::table("products")->where("link_md5",$linkMD5)->first();
+
+        $specifications = $res['attr'];
+        $qty = isset($res['qty']) ? $res['qty']:null;
+
+        $upc_number = "";
+        $MSRP = "";
+        $mpn = "";
+        $j = 0;
+        $brand = "";
+        $model = "";
+
+        if(count($specifications) > 0)
+        {
+            foreach($specifications as $row)
+            {
+                $row['key'] = rtrim($row['key'],":");
+
+                // echo "\n cate=>".trim(strtolower(html_entity_decode($row['key'])));
+
+                if(trim(strtolower($row['key'])) == "upc")
+                {
+                    $upc_number = $row['value'];
+                    if(isset($specifications[$j]))
+                    {
+                        unset($specifications[$j]);
+                    }                    
+                }
+                else if(trim(strtolower($row['key'])) == "msrp")
+                {
+                    $MSRP = $row['value'];
+                    if(isset($specifications[$j]))
+                    {
+                        unset($specifications[$j]);
+                    }                                        
+                }
+                else if(trim(strtolower($row['key'])) == "mpn")
+                {
+                    $mpn = $row['value'];
+                    if(isset($specifications[$j]))
+                    {
+                        unset($specifications[$j]);
+                    }
+                }
+                else if(trim(strtolower($row['key'])) == "brand" || $row['key'] == "brand")
+                {
+                    $brand = $row['value'];
+                    if(isset($specifications[$j]))
+                    {
+                        unset($specifications[$j]);
+                    }
+                }
+                else if(trim(strtolower($row['key'])) == "model" || trim(strtolower($row['key'])) == " model")
+                {
+                    $model = $row['value'];
+                    if(isset($specifications[$j]))
+                    {
+                        unset($specifications[$j]);                        
+                    }
+                }
+                $j++;
+            }                    
+        }               
+
+        $unique_id = null;
+
+        if(!empty($upc_number))
+        $unique_id = "GR-".$upc_number;
+
+        $image = "";
+
+        $images = $res['images'];    
+        foreach($images as $r)
+        {
+            if(empty($image))
+            $image = $r['image'];
+        }
+
+        $dataToInsert = 
+        [
+
+            "product_id" => $unique_id,
+            "item_id" => $unique_id,
+            "title" => $title,
+            "link" => $link,
+            "link_md5" => $link_md5,
+            "image" => $image,            
+            "item_unique_id" => $unique_id,
+            "brand" => $brand,
+            "model" => $model,
+            "upc_number" => $upc_number,
+            "msrp" => $res["old_price"],                        
+            "created_at" => date("Y-m-d H:i:s"),
+            "source_id" => $res['source_id'],
+            "breadcrumbs" => isset($res['categories']) ? json_encode($res['categories']):null,
+            // "sale_price" => $res["special_price"],
+            // "base_price" => $res["old_price"]
+        ];
+
+
+        if($res['category_id'] > 0)
+        $dataToInsert["product_category_id"] = $res['category_id'];
+
+        if(isset($res['url_id']))
+        {
+            $dataToInsert["source_url_id"] = $res['url_id'];
+        }
+
+        // if(isset($res['out_of_stock']))
+        // {
+        //     $dataToUpdate["out_of_stock"] = $res['out_of_stock'];
+        // }
+
+
+        if(!empty($MSRP))
+        {
+            $dataToUpdate["msrp"] = $MSRP;
+        }
+
+        if(isset($res['from_url']))
+        {
+            $dataToInsert["from_url"] = $res['from_url'];
+        }
+
+        $dataToInsert["mpn"] = $mpn;
+        $dataToInsert["last_visit_date"] = date("Y-m-d H:i:s");
+        $dataToInsert['created_at'] = date("Y-m-d H:i:s");
+
+        if($isExist)
+        {
+            $productId = $isExist->id;
+
+            $dataToInsert['updated_at'] = $dataToInsert['created_at'];
+            unset($dataToInsert['created_at']);
+
+            \DB::table("products")
+            ->where("id",$productId)
+            ->update($dataToInsert);
+
+            \DB::table("product_attributes")
+            ->where("product_id",$productId)
+            ->delete();
+        }
+        else
+        {
+            $productId = \DB::table("products")
+            ->insertGetId($dataToInsert);            
+     
+            $new_count = session("new_count");
+            $new_count++;
+            session(["new_count" => $new_count]);                 
+        }        
+
+
+        \DB::table("product_prices")
+        ->insert
+        (
+            [
+                "product_id" => $productId,
+                "sale_price" => $res["special_price"],
+                "base_price" => $res["old_price"],
+                "date" => date("Y-m-d"),
+                "qty" => $qty
+            ]
+        );
+
+
+        if(count($specifications) > 0)
+        {
+            foreach($specifications as $r)
+            {
+                \DB::table("product_attributes")
+                ->insert([
+                    "product_id" => $productId,
+                    "keyname" => $r["key"],
+                    "keyvalue" => $r["value"],
+                ]);
+            }
+        }        
+
+        // if(count($images) > 0)
+        // {
+        //     foreach($images as $row)
+        //     {
+        //         $image = $row['image'];                        
+        //         \DB::table("dealer_product_photos")
+        //         ->insert([
+        //             "product_id" => $productId,
+        //             "image_url" => $image,
+        //             "created_at" => date("Y-m-d H:i:s")
+        //         ]);                
+        //     }                    
+        // }        
     }
 
     public static function createDealFromMidUsa($res)

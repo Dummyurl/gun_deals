@@ -55,7 +55,7 @@ class ProductsController extends Controller {
         $data['page_title'] = "Manage Products";
 
         $data['add_url'] = route($this->moduleRouteText . '.create');
-        $data['sources'] = Product::groupBy("category")->pluck("category","category")->toArray();        
+        $data['sources'] = ScrapSource::pluck('title','id')->all();        
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_GALLERYGUNS);
         return view($this->moduleViewName . ".index", $data);
     }
@@ -197,7 +197,7 @@ class ProductsController extends Controller {
         $data['page_title'] = "Manage Pending Products";
 
         $data['add_url'] = route($this->moduleRouteText . '.create');
-        $data['sources'] = Product::groupBy("category")->pluck("category","category")->toArray();        
+        $data['sources'] = ScrapSource::pluck('title','id')->all();
         $data['btnAdd'] = \App\Models\Admin::isAccess(\App\Models\Admin::$ADD_GALLERYGUNS);
         return view($this->moduleViewName . ".pending", $data);
     }
@@ -404,6 +404,21 @@ class ProductsController extends Controller {
                             else
                                 return '-';    
                         })                        
+                        ->editColumn('source_id', function($row){
+                            if($row->source_id > 0)
+                            {
+                                $obj = ScrapSource::find($row->source_id);
+                                if($obj)
+                                {
+                                    return $obj->title;
+                                }
+                                return '-';
+                            }                            
+                            else
+                            {
+                                return '-';
+                            }
+                        })                        
                         ->rawColumns(['action'])
                         ->filter(function ($query) {                            
 
@@ -429,7 +444,7 @@ class ProductsController extends Controller {
 
                             if (!empty($category)) 
                             {
-                                $query = $query->where(TBL_PRODUCTS.".category", 'LIKE', $category);
+                                $query = $query->where(TBL_PRODUCTS.".source_id", '=', $category);
                             }   
 
                             if (!empty($search_gr_id)) 
