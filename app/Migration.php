@@ -548,6 +548,8 @@ class Migration
         $brand = "";
         $model = "";
 
+        print_r($specifications);
+
         if(count($specifications) > 0)
         {
             foreach($specifications as $row)
@@ -599,6 +601,11 @@ class Migration
                 $j++;
             }                    
         }               
+
+        if(empty($title) && (!empty($brand) OR (!$model)))
+        {
+            $title = $brand." ".$model;
+        }
 
         $unique_id = null;
 
@@ -663,6 +670,9 @@ class Migration
         $dataToInsert["mpn"] = $mpn;
         $dataToInsert["last_visit_date"] = date("Y-m-d H:i:s");
         $dataToInsert['created_at'] = date("Y-m-d H:i:s");
+
+        // print_r($dataToInsert);
+        // exit;
 
         if($isExist)
         {

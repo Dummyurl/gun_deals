@@ -27,9 +27,10 @@ class ProductCategory extends Model
     public static $HANDSGUN_REVOLVER_DOUBLE_ACTION_ONLY = 31;
     public static $HANDSGUN_REVOLVER_SINGLE_ACTION= 32;
 
+    public static $HANDSGUN_DOUBLE_ACTION = 33;
     public static $HANDSGUN_SPC_DERRINGER = 33;
     public static $HANDSGUN_SPC_SINGLE_SHOT = 34;
-    public static $HANDSGUN_SPC_LEVER_ACTION= 35;
+    public static $HANDSGUN_SPC_LEVER_ACTION= 35;    
 
     public static $RIFLES_SEMI_AUTO = 11;
     public static $RIFLES_BOLT_ACTION = 12;

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Validator;
 use App\Models\ProductCategory;
 use App\Models\Product;
+use App\Models\FinalProduct;
 use App\Models\Deal;
 
 class DealsController extends Controller
@@ -67,9 +68,7 @@ class DealsController extends Controller
         $ids = getChildrens($id);
         $ids[] = $id;
 
-        $data['rows'] = \App\Models\Product::join("deals","deals.product_id","=","products.id")
-                        ->select("deals.*")    
-                        ->whereIn("products.product_category_id",$ids)
+        $data['rows'] = \App\Models\FinalProduct::whereIn("product_category_id",$ids)
                         ->paginate(10);
 
         $deal = new \App\Models\Deal;

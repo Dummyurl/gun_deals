@@ -56,7 +56,7 @@ class Scrapping {
             if($page > 0)
             $url = $scrap_url."&index=$page";
 
-            $rows = Scrapping::scrapGuns($pageUrl, "master");           
+            $rows = Scrapping::scrapGuns($url, "master");           
 
 
             if(is_array($rows) && count($rows) > 0)

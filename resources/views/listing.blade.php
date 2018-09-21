@@ -130,39 +130,40 @@
 	                        			<tr>
 	                        				<td>
 	                        					@php
-	                        						$photo = \App\Models\DealPhotos::where("deal_id",$row->id)->first();
+	                        						$photo = $row->image;
+	                        						$link = "#";
+	                        						if($row->map_id > 0)
+	                        						{
+	                        							$obj = \App\Models\Product::find($row->map_id);
+	                        							if($obj)
+	                        							{
+	                        								$link = $obj->link;
+	                        						    }
+	                        						}
 	                        					@endphp
 
-	                        					@if($photo)
-		                        					<a href="{{ $row->link }}" target="_blank">
-		                        						<img src="{{ $photo->image_url }}" class="img-responsive" alt="image"/>
+	                        					@if(!empty($photo))
+		                        					<a href="{{ $link }}" target="_blank">
+		                        						<img src="{{ $photo }}" class="img-responsive" alt="image"/>
 		                        					</a>
 	                        					@endif
 	                        				</td>
 	                        				<td>
-	                        					<a href="{{ $row->link }}" target="_blank">
+	                        					<a href="{{ $link }}" target="_blank">
 	                        						{{ $row->title }}
 	                        					</a>
 	                        				</td>
-	                        				<td>
-	                        					@if($row->base_price > 0)
-	                        					<b>Base Price:</b> ${{ number_format($row->base_price,2) }}
-	                        					@endif
-
-	                        					@if($row->sale_price > 0)
-	                        					<br />
-	                        					<b>Sale Price:</b> ${{ number_format($row->sale_price,2) }}
-	                        					@endif
-
+	                        				<td>	                        					
+	                        					{{ $row->msrp }}	                        					
 	                        				</td>
 	                        				<td>
 	                        					@php
-	                        						$options = \App\Models\DealSpecification::whereIn("key",["UPC","Type","SKU","Type"])
-	                        								->where("deal_id",$row->id)
+	                        						$options = \App\Models\FinalProductAttribute::whereIn("keyname",["type","action","barrel","rate-of-twist","stock","# of mags","finish"])
+	                        								->where("product_id",$row->id)
 	                        								->get();				
 	                        					@endphp
 	                        					@foreach($options as $option)
-	                        						<b>{{ $option->key }}: </b>{{ $option->value }}<br />
+	                        						<b>{{ $option->keyname }}: </b>{{ $option->keyvalue }}<br />
 	                        					@endforeach
 	                        				</td>
 	                        			</tr>

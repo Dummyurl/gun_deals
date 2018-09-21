@@ -14,9 +14,10 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\TestData',
-        'App\Console\Commands\ScrapSale',
         'App\Console\Commands\MigrationDeals',
         'App\Console\Commands\ScrapDeals',
+        'App\Console\Commands\MigrationDeals',
+        'App\Console\Commands\MapProducts',
     ];
 
     /**
